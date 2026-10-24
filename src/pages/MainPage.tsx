@@ -1,4 +1,5 @@
 import { MicOff, Play, RotateCw } from 'lucide-react'
+import { useEffect, useState } from 'react'
 import { Gauge } from '../components/Gauge'
 import { ModeSwitch } from '../components/ModeSwitch'
 import { StatusBar } from '../components/StatusBar'
@@ -64,6 +65,18 @@ export function MainPage({
 
   const errorCopy = error ? ERROR_COPY[error.code] : null
 
+  // If the first microphone request takes a while, the OS may be showing a
+  // permission prompt outside the app – tell the user what to click.
+  const [startHint, setStartHint] = useState(false)
+  useEffect(() => {
+    if (status !== 'starting' && status !== 'suspended') {
+      setStartHint(false)
+      return
+    }
+    const timer = window.setTimeout(() => setStartHint(true), 3500)
+    return () => window.clearTimeout(timer)
+  }, [status])
+
   return (
     <div className="relative flex h-full flex-col overflow-hidden rounded-[15px] border border-black/[0.07] bg-paper">
       <TitleBar
@@ -94,6 +107,12 @@ export function MainPage({
           </div>
           <Waveform history={history} levels={levels} accent={accent} />
         </div>
+
+        {startHint && status === 'starting' ? (
+          <p className="mt-3 rounded-lg bg-[#FFFBEB] px-3 py-1.5 text-center text-[10.5px] leading-relaxed text-[#B45309]">
+            若系统弹出麦克风权限请求，请点「允许」
+          </p>
+        ) : null}
 
         {status === 'suspended' ? (
           <div className="absolute inset-0 z-20 grid place-items-center bg-paper/78 backdrop-blur-[2px]">

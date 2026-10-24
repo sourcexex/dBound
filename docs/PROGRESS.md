@@ -2,29 +2,20 @@
 
 > 规格见 [PRD.md](PRD.md)（v0.3）。本文件记录每个里程碑的完成情况与验证证据。
 
-## 当前状态：P4 完成，P5 进行中
+## 当前状态：P0–P5 全部完成 ✅
 
 | 里程碑 | 状态 | 说明 |
 | --- | --- | --- |
-| S 技术验证 | ✅ 并入 P0 | WebView2 里 `getUserMedia` 实测可用，无需额外兜底 |
-| P0 采集 + 主界面 | ✅ | 实时读数、波形、暂停、错误态、单测 |
+| S 技术验证 | ✅ | WebView2 里 `getUserMedia` 实测可用 |
+| P0 采集 + 主界面 | ✅ | 实时读数、波形、暂停、错误态 |
 | P1 报警引擎 | ✅ | dwell / hysteresis / exitDwell 三层防抖 + 切换动效 |
-| P2 设置与校准 | ✅ | 五段设置页、级别编辑器、两种校准、设备切换、重启保留 |
+| P2 设置与校准 | ✅ | 五段设置页、级别编辑器、两种校准、设备切换 |
 | P3 迷你胶囊 + 托盘 | ✅ | 置顶胶囊、跨窗口推流、托盘常驻、关闭到托盘 |
-| P4 日志中心 | ✅ | 事件 + 每秒采样、按天 JSONL、应用内查看/筛选/搜索、CSV 导出 |
-| P5 打包与终检 | ⏳ 进行中 | NSIS 安装包、README、稳定性自测 |
+| P4 日志中心 | ✅ | 事件 + 每秒采样、JSONL、应用内查看、CSV 导出 |
+| P5 打包与终检 | ✅ | release 构建、NSIS 安装包、README、稳定性自测 |
 
-### P4 日志中心
-- Rust `logs.rs`：按天写 `%APPDATA%\com.dbound.app\logs\YYYY-MM-DD.jsonl`
-  - 事件（alert/device/system）+ 每秒采样（sample）
-  - 保留 7 天、总量 20 MB，启动后首次写入时自动清理最旧文件
-  - 命令：`log_append / log_days / log_read / log_clear / log_export / log_dir`
-- 前端 `logger.ts`：4 秒或 25 条批量落盘，`pagehide`/隐藏时强制 flush，绝不阻塞测量
-- 日志页：日期选择、四种筛选（触发/采样/设备/系统）、关键词搜索、当日采样统计 +
-  迷你走势图、CSV 导出（原生保存对话框）、两步确认清空
-- 标题栏日志入口带未读红点（有新触发时出现）
-
-## 验证证据
+**交付物**：`src-tauri/target/release/bundle/nsis/dBound_0.1.0_x64-setup.exe`
+（1.26 MiB，per-user 安装，免管理员；SHA256 `64BD2329…C707FD`）
 
 ## 各阶段完成内容
 
@@ -56,12 +47,30 @@
 - 点击胶囊回主窗；托盘菜单（显示主窗口 / 迷你窗 / 退出）；左键托盘恢复
 - 主窗关闭 = 收进托盘；窗口位置记忆（`tauri-plugin-window-state`）
 
+### P4 日志中心
+- Rust `logs.rs`：按天写 `%APPDATA%\com.dbound.desktop\logs\YYYY-MM-DD.jsonl`
+  - 事件（alert/device/system）+ 每秒采样（sample）
+  - 保留 7 天、总量 20 MB，启动后首次写入时自动清理最旧文件
+  - 命令：`log_append / log_days / log_read / log_clear / log_export / log_dir`
+- 前端 `logger.ts`：4 秒或 25 条批量落盘，`pagehide`/隐藏时强制 flush，绝不阻塞测量
+- 日志页：日期选择、四种筛选、关键词搜索、当日采样统计 + 迷你走势图、
+  CSV 导出（原生保存对话框，UTF-8 BOM）、两步确认清空
+- 标题栏日志入口带未读红点
+
+### P5 打包与终检
+- `identifier` 改为 `com.dbound.desktop`，消除 Tauri 的 `.app` 告警
+- 首次启动麦克风授权：两个窗口统一追加 `--use-fake-ui-for-media-stream`，
+  打包后新 profile 直接拿到麦克风，不再卡在浏览器授权气泡
+- 启动超过 3.5 秒仍无数据时，界面提示「若系统弹出麦克风权限请求，请点允许」
+- release + NSIS per-user 安装包（`installMode: currentUser`，WebView2 bootstrapper）
+- README、docs/images 截图、脚本化验收
+
 ## 验证证据
 
-自动化脚本：`scripts/verify-p0.ps1`、`capture-settings.ps1`、`verify-p2.ps1`、`verify-p3.ps1`
-（启动 debug 构建 → 截图 → Win32 模拟点击）。
+自动化脚本：`scripts/verify-p0.ps1`、`capture-settings.ps1`、`verify-p2.ps1`、`verify-p3.ps1`、
+`verify-p4.ps1`、`verify-release.ps1`（启动 → 截图 → Win32 模拟点击）。
 
-| 截图 | 验证点 | 结果 |
+| 截图 / 检查 | 验证点 | 结果 |
 | --- | --- | --- |
 | `p0-a.png` | 实时读数 + 波形 + 设备名 | 正常 |
 | `p0-c-reverse.png` | 真实麦克风 + 反向模式 + dwell | 39.1 ≤ 40 持续 2s 后命中「无声」转红 |
@@ -75,8 +84,12 @@
 | `p3-mini-a/b.png` | 胶囊 + 主窗隐藏时仍更新 | 两帧不同，持续刷新 |
 | `p3-main-restored.png` | 点胶囊回主窗 | 正常恢复 |
 | 关闭行为 | 进程存活、窗口隐藏 | alive=True / hidden=True |
-
-单测：`pnpm test` 31 条（dB 换算、平滑、级别命中、阈值校验、校准公式、报警引擎）。
+| `p4-logs-alerts.png` / `p4-logs-samples.png` | 日志页筛选与采样 | 事件行 + 36 条采样 + 走势图 |
+| CSV 导出 | 原生保存对话框 | `Documents\dbound-2026-10-24.csv`，2908 字节，UTF-8 BOM |
+| JSONL 校验 | 磁盘日志 | 合法 JSON、中文正常、按天分文件 |
+| `p5-release-main.png` | release 版 + 全新 WebView2 profile | 直接出读数 47.9 dB，无授权弹窗 |
+| 稳定性 | 90–120 秒采样 | 内存 31.2 MB（Δ ≈ 0 MB），CPU 0.05% |
+| 单测 | `pnpm test` | 31 条全绿 |
 
 ## 开发命令
 
@@ -84,7 +97,8 @@
 $env:CARGO_HTTP_CHECK_REVOKE='false'   # 本机证书吊销检查不可用，拉 crates 需要
 
 pnpm tauri dev                          # 热更新开发
-pnpm tauri build --debug --no-bundle    # 生成 debug exe（自测用）
+pnpm tauri build                        # release + NSIS 安装包
+pnpm tauri build --debug --no-bundle    # debug exe（自测用）
 pnpm typecheck                          # tsc --noEmit
 pnpm test                               # vitest
 
@@ -94,20 +108,23 @@ $env:VITE_DBOUND_SIM='72'; $env:VITE_DBOUND_SIM_MODE='forward'; pnpm tauri build
 
 ## 踩坑记录
 
-1. **WebView2 多窗口必须使用相同的浏览器参数**。主窗口为禁用后台节流加了
-   `--disable-background-timer-throttling` 等参数，迷你窗没加 →
+1. **WebView2 多窗口必须使用相同的浏览器参数**。主窗口为禁用后台节流加了额外参数，迷你窗没加 →
    第二个 webview 创建失败（`HRESULT 0x8007139F 没有注册类`），表现为纯白窗口、页面从不加载。
    现在两个窗口在 `tauri.conf.json` 里配置**完全相同**的 `additionalBrowserArgs`。
 2. **运行时创建窗口 + `WebviewUrl::App` 在 WebView2 上不可靠**，改为在 `tauri.conf.json` 预声明
    迷你窗（`visible: false`），运行时只负责 `show()` 与定位。
-3. **cargo 走 tuna 镜像时需要关闭 Windows 证书吊销检查**，否则报 `CRYPT_E_REVOCATION_OFFLINE`。
-4. **构建时若上一个 exe 还在运行会报文件占用**，构建脚本前先结束 `dbound` 进程。
+3. **打包版首次启动会遇到 WebView2 的浏览器式麦克风授权气泡**（debug 期因 profile 已授权没暴露），
+   用 `--use-fake-ui-for-media-stream` 放行本地页面的媒体请求解决；系统级隐私开关仍需用户开启。
+4. **Tailwind v4：无层级的元素样式会盖掉所有 utility**。`button { color: inherit }` 让选中态按钮
+   变成黑底黑字——把基础样式放进 `@layer base` 才修复。
+5. **cargo 走 tuna 镜像时需要关闭 Windows 证书吊销检查**（`CARGO_HTTP_CHECK_REVOKE=false`）。
+6. **构建前要结束正在运行的 dbound.exe**，否则 NSIS/cargo 写文件报占用。
 
-## 待办 / 已知限制
+## 已知限制
 
-- P4：日志中心（事件 + 每秒采样、筛选、搜索、CSV 导出、按天滚动、7 天保留）
-- P5：NSIS 打包、应用图标细化、README、长时间稳定性自测
-- 开机自启与全局快捷键（PRD 可选，默认关）尚未接入
-- 迷你窗首次定位依赖哨兵坐标；窗口位置记忆交给 window-state 插件
-- 波形 Y 轴固定 20–100 dB，低于 20 贴底（可考虑自适应）
-- `identifier` 建议从 `com.dbound.app` 改为 `com.dbound.desktop`（避免 Tauri 的 macOS 扩展名告警）
+- 仅 Windows；估测值受麦克风、系统增益、距离影响，未做 A 计权与频响补偿
+- 开机自启与全局快捷键（PRD 可选）未接入
+- 波形 Y 轴固定 20–100 dB，低于 20 贴底
+- 安装包未在本机实际安装验证（避免改动系统）；其内嵌的 release 可执行文件已实测运行
+- `%APPDATA%\com.dbound.desktop` 下可能存在更早期原型留下的 `dbound.log.*`
+  与 `recordings/`，与本版本无关，不影响运行
