@@ -34,9 +34,13 @@ const ERROR_COPY: Record<CaptureErrorCode, { title: string; hint: string }> = {
 export function MainPage({
   onToggle,
   onStart,
+  onOpenSettings,
+  onOpenMini,
 }: {
   onToggle: () => void
   onStart: () => void
+  onOpenSettings: () => void
+  onOpenMini: () => void
 }) {
   const mode = useSettingsStore((state) => state.mode)
   const setMode = useSettingsStore((state) => state.setMode)
@@ -58,7 +62,7 @@ export function MainPage({
 
   return (
     <div className="relative flex h-full flex-col overflow-hidden rounded-[15px] border border-black/[0.07] bg-paper">
-      <TitleBar />
+      <TitleBar onOpenSettings={onOpenSettings} onOpenMini={onOpenMini} />
 
       <div className="mt-0.5 px-6">
         <ModeSwitch mode={mode} onChange={setMode} />

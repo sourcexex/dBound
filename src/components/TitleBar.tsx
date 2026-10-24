@@ -1,4 +1,4 @@
-import { Minus, X } from 'lucide-react'
+import { Minus, PictureInPicture2, Settings, X } from 'lucide-react'
 import { closeWindow, minimizeWindow } from '../lib/tauri'
 
 function ControlButton({
@@ -31,7 +31,13 @@ function ControlButton({
   )
 }
 
-export function TitleBar() {
+export function TitleBar({
+  onOpenSettings,
+  onOpenMini,
+}: {
+  onOpenSettings?: () => void
+  onOpenMini?: () => void
+}) {
   return (
     <header
       data-tauri-drag-region
@@ -50,6 +56,16 @@ export function TitleBar() {
       </div>
 
       <div className="flex items-center gap-0.5">
+        {onOpenMini ? (
+          <ControlButton label="迷你窗" onClick={onOpenMini}>
+            <PictureInPicture2 size={14} strokeWidth={2} />
+          </ControlButton>
+        ) : null}
+        {onOpenSettings ? (
+          <ControlButton label="设置" onClick={onOpenSettings}>
+            <Settings size={14} strokeWidth={2} />
+          </ControlButton>
+        ) : null}
         <ControlButton label="最小化" onClick={() => void minimizeWindow()}>
           <Minus size={14} strokeWidth={2} />
         </ControlButton>

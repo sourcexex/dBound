@@ -23,6 +23,7 @@ export interface SettingsState {
   addLevel: (mode: Mode) => void
   removeLevel: (mode: Mode, id: string) => void
   resetLevels: (mode: Mode) => void
+  resetAll: () => void
 }
 
 const MAX_LEVELS = 8
@@ -104,6 +105,19 @@ export const useSettingsStore = create<SettingsState>()(
         set((state) => ({
           levels: { ...state.levels, [mode]: defaultLevels(mode) },
         })),
+
+      resetAll: () =>
+        set({
+          mode: 'forward',
+          offset: DEFAULT_OFFSET,
+          readingSmooth: true,
+          showPeak: true,
+          deviceId: 'default',
+          levels: {
+            forward: defaultLevels('forward'),
+            reverse: defaultLevels('reverse'),
+          },
+        }),
     }),
     {
       name: 'dbound.settings',

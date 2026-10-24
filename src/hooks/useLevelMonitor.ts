@@ -2,6 +2,7 @@ import { useCallback, useEffect, useRef } from 'react'
 import { AlertEngine } from '../lib/alertEngine'
 import { AudioEngine } from '../lib/audio/capture'
 import { frameAverage, rmsToDb, tauForMode, timeWeight } from '../lib/dsp'
+import { emitMiniState, listenMiniCommands } from '../lib/miniBridge'
 import { useLevelStore } from '../stores/level'
 import { useSettingsStore } from '../stores/settings'
 
@@ -26,6 +27,22 @@ export function useLevelMonitor() {
   const lastTsRef = useRef(0)
   const peakRef = useRef<Array<{ t: number; db: number }>>([])
   const lastHistoryRef = useRef(0)
+  const lastMiniEmitRef = useRef(0)
+
+  const publishMiniState = useCallback(() => {
+    const settings = useSettingsStore.getState()
+    const level = useLevelStore.getState()
+    const active = level.activeLevel
+    void emitMiniState({
+      db: level.db,
+      peak: level.peak,
+      color: active?.color ?? '#17171A',
+      name: active?.name ?? null,
+      mode: settings.mode,
+      running: level.status === 'running',
+      paused: level.status === 'idle' || level.status === 'error',
+    })
+  }, [])
 
   const getAlert = useCallback((): AlertEngine => {
     if (!alertRef.current) alertRef.current = new AlertEngine()
@@ -63,8 +80,15 @@ export function useLevelMonitor() {
         lastHistoryRef.current = now
         store.pushHistory(db)
       }
+
+      // The mini capsule window lives in a separate webview, so it gets the
+      // reading through a Tauri event at ~10 Hz.
+      if (now - lastMiniEmitRef.current >= 100) {
+        lastMiniEmitRef.current = now
+        publishMiniState()
+      }
     },
-    [getAlert],
+    [getAlert, publishMiniState],
   )
 
   const getAudio = useCallback((): AudioEngine => {
@@ -89,11 +113,12 @@ export function useLevelMonitor() {
             getAlert().reset()
             store.setActiveLevel(null)
           }
+          publishMiniState()
         },
       )
     }
     return audioRef.current
-  }, [applyDb, getAlert])
+  }, [applyDb, getAlert, publishMiniState])
 
   const start = useCallback(async (): Promise<void> => {
     if (SIMULATION) return
@@ -111,7 +136,8 @@ export function useLevelMonitor() {
     getAlert().reset()
     useLevelStore.getState().clearHistory()
     useLevelStore.getState().setActiveLevel(null)
-  }, [getAlert])
+    publishMiniState()
+  }, [getAlert, publishMiniState])
 
   const toggle = useCallback(async (): Promise<void> => {
     if (SIMULATION) return
@@ -123,16 +149,46 @@ export function useLevelMonitor() {
     }
   }, [getAudio, start, stop])
 
+  /** Switch input device and rebuild the capture chain (also used by settings). */
+  const restartDevice = useCallback(
+    async (deviceId: string): Promise<void> => {
+      if (SIMULATION) return
+      const audio = getAudio()
+      audio.stop()
+      getAlert().reset()
+      useLevelStore.getState().setActiveLevel(null)
+      await audio.start({ deviceId })
+    },
+    [getAlert, getAudio],
+  )
+
   // Reset the alert state whenever the mode changes.
   useEffect(() => {
     const unsubscribe = useSettingsStore.subscribe((state, previous) => {
       if (state.mode !== previous.mode) {
         getAlert().reset()
         useLevelStore.getState().setActiveLevel(null)
+        publishMiniState()
       }
     })
     return unsubscribe
-  }, [getAlert])
+  }, [getAlert, publishMiniState])
+
+  // The mini window asks for a fresh snapshot right after it opens.
+  useEffect(() => {
+    let disposed = false
+    let unlisten: (() => void) | undefined
+    void listenMiniCommands((command) => {
+      if (command === 'mini-ready') publishMiniState()
+    }).then((fn) => {
+      if (disposed) fn()
+      else unlisten = fn
+    })
+    return () => {
+      disposed = true
+      unlisten?.()
+    }
+  }, [publishMiniState])
 
   // Start once on mount. A suspended AudioContext (first launch, no gesture yet)
   // surfaces as status 'suspended' and the UI asks for one click.
@@ -176,5 +232,5 @@ export function useLevelMonitor() {
     return () => window.clearInterval(timer)
   }, [applyDb])
 
-  return { start, stop, toggle }
+  return { start, stop, toggle, restartDevice }
 }

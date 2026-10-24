@@ -1,0 +1,115 @@
+import { useCallback, useEffect, useState } from 'react'
+import { Mic, RefreshCw } from 'lucide-react'
+import { listAudioInputs, onDeviceChange, type AudioInput } from '../../lib/audio/capture'
+import { useLevelStore } from '../../stores/level'
+import { useSettingsStore } from '../../stores/settings'
+import { Row, SectionCard } from '../ui/SectionCard'
+
+export function DevicesPanel({ onRestart }: { onRestart: (deviceId: string) => void }) {
+  const deviceId = useSettingsStore((state) => state.deviceId)
+  const setDeviceId = useSettingsStore((state) => state.setDeviceId)
+  const deviceLabel = useLevelStore((state) => state.deviceLabel)
+  const constraintFallback = useLevelStore((state) => state.constraintFallback)
+  const status = useLevelStore((state) => state.status)
+
+  const [devices, setDevices] = useState<AudioInput[]>([])
+  const [loading, setLoading] = useState(false)
+
+  const refresh = useCallback(async () => {
+    setLoading(true)
+    try {
+      let list = await listAudioInputs()
+      if (list.length === 0) {
+        // WebView2 can report an empty list on the very first call after the
+        // permission is granted; retry once shortly after.
+        await new Promise((resolve) => window.setTimeout(resolve, 400))
+        list = await listAudioInputs()
+      }
+      setDevices(list)
+    } catch {
+      setDevices([])
+    } finally {
+      setLoading(false)
+    }
+  }, [])
+
+  useEffect(() => {
+    void refresh()
+    return onDeviceChange(() => {
+      void refresh()
+    })
+  }, [refresh])
+
+  const options: Array<{ deviceId: string; label: string }> = [
+    { deviceId: 'default', label: '跟随系统默认' },
+    ...devices.filter((device) => device.deviceId !== 'default'),
+  ]
+
+  const select = (id: string) => {
+    setDeviceId(id)
+    onRestart(id)
+  }
+
+  return (
+    <div className="space-y-3">
+      <SectionCard
+        title="输入设备"
+        hint={status === 'running' ? `当前：${deviceLabel || '默认麦克风'}` : '测量未运行时切换会在下次启动生效'}
+        action={
+          <button
+            type="button"
+            onClick={() => void refresh()}
+            aria-label="刷新设备"
+            className="grid h-6 w-6 place-items-center rounded-md text-ink-faint transition-colors hover:bg-black/[0.05] hover:text-ink"
+          >
+            <RefreshCw size={12.5} strokeWidth={2} className={loading ? 'animate-spin' : ''} />
+          </button>
+        }
+      >
+        <div className="space-y-1.5">
+          {options.map((option) => {
+            const selected = deviceId === option.deviceId
+            return (
+              <button
+                key={option.deviceId}
+                type="button"
+                onClick={() => select(option.deviceId)}
+                className={`flex w-full items-center gap-2.5 rounded-lg border px-2.5 py-2 text-left transition-colors ${
+                  selected ? 'border-ink/25 bg-white' : 'border-transparent hover:bg-black/[0.03]'
+                }`}
+              >
+                <Mic size={13} strokeWidth={2} className="shrink-0 text-ink-soft" />
+                <span className="min-w-0 flex-1 truncate text-[11.5px] text-ink">{option.label}</span>
+                <span
+                  className={`grid h-3.5 w-3.5 shrink-0 place-items-center rounded-full border ${
+                    selected ? 'border-ink bg-ink' : 'border-[#C9C8C1]'
+                  }`}
+                >
+                  {selected ? <span className="h-1 w-1 rounded-full bg-white" /> : null}
+                </span>
+              </button>
+            )
+          })}
+        </div>
+        {devices.length === 0 ? (
+          <p className="mt-2 text-[10.5px] text-ink-faint">
+            还没有读到设备列表。首次授权后设备名称才会显示，可点右上角刷新。
+          </p>
+        ) : null}
+      </SectionCard>
+
+      {constraintFallback ? (
+        <SectionCard title="兼容性提示">
+          <Row
+            label="已放宽采集约束"
+            hint="当前麦克风不接受「关闭回声消除/降噪/自动增益」的要求，读数可能波动更大，但不影响相对比较。"
+          />
+        </SectionCard>
+      ) : (
+        <SectionCard title="采集设置">
+          <Row label="回声消除 / 降噪 / 自动增益" hint="已强制关闭，否则读数会被系统「熨平」" />
+        </SectionCard>
+      )}
+    </div>
+  )
+}

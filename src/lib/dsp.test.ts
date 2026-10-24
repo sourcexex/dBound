@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import {
   DEFAULT_OFFSET,
+  calibratedOffset,
   clamp,
   frameAverage,
   pickActiveLevel,
@@ -59,6 +60,29 @@ describe('smoothing', () => {
   it('keeps reverse mode slower than forward mode', () => {
     expect(tauForMode('forward', false)).toBeLessThan(tauForMode('reverse', false))
     expect(tauForMode('reverse', true)).toBeGreaterThan(tauForMode('reverse', false))
+  })
+})
+
+describe('calibration', () => {
+  it('shifts the measured average onto the target', () => {
+    // Reading 72 dB with offset 95; calibrating to 70 means subtracting 2.
+    expect(calibratedOffset(95, 72, 70)).toBe(93)
+    // Reading 30 dB, calibrating a quiet room to 35 means adding 5.
+    expect(calibratedOffset(95, 30, 35)).toBe(100)
+  })
+
+  it('snaps to half a dB', () => {
+    expect(calibratedOffset(95, 72.3, 70)).toBeCloseTo(92.5, 5)
+  })
+
+  it('clamps into the supported offset range', () => {
+    expect(calibratedOffset(95, -50, 70)).toBe(125)
+    expect(calibratedOffset(95, 200, 35)).toBe(65)
+  })
+
+  it('is idempotent once the average already matches the target', () => {
+    const offset = calibratedOffset(95, 72, 70)
+    expect(calibratedOffset(offset, 70, 70)).toBe(offset)
   })
 })
 

@@ -92,3 +92,21 @@ export function tauForMode(mode: Mode, readingSmooth: boolean): number {
   if (mode === 'reverse') return readingSmooth ? TAU_READING : TAU_SLOW
   return TAU_FAST
 }
+
+/**
+ * Offset that shifts the measured average onto the calibration target.
+ *
+ * The reading is `dBFS + offset`, so moving the average from `averageDb` to
+ * `targetDb` means adding the difference to the current offset. The result is
+ * snapped to 0.5 dB and clamped to the supported offset range.
+ */
+export function calibratedOffset(
+  currentOffset: number,
+  averageDb: number,
+  targetDb: number,
+  min = 65,
+  max = 125,
+): number {
+  const raw = currentOffset + (targetDb - averageDb)
+  return Math.round(clamp(raw, min, max) * 2) / 2
+}
