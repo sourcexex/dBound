@@ -4,6 +4,7 @@ dist-ssr
 *.local
 .DS_Store
 *.log
+output/
 
 # Rust / Tauri
 src-tauri/target
