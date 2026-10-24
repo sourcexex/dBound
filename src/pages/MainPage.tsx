@@ -38,6 +38,7 @@ export function MainPage({
   onOpenSettings,
   onOpenMini,
   onOpenLogs,
+  onOpenFullscreen,
   unseenLogs,
 }: {
   onToggle: () => void
@@ -45,6 +46,7 @@ export function MainPage({
   onOpenSettings: () => void
   onOpenMini: () => void
   onOpenLogs: () => void
+  onOpenFullscreen: () => void
   unseenLogs: boolean
 }) {
   const mode = useSettingsStore((state) => state.mode)
@@ -83,6 +85,7 @@ export function MainPage({
         onOpenSettings={onOpenSettings}
         onOpenMini={onOpenMini}
         onOpenLogs={onOpenLogs}
+        onOpenFullscreen={onOpenFullscreen}
         unseenLogs={unseenLogs}
       />
 

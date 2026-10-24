@@ -2,7 +2,7 @@
   "$schema": "../gen/schemas/desktop-schema.json",
   "identifier": "default",
   "description": "Capabilities for the dBound main window.",
-  "windows": ["main", "mini"],
+  "windows": ["main", "mini", "full"],
   "permissions": [
     "core:default",
     "core:event:default",
@@ -14,6 +14,7 @@
     "core:window:allow-set-focus",
     "core:window:allow-start-dragging",
     "core:window:allow-set-always-on-top",
+    "core:window:allow-set-fullscreen",
     "core:window:allow-set-position",
     "core:window:allow-set-size",
     "core:window:allow-outer-position",

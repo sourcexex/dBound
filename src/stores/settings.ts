@@ -1,7 +1,13 @@
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
-import { DEFAULT_OFFSET } from '../lib/dsp'
 import { defaultLevels } from '../lib/presets'
+import {
+  MAX_LEVELS,
+  SETTINGS_VERSION,
+  defaultSettings,
+  migrateSettings,
+  type PersistedSettings,
+} from '../lib/settingsSchema'
 import type { Level, Mode } from '../lib/types'
 
 export interface SettingsState {
@@ -26,8 +32,6 @@ export interface SettingsState {
   resetAll: () => void
 }
 
-const MAX_LEVELS = 8
-
 function nextLevel(levels: Level[], mode: Mode): Level {
   const sorted = [...levels].sort((a, b) =>
     mode === 'forward' ? a.threshold - b.threshold : b.threshold - a.threshold,
@@ -50,18 +54,17 @@ function nextLevel(levels: Level[], mode: Mode): Level {
   }
 }
 
+const initial = defaultSettings()
+
 export const useSettingsStore = create<SettingsState>()(
-  persist(
+  persist<SettingsState, [], [], PersistedSettings>(
     (set) => ({
-      mode: 'forward',
-      offset: DEFAULT_OFFSET,
-      readingSmooth: true,
-      showPeak: true,
-      deviceId: 'default',
-      levels: {
-        forward: defaultLevels('forward'),
-        reverse: defaultLevels('reverse'),
-      },
+      mode: initial.mode,
+      offset: initial.offset,
+      readingSmooth: initial.readingSmooth,
+      showPeak: initial.showPeak,
+      deviceId: initial.deviceId,
+      levels: initial.levels,
 
       setMode: (mode) => set({ mode }),
       setOffset: (offset) => set({ offset }),
@@ -106,22 +109,22 @@ export const useSettingsStore = create<SettingsState>()(
           levels: { ...state.levels, [mode]: defaultLevels(mode) },
         })),
 
-      resetAll: () =>
+      resetAll: () => {
+        const fresh = defaultSettings()
         set({
-          mode: 'forward',
-          offset: DEFAULT_OFFSET,
-          readingSmooth: true,
-          showPeak: true,
-          deviceId: 'default',
-          levels: {
-            forward: defaultLevels('forward'),
-            reverse: defaultLevels('reverse'),
-          },
-        }),
+          mode: fresh.mode,
+          offset: fresh.offset,
+          readingSmooth: fresh.readingSmooth,
+          showPeak: fresh.showPeak,
+          deviceId: fresh.deviceId,
+          levels: fresh.levels,
+        })
+      },
     }),
     {
       name: 'dbound.settings',
-      version: 1,
+      version: SETTINGS_VERSION,
+      migrate: (persisted, version) => migrateSettings(persisted, version),
       partialize: (state) => ({
         mode: state.mode,
         offset: state.offset,

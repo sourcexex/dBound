@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { useLevelMonitor } from './hooks/useLevelMonitor'
 import { flushLogs, initLogFlushHooks, logSystem } from './lib/logger'
-import { showMiniWindow } from './lib/miniBridge'
+import { showFullscreen, showMiniWindow } from './lib/miniBridge'
 import { LogsPage } from './pages/LogsPage'
 import { MainPage } from './pages/MainPage'
 import { SettingsPage } from './pages/SettingsPage'
@@ -25,6 +25,17 @@ export default function App() {
       flushLogs()
       dispose()
     }
+  }, [])
+
+  useEffect(() => {
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'F11') {
+        event.preventDefault()
+        void showFullscreen()
+      }
+    }
+    window.addEventListener('keydown', onKeyDown)
+    return () => window.removeEventListener('keydown', onKeyDown)
   }, [])
 
   if (view === 'settings') {
@@ -53,6 +64,9 @@ export default function App() {
       onOpenSettings={() => setView('settings')}
       onOpenMini={() => {
         void showMiniWindow()
+      }}
+      onOpenFullscreen={() => {
+        void showFullscreen()
       }}
       onOpenLogs={() => {
         useLevelStore.getState().clearUnseenAlerts()

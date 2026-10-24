@@ -1,4 +1,4 @@
-import { Minus, PictureInPicture2, ScrollText, Settings, X } from 'lucide-react'
+import { Maximize2, Minus, PictureInPicture2, ScrollText, Settings, X } from 'lucide-react'
 import { closeWindow, minimizeWindow } from '../lib/tauri'
 
 function ControlButton({
@@ -35,11 +35,13 @@ export function TitleBar({
   onOpenSettings,
   onOpenMini,
   onOpenLogs,
+  onOpenFullscreen,
   unseenLogs = false,
 }: {
   onOpenSettings?: () => void
   onOpenMini?: () => void
   onOpenLogs?: () => void
+  onOpenFullscreen?: () => void
   unseenLogs?: boolean
 }) {
   return (
@@ -68,6 +70,11 @@ export function TitleBar({
                 <span className="absolute -top-0.5 -right-1 h-[5px] w-[5px] rounded-full bg-[#DC2626]" />
               ) : null}
             </span>
+          </ControlButton>
+        ) : null}
+        {onOpenFullscreen ? (
+          <ControlButton label="全屏" onClick={onOpenFullscreen}>
+            <Maximize2 size={13.5} strokeWidth={2} />
           </ControlButton>
         ) : null}
         {onOpenMini ? (

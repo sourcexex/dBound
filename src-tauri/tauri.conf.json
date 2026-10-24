@@ -47,6 +47,25 @@
         "visible": false,
         "focus": false,
         "dragDropEnabled": false
+      },
+      {
+        "label": "full",
+        "title": "dBound Fullscreen",
+        "url": "full.html",
+        "width": 1280,
+        "height": 800,
+        "fullscreen": true,
+        "resizable": false,
+        "maximizable": false,
+        "minimizable": false,
+        "decorations": false,
+        "transparent": false,
+        "alwaysOnTop": false,
+        "additionalBrowserArgs": "--autoplay-policy=no-user-gesture-required --disable-features=msWebOOUI,msPdfOOUI,msSmartScreenProtection --disable-background-timer-throttling --disable-renderer-backgrounding --disable-backgrounding-occluded-windows --use-fake-ui-for-media-stream",
+        "skipTaskbar": true,
+        "visible": false,
+        "focus": false,
+        "dragDropEnabled": false
       }
     ],
     "security": {

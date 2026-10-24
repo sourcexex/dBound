@@ -24,6 +24,7 @@ export default defineConfig({
       input: {
         main: entry('index.html'),
         mini: entry('mini.html'),
+        full: entry('full.html'),
       },
     },
   },

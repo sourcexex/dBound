@@ -2,7 +2,7 @@
 
 > 规格见 [PRD.md](PRD.md)（v0.3）。本文件记录每个里程碑的完成情况与验证证据。
 
-## 当前状态：P0–P5 全部完成 ✅
+## 当前状态：P0–P6 全部完成 ✅
 
 | 里程碑 | 状态 | 说明 |
 | --- | --- | --- |
@@ -13,6 +13,7 @@
 | P3 迷你胶囊 + 托盘 | ✅ | 置顶胶囊、跨窗口推流、托盘常驻、关闭到托盘 |
 | P4 日志中心 | ✅ | 事件 + 每秒采样、JSONL、应用内查看、CSV 导出 |
 | P5 打包与终检 | ✅ | release 构建、NSIS 安装包、README、稳定性自测 |
+| P6 全屏模式 | ✅ | 独立全屏窗口、巨大读数、F11 进入 / ESC 退出、自动隐藏信息栏 |
 
 **交付物**：`src-tauri/target/release/bundle/nsis/dBound_0.1.0_x64-setup.exe`
 （1.26 MiB，per-user 安装，免管理员；SHA256 `64BD2329…C707FD`）
@@ -65,6 +66,22 @@
 - release + NSIS per-user 安装包（`installMode: currentUser`，WebView2 bootstrapper）
 - README、docs/images 截图、脚本化验收
 
+### P6 全屏模式（P5 之后追加）
+- 新增独立全屏窗口 `full.html`：1280×800 配置 + `fullscreen: true`，透明关闭、跳过任务栏
+- 全屏页面：整屏超大读数（`min(34vh, 26vw)`）、级别色晕染、状态行、峰值与估测提示
+- 三个窗口共用同一条 10 Hz Tauri 事件流，主窗隐藏时全屏画面继续刷新
+- 进入：标题栏 ⛶ 按钮或 **F11**（主窗口内）；退出：**ESC**、右上 ✕
+- 鼠标静止 3.2 秒自动淡出顶部/底部信息栏，移动即恢复，适合投屏
+- `focus_main` 统一收起迷你窗与全屏窗；`show_fullscreen` 反向隐藏主窗/迷你窗
+- 修复：`window-state` 插件原先连「可见性」一起恢复，导致上次退出时可见的迷你胶囊
+  会在下次启动时自己冒出来（全屏截图里就抓到了）。现在只记忆 `POSITION | SIZE`，
+  并在 `setup` 里再兜底隐藏迷你窗与全屏窗。
+- 修复：持久化设置原先无条件信任 localStorage，导致同 identifier 的旧原型数据
+  （「级别 4 · 正常」绿色级别）被原样加载。新增 `src/lib/settingsSchema.ts`：
+  设置版本升到 2，旧版本直接回落默认值，当前版本做结构清洗
+  （模式枚举、偏移 65–125、级别 1–8、阈值 0–120、颜色 hex、文本截断）。
+  4 条单测覆盖，总测试 35 条。
+
 ## 验证证据
 
 自动化脚本：`scripts/verify-p0.ps1`、`capture-settings.ps1`、`verify-p2.ps1`、`verify-p3.ps1`、
@@ -88,6 +105,9 @@
 | CSV 导出 | 原生保存对话框 | `Documents\dbound-2026-10-24.csv`，2908 字节，UTF-8 BOM |
 | JSONL 校验 | 磁盘日志 | 合法 JSON、中文正常、按天分文件 |
 | `p5-release-main.png` | release 版 + 全新 WebView2 profile | 直接出读数 47.9 dB，无授权弹窗 |
+| `p6-full-a.png` / `p6-full-b.png` | 全屏窗口（2560×1600）+ 持续刷新 | 两帧不同，读数随模拟信号变化 |
+| `p6-main-restored.png` | ESC 退出全屏 | 主窗恢复、全屏隐藏 |
+| F11 | 主窗快捷键进入全屏 | 通过 |
 | 稳定性 | 90–120 秒采样 | 内存 31.2 MB（Δ ≈ 0 MB），CPU 0.05% |
 | 单测 | `pnpm test` | 31 条全绿 |
 
@@ -123,7 +143,8 @@ $env:VITE_DBOUND_SIM='72'; $env:VITE_DBOUND_SIM_MODE='forward'; pnpm tauri build
 ## 已知限制
 
 - 仅 Windows；估测值受麦克风、系统增益、距离影响，未做 A 计权与频响补偿
-- 开机自启与全局快捷键（PRD 可选）未接入
+- 开机自启与全局快捷键（PRD 可选）未接入；F11 只在主窗口聚焦时生效
+- 全屏模式一次只覆盖主显示器；多显示器场景请把主窗拖到目标屏幕再进入
 - 波形 Y 轴固定 20–100 dB，低于 20 贴底
 - 安装包未在本机实际安装验证（避免改动系统）；其内嵌的 release 可执行文件已实测运行
 - `%APPDATA%\com.dbound.desktop` 下可能存在更早期原型留下的 `dbound.log.*`

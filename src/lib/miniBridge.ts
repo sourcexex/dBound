@@ -48,6 +48,13 @@ export async function showMainWindow(): Promise<void> {
   await invoke('show_main_window').catch(() => undefined)
 }
 
+/** Open the full-screen presentation window and hide the other windows. */
+export async function showFullscreen(): Promise<void> {
+  if (!isTauri()) return
+  const { invoke } = await import('@tauri-apps/api/core')
+  await invoke('show_fullscreen').catch(() => undefined)
+}
+
 /** Subscribe to commands sent by the mini window (e.g. it just became ready). */
 export async function listenMiniCommands(
   handler: (command: string) => void,
