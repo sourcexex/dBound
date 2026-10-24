@@ -1,5 +1,9 @@
 import { create } from 'zustand'
-import type { CaptureError, CaptureStatus } from '../lib/types'
+import type { AlertEvent } from '../lib/alertEngine'
+import type { CaptureError, CaptureStatus, Level } from '../lib/types'
+
+const HISTORY_POINTS = 600
+const EVENT_POINTS = 200
 
 export interface LevelState {
   /** 0..120 estimated dB, or null while not measuring. */
@@ -12,6 +16,10 @@ export interface LevelState {
   constraintFallback: boolean
   /** dB values for the 60 s waveform, oldest first. */
   history: number[]
+  /** Level currently shown by the alert engine (already debounced). */
+  activeLevel: Level | null
+  /** Recent enter/exit transitions, newest last. */
+  events: AlertEvent[]
 
   setReading: (reading: { db: number; peak: number; rawDb: number }) => void
   setStatus: (status: CaptureStatus, error?: CaptureError | null) => void
@@ -19,10 +27,10 @@ export interface LevelState {
   setConstraintFallback: (value: boolean) => void
   pushHistory: (db: number) => void
   clearHistory: () => void
+  setActiveLevel: (level: Level | null) => void
+  pushAlertEvent: (event: AlertEvent) => void
   reset: () => void
 }
-
-const HISTORY_POINTS = 600
 
 export const useLevelStore = create<LevelState>()((set) => ({
   db: null,
@@ -33,6 +41,8 @@ export const useLevelStore = create<LevelState>()((set) => ({
   deviceLabel: '',
   constraintFallback: false,
   history: [],
+  activeLevel: null,
+  events: [],
 
   setReading: ({ db, peak, rawDb }) => set({ db, peak, rawDb }),
 
@@ -43,6 +53,7 @@ export const useLevelStore = create<LevelState>()((set) => ({
       // Keep the last reading when paused (shown dimmed) but never when the mic failed.
       db: status === 'error' ? null : state.db,
       peak: status === 'error' ? null : state.peak,
+      activeLevel: status === 'error' ? null : state.activeLevel,
     })),
 
   setDeviceLabel: (deviceLabel) => set({ deviceLabel }),
@@ -50,14 +61,27 @@ export const useLevelStore = create<LevelState>()((set) => ({
 
   pushHistory: (db) =>
     set((state) => {
-      const next = state.history.length >= HISTORY_POINTS
-        ? state.history.slice(state.history.length - HISTORY_POINTS + 1)
-        : state.history.slice()
+      const next =
+        state.history.length >= HISTORY_POINTS
+          ? state.history.slice(state.history.length - HISTORY_POINTS + 1)
+          : state.history.slice()
       next.push(db)
       return { history: next }
     }),
 
   clearHistory: () => set({ history: [] }),
+
+  setActiveLevel: (activeLevel) => set({ activeLevel }),
+
+  pushAlertEvent: (event) =>
+    set((state) => {
+      const next =
+        state.events.length >= EVENT_POINTS
+          ? state.events.slice(state.events.length - EVENT_POINTS + 1)
+          : state.events.slice()
+      next.push(event)
+      return { events: next }
+    }),
 
   reset: () =>
     set({
@@ -67,5 +91,6 @@ export const useLevelStore = create<LevelState>()((set) => ({
       status: 'idle',
       error: null,
       history: [],
+      activeLevel: null,
     }),
 }))

@@ -1,11 +1,9 @@
-import { useMemo } from 'react'
 import { MicOff, Play, RotateCw } from 'lucide-react'
 import { Gauge } from '../components/Gauge'
 import { ModeSwitch } from '../components/ModeSwitch'
 import { StatusBar } from '../components/StatusBar'
 import { TitleBar } from '../components/TitleBar'
 import { Waveform } from '../components/Waveform'
-import { pickActiveLevel } from '../lib/dsp'
 import type { CaptureErrorCode } from '../lib/types'
 import { useLevelStore } from '../stores/level'
 import { useSettingsStore } from '../stores/settings'
@@ -52,11 +50,8 @@ export function MainPage({
   const deviceLabel = useLevelStore((state) => state.deviceLabel)
   const constraintFallback = useLevelStore((state) => state.constraintFallback)
   const history = useLevelStore((state) => state.history)
+  const activeLevel = useLevelStore((state) => state.activeLevel)
 
-  const activeLevel = useMemo(
-    () => (db === null ? null : pickActiveLevel(mode, levels, db)),
-    [db, levels, mode],
-  )
   const accent = activeLevel?.color ?? '#17171A'
 
   const errorCopy = error ? ERROR_COPY[error.code] : null

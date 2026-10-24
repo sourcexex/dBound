@@ -76,7 +76,7 @@ Start-Sleep -Milliseconds 150
 [P0Check]::mouse_event(0x0002, 0, 0, 0, [UIntPtr]::Zero)
 Start-Sleep -Milliseconds 60
 [P0Check]::mouse_event(0x0004, 0, 0, 0, [UIntPtr]::Zero)
-Start-Sleep -Seconds 2
+Start-Sleep -Seconds 3
 Save-Shot 'p0-c-reverse.png'
 
 # Pause button: 40 CSS px round button at the left of the 68 px footer.

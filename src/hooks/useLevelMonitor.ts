@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useRef } from 'react'
+import { AlertEngine } from '../lib/alertEngine'
 import { AudioEngine } from '../lib/audio/capture'
 import { frameAverage, rmsToDb, tauForMode, timeWeight } from '../lib/dsp'
 import { useLevelStore } from '../stores/level'
@@ -6,112 +7,174 @@ import { useSettingsStore } from '../stores/settings'
 
 const PEAK_WINDOW_MS = 3000
 const HISTORY_INTERVAL_MS = 100
+const SAMPLE_STEP_MS = 33
+
+/** `VITE_DBOUND_SIM=<db>` fakes the signal so the UI can be previewed without a mic. */
+const SIM_DB = Number(import.meta.env.VITE_DBOUND_SIM)
+const SIMULATION = Number.isFinite(SIM_DB) && SIM_DB > 0
 
 /**
- * Owns the audio engine and turns its raw RMS samples into the smoothed reading
- * shown by the UI. Frame EMA + display time weighting mirror the reference
- * implementation (0.72 / 0.28 plus 125 ms / 1 s / 3 s integration).
+ * Owns the audio engine and turns raw RMS samples into the smoothed reading:
+ * frame EMA (0.72/0.28, same as the reference monitor) → display time weighting
+ * (125 ms / 1 s / 3 s) → alert engine (dwell + hysteresis) → stores.
  */
 export function useLevelMonitor() {
-  const engineRef = useRef<AudioEngine | null>(null)
+  const audioRef = useRef<AudioEngine | null>(null)
+  const alertRef = useRef<AlertEngine | null>(null)
   const frameRef = useRef(Number.NaN)
   const weightedRef = useRef(Number.NaN)
   const lastTsRef = useRef(0)
   const peakRef = useRef<Array<{ t: number; db: number }>>([])
   const lastHistoryRef = useRef(0)
 
-  const getEngine = useCallback((): AudioEngine => {
-    if (!engineRef.current) {
-      engineRef.current = new AudioEngine(
+  const getAlert = useCallback((): AlertEngine => {
+    if (!alertRef.current) alertRef.current = new AlertEngine()
+    return alertRef.current
+  }, [])
+
+  const applyDb = useCallback(
+    (rawDb: number, now: number) => {
+      const settings = useSettingsStore.getState()
+
+      frameRef.current = frameAverage(frameRef.current, rawDb)
+      const dt = lastTsRef.current === 0 ? SAMPLE_STEP_MS : now - lastTsRef.current
+      lastTsRef.current = now
+
+      const tau = tauForMode(settings.mode, settings.readingSmooth)
+      weightedRef.current = timeWeight(weightedRef.current, frameRef.current, dt, tau)
+      const db = weightedRef.current
+
+      const peaks = peakRef.current
+      peaks.push({ t: now, db })
+      while (peaks.length > 0 && now - peaks[0].t > PEAK_WINDOW_MS) peaks.shift()
+      let peak = db
+      for (const entry of peaks) {
+        if (entry.db > peak) peak = entry.db
+      }
+
+      const store = useLevelStore.getState()
+      store.setReading({ db, peak, rawDb })
+
+      const update = getAlert().update(settings.mode, settings.levels[settings.mode], db, now)
+      if (store.activeLevel !== update.active) store.setActiveLevel(update.active)
+      for (const event of update.events) store.pushAlertEvent(event)
+
+      if (now - lastHistoryRef.current >= HISTORY_INTERVAL_MS) {
+        lastHistoryRef.current = now
+        store.pushHistory(db)
+      }
+    },
+    [getAlert],
+  )
+
+  const getAudio = useCallback((): AudioEngine => {
+    if (!audioRef.current) {
+      audioRef.current = new AudioEngine(
         (sample) => {
-          const settings = useSettingsStore.getState()
-          const rawDb = rmsToDb(sample.rms, settings.offset)
-
-          frameRef.current = frameAverage(frameRef.current, rawDb)
-          const dt = lastTsRef.current === 0 ? 33 : sample.t - lastTsRef.current
-          lastTsRef.current = sample.t
-
-          const tau = tauForMode(settings.mode, settings.readingSmooth)
-          weightedRef.current = timeWeight(weightedRef.current, frameRef.current, dt, tau)
-          const db = weightedRef.current
-
-          const peaks = peakRef.current
-          peaks.push({ t: sample.t, db })
-          while (peaks.length > 0 && sample.t - peaks[0].t > PEAK_WINDOW_MS) peaks.shift()
-          let peak = db
-          for (const entry of peaks) {
-            if (entry.db > peak) peak = entry.db
-          }
-
-          const store = useLevelStore.getState()
-          store.setReading({ db, peak, rawDb })
-
-          if (sample.t - lastHistoryRef.current >= HISTORY_INTERVAL_MS) {
-            lastHistoryRef.current = sample.t
-            store.pushHistory(db)
-          }
+          const { offset } = useSettingsStore.getState()
+          applyDb(rmsToDb(sample.rms, offset), sample.t)
         },
         (status, error) => {
           const store = useLevelStore.getState()
           store.setStatus(status, error ?? null)
-          if (status === 'running' && engineRef.current) {
-            store.setDeviceLabel(engineRef.current.trackLabel || '默认麦克风')
-            store.setConstraintFallback(engineRef.current.constraintFallback)
+          if (status === 'running' && audioRef.current) {
+            store.setDeviceLabel(audioRef.current.trackLabel || '默认麦克风')
+            store.setConstraintFallback(audioRef.current.constraintFallback)
           }
           if (status === 'error' || status === 'idle') {
             frameRef.current = Number.NaN
             weightedRef.current = Number.NaN
             lastTsRef.current = 0
             peakRef.current = []
+            getAlert().reset()
+            store.setActiveLevel(null)
           }
         },
       )
     }
-    return engineRef.current
-  }, [])
+    return audioRef.current
+  }, [applyDb, getAlert])
 
   const start = useCallback(async (): Promise<void> => {
-    const engine = getEngine()
-    if (engine.isRunning) {
-      if (engine.contextState === 'suspended') await engine.resume()
+    if (SIMULATION) return
+    const audio = getAudio()
+    if (audio.isRunning) {
+      if (audio.contextState === 'suspended') await audio.resume()
       return
     }
     const { deviceId } = useSettingsStore.getState()
-    await engine.start({ deviceId })
-  }, [getEngine])
+    await audio.start({ deviceId })
+  }, [getAudio])
 
   const stop = useCallback((): void => {
-    engineRef.current?.stop()
+    audioRef.current?.stop()
+    getAlert().reset()
     useLevelStore.getState().clearHistory()
-  }, [])
+    useLevelStore.getState().setActiveLevel(null)
+  }, [getAlert])
 
   const toggle = useCallback(async (): Promise<void> => {
-    const engine = getEngine()
-    if (engine.isRunning && engine.contextState === 'running') {
+    if (SIMULATION) return
+    const audio = getAudio()
+    if (audio.isRunning && audio.contextState === 'running') {
       stop()
     } else {
       await start()
     }
-  }, [getEngine, start, stop])
+  }, [getAudio, start, stop])
+
+  // Reset the alert state whenever the mode changes.
+  useEffect(() => {
+    const unsubscribe = useSettingsStore.subscribe((state, previous) => {
+      if (state.mode !== previous.mode) {
+        getAlert().reset()
+        useLevelStore.getState().setActiveLevel(null)
+      }
+    })
+    return unsubscribe
+  }, [getAlert])
 
   // Start once on mount. A suspended AudioContext (first launch, no gesture yet)
   // surfaces as status 'suspended' and the UI asks for one click.
   useEffect(() => {
+    if (SIMULATION) return
     let cancelled = false
-    const engine = getEngine()
+    const audio = getAudio()
     const timer = window.setTimeout(() => {
       if (cancelled) return
-      if (engine.isRunning) return
-      void engine.start({ deviceId: useSettingsStore.getState().deviceId })
+      if (audio.isRunning) return
+      void audio.start({ deviceId: useSettingsStore.getState().deviceId })
     }, 200)
 
     return () => {
       cancelled = true
       window.clearTimeout(timer)
-      engine.stop()
-      engineRef.current = null
+      audio.stop()
+      audioRef.current = null
     }
-  }, [getEngine])
+  }, [getAudio])
+
+  // Synthetic signal for UI previews and screenshots (no microphone involved).
+  useEffect(() => {
+    if (!SIMULATION) return
+    const store = useLevelStore.getState()
+    store.setStatus('running')
+    store.setDeviceLabel('演示信号（未使用麦克风）')
+
+    const simulatedMode = import.meta.env.VITE_DBOUND_SIM_MODE
+    if (simulatedMode === 'forward' || simulatedMode === 'reverse') {
+      useSettingsStore.getState().setMode(simulatedMode)
+    }
+
+    const startedAt = performance.now()
+    const timer = window.setInterval(() => {
+      const now = performance.now()
+      const elapsed = now - startedAt
+      const value = SIM_DB + Math.sin(elapsed / 900) * 4 + Math.sin(elapsed / 210) * 1.5
+      applyDb(value, now)
+    }, SAMPLE_STEP_MS)
+    return () => window.clearInterval(timer)
+  }, [applyDb])
 
   return { start, stop, toggle }
 }

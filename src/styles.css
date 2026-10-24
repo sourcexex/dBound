@@ -61,6 +61,21 @@ button {
   animation: dbound-breathe 2s ease-in-out infinite;
 }
 
+@keyframes dbound-ripple {
+  0% {
+    opacity: 0.4;
+    transform: translate(-50%, -50%) scale(0.82);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(1.22);
+  }
+}
+
+.dbound-ripple {
+  animation: dbound-ripple 900ms cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
 @keyframes dbound-rise {
   from {
     opacity: 0;
