@@ -20,6 +20,8 @@ export interface LevelState {
   activeLevel: Level | null
   /** Recent enter/exit transitions, newest last. */
   events: AlertEvent[]
+  /** Alerts seen since the log page was opened last. */
+  unseenAlerts: number
 
   setReading: (reading: { db: number; peak: number; rawDb: number }) => void
   setStatus: (status: CaptureStatus, error?: CaptureError | null) => void
@@ -29,6 +31,7 @@ export interface LevelState {
   clearHistory: () => void
   setActiveLevel: (level: Level | null) => void
   pushAlertEvent: (event: AlertEvent) => void
+  clearUnseenAlerts: () => void
   reset: () => void
 }
 
@@ -43,6 +46,7 @@ export const useLevelStore = create<LevelState>()((set) => ({
   history: [],
   activeLevel: null,
   events: [],
+  unseenAlerts: 0,
 
   setReading: ({ db, peak, rawDb }) => set({ db, peak, rawDb }),
 
@@ -80,8 +84,10 @@ export const useLevelStore = create<LevelState>()((set) => ({
           ? state.events.slice(state.events.length - EVENT_POINTS + 1)
           : state.events.slice()
       next.push(event)
-      return { events: next }
+      return { events: next, unseenAlerts: state.unseenAlerts + 1 }
     }),
+
+  clearUnseenAlerts: () => set({ unseenAlerts: 0 }),
 
   reset: () =>
     set({

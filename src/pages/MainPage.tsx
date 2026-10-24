@@ -36,11 +36,15 @@ export function MainPage({
   onStart,
   onOpenSettings,
   onOpenMini,
+  onOpenLogs,
+  unseenLogs,
 }: {
   onToggle: () => void
   onStart: () => void
   onOpenSettings: () => void
   onOpenMini: () => void
+  onOpenLogs: () => void
+  unseenLogs: boolean
 }) {
   const mode = useSettingsStore((state) => state.mode)
   const setMode = useSettingsStore((state) => state.setMode)
@@ -62,7 +66,12 @@ export function MainPage({
 
   return (
     <div className="relative flex h-full flex-col overflow-hidden rounded-[15px] border border-black/[0.07] bg-paper">
-      <TitleBar onOpenSettings={onOpenSettings} onOpenMini={onOpenMini} />
+      <TitleBar
+        onOpenSettings={onOpenSettings}
+        onOpenMini={onOpenMini}
+        onOpenLogs={onOpenLogs}
+        unseenLogs={unseenLogs}
+      />
 
       <div className="mt-0.5 px-6">
         <ModeSwitch mode={mode} onChange={setMode} />

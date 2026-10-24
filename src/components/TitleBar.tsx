@@ -1,4 +1,4 @@
-import { Minus, PictureInPicture2, Settings, X } from 'lucide-react'
+import { Minus, PictureInPicture2, ScrollText, Settings, X } from 'lucide-react'
 import { closeWindow, minimizeWindow } from '../lib/tauri'
 
 function ControlButton({
@@ -34,9 +34,13 @@ function ControlButton({
 export function TitleBar({
   onOpenSettings,
   onOpenMini,
+  onOpenLogs,
+  unseenLogs = false,
 }: {
   onOpenSettings?: () => void
   onOpenMini?: () => void
+  onOpenLogs?: () => void
+  unseenLogs?: boolean
 }) {
   return (
     <header
@@ -56,6 +60,16 @@ export function TitleBar({
       </div>
 
       <div className="flex items-center gap-0.5">
+        {onOpenLogs ? (
+          <ControlButton label="日志" onClick={onOpenLogs}>
+            <span className="relative">
+              <ScrollText size={14} strokeWidth={2} />
+              {unseenLogs ? (
+                <span className="absolute -top-0.5 -right-1 h-[5px] w-[5px] rounded-full bg-[#DC2626]" />
+              ) : null}
+            </span>
+          </ControlButton>
+        ) : null}
         {onOpenMini ? (
           <ControlButton label="迷你窗" onClick={onOpenMini}>
             <PictureInPicture2 size={14} strokeWidth={2} />

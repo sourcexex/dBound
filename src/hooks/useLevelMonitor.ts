@@ -3,6 +3,7 @@ import { AlertEngine } from '../lib/alertEngine'
 import { AudioEngine } from '../lib/audio/capture'
 import { frameAverage, rmsToDb, tauForMode, timeWeight } from '../lib/dsp'
 import { emitMiniState, listenMiniCommands } from '../lib/miniBridge'
+import { logAlert, logDevice, logSample, logSystem } from '../lib/logger'
 import { useLevelStore } from '../stores/level'
 import { useSettingsStore } from '../stores/settings'
 
@@ -28,6 +29,7 @@ export function useLevelMonitor() {
   const peakRef = useRef<Array<{ t: number; db: number }>>([])
   const lastHistoryRef = useRef(0)
   const lastMiniEmitRef = useRef(0)
+  const lastSampleLogRef = useRef(0)
 
   const publishMiniState = useCallback(() => {
     const settings = useSettingsStore.getState()
@@ -74,11 +76,20 @@ export function useLevelMonitor() {
 
       const update = getAlert().update(settings.mode, settings.levels[settings.mode], db, now)
       if (store.activeLevel !== update.active) store.setActiveLevel(update.active)
-      for (const event of update.events) store.pushAlertEvent(event)
+      for (const event of update.events) {
+        store.pushAlertEvent(event)
+        logAlert(event.type, event.level.name, event.db)
+      }
 
       if (now - lastHistoryRef.current >= HISTORY_INTERVAL_MS) {
         lastHistoryRef.current = now
         store.pushHistory(db)
+      }
+
+      // One log sample per second keeps the JSONL small while still describing the day.
+      if (now - lastSampleLogRef.current >= 1000) {
+        lastSampleLogRef.current = now
+        logSample(db, update.active?.name ?? null)
       }
 
       // The mini capsule window lives in a separate webview, so it gets the
@@ -104,6 +115,13 @@ export function useLevelMonitor() {
           if (status === 'running' && audioRef.current) {
             store.setDeviceLabel(audioRef.current.trackLabel || '默认麦克风')
             store.setConstraintFallback(audioRef.current.constraintFallback)
+            logSystem(`开始测量 · ${audioRef.current.trackLabel || '默认麦克风'}`)
+          }
+          if (status === 'error') {
+            logDevice(`采集失败：${error?.code ?? 'unknown'} ${error?.message ?? ''}`.trim())
+          }
+          if (status === 'idle') {
+            logSystem('暂停测量（麦克风已释放）')
           }
           if (status === 'error' || status === 'idle') {
             frameRef.current = Number.NaN
@@ -168,6 +186,7 @@ export function useLevelMonitor() {
       if (state.mode !== previous.mode) {
         getAlert().reset()
         useLevelStore.getState().setActiveLevel(null)
+        logSystem(`切换到${state.mode === 'forward' ? '正向' : '反向'}模式`)
         publishMiniState()
       }
     })
@@ -216,6 +235,7 @@ export function useLevelMonitor() {
     const store = useLevelStore.getState()
     store.setStatus('running')
     store.setDeviceLabel('演示信号（未使用麦克风）')
+    logSystem('开始测量 · 演示信号（未使用麦克风）')
 
     const simulatedMode = import.meta.env.VITE_DBOUND_SIM_MODE
     if (simulatedMode === 'forward' || simulatedMode === 'reverse') {

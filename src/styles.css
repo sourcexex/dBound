@@ -14,67 +14,42 @@
     sans-serif;
 }
 
-html,
-body,
-#root {
-  height: 100%;
-}
+/* Element resets live in @layer base so Tailwind utilities can still override them. */
+@layer base {
+  html,
+  body,
+  #root {
+    height: 100%;
+  }
 
-body {
-  margin: 0;
-  background: transparent;
-  overflow: hidden;
-  font-family: var(--font-sans);
-  color: var(--color-ink);
-  -webkit-font-smoothing: antialiased;
-  user-select: none;
-  cursor: default;
-}
+  body {
+    margin: 0;
+    background: transparent;
+    overflow: hidden;
+    font-family: var(--font-sans);
+    color: var(--color-ink);
+    -webkit-font-smoothing: antialiased;
+    user-select: none;
+    cursor: default;
+  }
 
-* {
-  -webkit-tap-highlight-color: transparent;
-}
+  * {
+    -webkit-tap-highlight-color: transparent;
+  }
 
-button {
-  font: inherit;
-  color: inherit;
-  cursor: pointer;
-}
+  button {
+    font: inherit;
+    color: inherit;
+    cursor: pointer;
+  }
 
-input,
-textarea {
-  user-select: text;
-}
-
-.dbound-range {
-  -webkit-appearance: none;
-  appearance: none;
-  width: 100%;
-  height: 20px;
-  background: transparent;
-  cursor: pointer;
-}
-
-.dbound-range::-webkit-slider-runnable-track {
-  height: 4px;
-  border-radius: 999px;
-  background: #e6e5de;
-}
-
-.dbound-range::-webkit-slider-thumb {
-  -webkit-appearance: none;
-  width: 15px;
-  height: 15px;
-  margin-top: -5.5px;
-  border-radius: 50%;
-  background: #fff;
-  border: 1px solid rgb(0 0 0 / 0.16);
-  box-shadow: 0 1px 3px rgb(0 0 0 / 0.18);
-}
-
-.dbound-range:focus-visible::-webkit-slider-thumb {
-  outline: 2px solid rgb(0 0 0 / 0.25);
-  outline-offset: 1px;
+  input,
+  textarea,
+  select {
+    font: inherit;
+    color: inherit;
+    user-select: text;
+  }
 }
 
 .num {
@@ -129,9 +104,41 @@ textarea {
 
 @media (prefers-reduced-motion: reduce) {
   .dbound-breathe,
-  .dbound-rise {
+  .dbound-rise,
+  .dbound-ripple {
     animation: none;
   }
+}
+
+.dbound-range {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  height: 20px;
+  background: transparent;
+  cursor: pointer;
+}
+
+.dbound-range::-webkit-slider-runnable-track {
+  height: 4px;
+  border-radius: 999px;
+  background: #e6e5de;
+}
+
+.dbound-range::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 15px;
+  height: 15px;
+  margin-top: -5.5px;
+  border-radius: 50%;
+  background: #fff;
+  border: 1px solid rgb(0 0 0 / 0.16);
+  box-shadow: 0 1px 3px rgb(0 0 0 / 0.18);
+}
+
+.dbound-range:focus-visible::-webkit-slider-thumb {
+  outline: 2px solid rgb(0 0 0 / 0.25);
+  outline-offset: 1px;
 }
 
 ::-webkit-scrollbar {

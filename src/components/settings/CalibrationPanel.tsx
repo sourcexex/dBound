@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { Mic, RotateCcw, Volume1 } from 'lucide-react'
 import { DEFAULT_OFFSET, calibratedOffset } from '../../lib/dsp'
+import { logSystem } from '../../lib/logger'
 import { useLevelStore } from '../../stores/level'
 import { useSettingsStore } from '../../stores/settings'
 import { Row, SectionCard } from '../ui/SectionCard'
@@ -59,6 +60,9 @@ export function CalibrationPanel() {
           OFFSET_MAX,
         )
         setOffset(next)
+        logSystem(
+          `校准（${target === QUIET_TARGET ? '安静环境' : '朗读'}）：实测 ${average.toFixed(1)} dB，对齐到 ${target} dB，偏移 ${next.toFixed(1)}`,
+        )
         setMessage(
           `校准完成：实测平均 ${average.toFixed(1)} dB，已对齐到 ${target} dB（偏移 ${next.toFixed(1)}）`,
         )
