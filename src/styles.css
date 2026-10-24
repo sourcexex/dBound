@@ -1,0 +1,98 @@
+@import "tailwindcss";
+
+@theme {
+  --color-paper: #fafaf8;
+  --color-paper-2: #f1f0eb;
+  --color-ink: #17171a;
+  --color-ink-soft: #6b6b72;
+  --color-ink-faint: #a1a1a8;
+  --color-line: #e8e7e1;
+
+  --font-sans: "Segoe UI Variable Text", "Segoe UI", "Microsoft YaHei UI", "PingFang SC",
+    system-ui, sans-serif;
+  --font-num: "Segoe UI Variable Display", "Segoe UI", "Microsoft YaHei UI", system-ui,
+    sans-serif;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  background: transparent;
+  overflow: hidden;
+  font-family: var(--font-sans);
+  color: var(--color-ink);
+  -webkit-font-smoothing: antialiased;
+  user-select: none;
+  cursor: default;
+}
+
+* {
+  -webkit-tap-highlight-color: transparent;
+}
+
+button {
+  font: inherit;
+  color: inherit;
+  cursor: pointer;
+}
+
+.num {
+  font-family: var(--font-num);
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum" 1, "ss01" 1;
+}
+
+@keyframes dbound-breathe {
+  0%,
+  100% {
+    opacity: 0.55;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+.dbound-breathe {
+  animation: dbound-breathe 2s ease-in-out infinite;
+}
+
+@keyframes dbound-rise {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.dbound-rise {
+  animation: dbound-rise 220ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .dbound-breathe,
+  .dbound-rise {
+    animation: none;
+  }
+}
+
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgb(0 0 0 / 0.14);
+  border-radius: 999px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
