@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { X } from 'lucide-react'
+import { RollingNumber } from '../components/RollingNumber'
 import { MINI_STATE_EVENT, type MiniState } from '../lib/miniBridge'
 import { isTauri } from '../lib/tauri'
 import { fontStackFor } from '../lib/titleFonts'
@@ -165,20 +166,22 @@ export function FullPage() {
               ––
             </span>
           ) : (
-            <>
+            <span
+              className="relative inline-flex items-center"
+              style={{ fontSize: 'min(34vh, 26vw)' }}
+            >
               <span
-                className="mt-[0.16em] mr-[0.06em] font-normal text-ink-faint"
-                style={{ fontSize: 'min(4vh, 3vw)' }}
+                aria-hidden
+                className="absolute top-[0.14em] right-full pr-[0.16em] text-[0.11em] font-normal text-ink-faint"
               >
                 ≈
               </span>
-              <span
-                className="num font-semibold tracking-[-0.045em] transition-colors duration-300"
-                style={{ fontSize: 'min(34vh, 26vw)', lineHeight: 0.86, color: measuring ? accent : '#A9A8A1' }}
-              >
-                {value}
-              </span>
-            </>
+              <RollingNumber
+                value={state.db}
+                className="num font-semibold tracking-[-0.03em] transition-colors duration-300"
+                style={{ color: measuring ? accent : '#A9A8A1' }}
+              />
+            </span>
           )}
         </div>
 

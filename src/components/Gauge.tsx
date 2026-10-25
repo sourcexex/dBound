@@ -1,9 +1,5 @@
+import { RollingNumber } from './RollingNumber'
 import type { CaptureStatus, Level } from '../lib/types'
-
-function formatDb(value: number | null): string {
-  if (value === null || !Number.isFinite(value)) return '––'
-  return value.toFixed(1)
-}
 
 const STATUS_COPY: Record<CaptureStatus, string> = {
   idle: '点击开始测量',
@@ -54,24 +50,28 @@ export function Gauge({
       ) : null}
 
       <div
-        className={`relative flex items-start justify-center transition-opacity duration-300 ${
+        className={`relative flex items-center justify-center transition-opacity duration-300 ${
           dimmed ? 'opacity-45' : 'opacity-100'
         }`}
       >
         {db === null ? (
-          <span className="num mt-[26px] text-[54px] leading-none font-semibold tracking-[0.08em] text-[#CFCEC7]">
+          <span className="num text-[54px] leading-none font-semibold tracking-[0.08em] text-[#CFCEC7]">
             ––
           </span>
         ) : (
-          <>
-            <span className="mt-[16px] mr-[2px] text-[19px] font-normal text-ink-faint">≈</span>
+          <span className="relative inline-flex items-center" style={{ fontSize: '108px' }}>
             <span
-              className="num text-[108px] leading-[0.86] font-semibold tracking-[-0.045em] transition-colors duration-200"
-              style={{ color: accent }}
+              aria-hidden
+              className="absolute top-[0.14em] right-full pr-[0.18em] text-[0.176em] font-normal text-ink-faint"
             >
-              {formatDb(db)}
+              ≈
             </span>
-          </>
+            <RollingNumber
+              value={db}
+              className="num font-semibold tracking-[-0.03em] transition-colors duration-200"
+              style={{ color: accent }}
+            />
+          </span>
         )}
       </div>
 
