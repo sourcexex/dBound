@@ -26,6 +26,7 @@ const INITIAL: MiniState = {
   idleNumberColor: '',
   levelNameSize: 13,
   levelNoteSize: 12,
+  levelNote: null,
   readoutAnimation: true,
   rollingMs: 600,
   readoutIntervalMs: 1000,

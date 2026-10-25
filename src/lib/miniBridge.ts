@@ -31,6 +31,7 @@ export interface MiniState {
   idleNumberColor: string
   levelNameSize: number
   levelNoteSize: number
+  levelNote: string | null
   readoutAnimation: boolean
   rollingMs: number
   readoutIntervalMs: number

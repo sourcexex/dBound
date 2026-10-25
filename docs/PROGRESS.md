@@ -214,3 +214,9 @@ $env:VITE_DBOUND_SIM='72'; $env:VITE_DBOUND_SIM_MODE='forward'; pnpm tauri build
   - 激活成功后同步更新缓存，无需重启
 - 验收：`scripts/verify-license-speed.ps1`（已激活直接进主界面 / 删除标记弹激活 / 输入序列号激活成功）、
   `scripts/verify-level-color.ps1`（命中级别时名称与提示文字同色，主界面 + 全屏截图）
+
+### 全屏状态行与主界面内容同步
+
+- 全屏状态行改为与主界面状态胶囊完全一致：`级别名称 · 提示文字`，颜色同样跟随级别颜色
+- 不再显示固定文案「声音偏大 / 声音偏小」或模式名，避免两个窗口信息不一致
+- 提示文字通过跨窗口状态新增的 `levelNote` 同步；未命中时仍显示「安静 / 音量正常」自定义文案

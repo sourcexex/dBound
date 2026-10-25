@@ -80,6 +80,7 @@ const INITIAL: MiniState = {
   idleNumberColor: '',
   levelNameSize: 13,
   levelNoteSize: 12,
+  levelNote: null,
   readoutAnimation: true,
   rollingMs: 600,
   readoutIntervalMs: 1000,
@@ -204,9 +205,7 @@ export function FullPage() {
     ? state.paused
       ? '已暂停'
       : '未开始测量'
-    : state.name
-      ? `${state.name} · ${state.modeLabel}`
-      : state.idleText || (state.mode === 'forward' ? '安静' : '音量正常')
+    : state.idleText || (state.mode === 'forward' ? '安静' : '音量正常')
 
   return (
     <div
@@ -368,28 +367,46 @@ export function FullPage() {
             className="h-[9px] w-[9px] rounded-full transition-colors duration-300"
             style={{ backgroundColor: state.name ? accent : mutedFallback(state.darkMode) }}
           />
-          <span
-            className="font-semibold text-ink"
-            style={{
-              fontFamily: fontStackFor(state.statusFont),
-              fontSize: `${state.name ? state.levelNameSize : state.statusSize}px`,
-              color: state.name ? state.color : state.statusColor || undefined,
-            }}
-          >
-            {statusText}
-          </span>
           {state.name ? (
+            <>
+              <span
+                className="font-semibold"
+                style={{
+                  fontFamily: fontStackFor(state.statusFont),
+                  fontSize: `${state.levelNameSize}px`,
+                  color: state.color,
+                }}
+              >
+                {state.name}
+              </span>
+              {state.levelNote ? (
+                <>
+                  <span className="text-ink-faint">·</span>
+                  <span
+                    className="font-medium"
+                    style={{
+                      fontFamily: fontStackFor(state.statusFont),
+                      fontSize: `${state.levelNoteSize}px`,
+                      color: state.color,
+                    }}
+                  >
+                    {state.levelNote}
+                  </span>
+                </>
+              ) : null}
+            </>
+          ) : (
             <span
-              className="text-ink-soft"
+              className="font-semibold text-ink"
               style={{
                 fontFamily: fontStackFor(state.statusFont),
-                fontSize: `${state.levelNoteSize}px`,
-                color: state.name ? state.color : undefined,
+                fontSize: `${state.statusSize}px`,
+                color: state.statusColor || undefined,
               }}
             >
-              · {state.mode === 'forward' ? '声音偏大' : '声音偏小'}
+              {statusText}
             </span>
-          ) : null}
+          )}
         </div>
       </main>
 

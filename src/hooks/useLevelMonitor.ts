@@ -63,6 +63,7 @@ export function useLevelMonitor() {
       idleNumberColor: settings.idleNumberColor,
       levelNameSize: settings.levelNameSize,
       levelNoteSize: settings.levelNoteSize,
+      levelNote: active?.note ?? null,
       readoutAnimation: settings.readoutAnimation,
       rollingMs: settings.rollingMs,
       readoutIntervalMs: settings.readoutIntervalMs,
