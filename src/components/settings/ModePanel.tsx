@@ -1,8 +1,59 @@
-import { DEFAULT_MODE_LABELS, MODE_LABEL_MAX } from '../../lib/settingsSchema'
+import {
+  DEFAULT_MODE_LABELS,
+  MODE_LABEL_MAX,
+  READOUT_INTERVAL_MAX,
+  READOUT_INTERVAL_MIN,
+  ROLLING_MS_MAX,
+  ROLLING_MS_MIN,
+} from '../../lib/settingsSchema'
 import type { Mode } from '../../lib/types'
 import { useSettingsStore } from '../../stores/settings'
 import { Row, SectionCard } from '../ui/SectionCard'
 import { Toggle } from '../ui/Toggle'
+
+function ValueSlider({
+  label,
+  hint,
+  value,
+  min,
+  max,
+  step,
+  unit,
+  disabled = false,
+  onChange,
+}: {
+  label: string
+  hint?: string
+  value: number
+  min: number
+  max: number
+  step: number
+  unit: string
+  disabled?: boolean
+  onChange: (value: number) => void
+}) {
+  return (
+    <div className={disabled ? 'opacity-45' : ''}>
+      <div className="mb-1 flex items-baseline justify-between">
+        <span className="text-[11.5px] font-medium text-ink">{label}</span>
+        <span className="num text-[11px] text-ink-soft">
+          {value} {unit}
+        </span>
+      </div>
+      <input
+        type="range"
+        className="dbound-range"
+        min={min}
+        max={max}
+        step={step}
+        value={value}
+        disabled={disabled}
+        onChange={(event) => onChange(Number(event.target.value))}
+      />
+      {hint ? <p className="mt-0.5 text-[10px] leading-relaxed text-ink-faint">{hint}</p> : null}
+    </div>
+  )
+}
 
 const MODE_COPY = {
   forward: {
@@ -27,6 +78,12 @@ export function ModePanel() {
   const setReadingSmooth = useSettingsStore((state) => state.setReadingSmooth)
   const showPeak = useSettingsStore((state) => state.showPeak)
   const setShowPeak = useSettingsStore((state) => state.setShowPeak)
+  const readoutAnimation = useSettingsStore((state) => state.readoutAnimation)
+  const setReadoutAnimation = useSettingsStore((state) => state.setReadoutAnimation)
+  const rollingMs = useSettingsStore((state) => state.rollingMs)
+  const setRollingMs = useSettingsStore((state) => state.setRollingMs)
+  const readoutIntervalMs = useSettingsStore((state) => state.readoutIntervalMs)
+  const setReadoutIntervalMs = useSettingsStore((state) => state.setReadoutIntervalMs)
 
   return (
     <div className="space-y-3">
@@ -113,6 +170,39 @@ export function ModePanel() {
         <Row label="显示峰值" hint="在大数字下方显示最近 3 秒的最高读数">
           <Toggle checked={showPeak} label="显示峰值" onChange={setShowPeak} />
         </Row>
+      </SectionCard>
+
+      <SectionCard title="数字显示" hint="控制大数字的滚动动画与刷新节奏">
+        <Row label="滚动动画" hint="关闭后数字直接跳变，不做滚筒动画">
+          <Toggle
+            checked={readoutAnimation}
+            label="滚动动画"
+            onChange={setReadoutAnimation}
+          />
+        </Row>
+        <div className="mt-2 space-y-3">
+          <ValueSlider
+            label="滚动时长"
+            value={rollingMs}
+            min={ROLLING_MS_MIN}
+            max={ROLLING_MS_MAX}
+            step={50}
+            unit="ms"
+            disabled={!readoutAnimation}
+            onChange={setRollingMs}
+            hint="越大越黏、越顺滑"
+          />
+          <ValueSlider
+            label="刷新间隔"
+            value={readoutIntervalMs}
+            min={READOUT_INTERVAL_MIN}
+            max={READOUT_INTERVAL_MAX}
+            step={50}
+            unit="ms"
+            onChange={setReadoutIntervalMs}
+            hint="越大数字越稳、变化越滞后"
+          />
+        </div>
       </SectionCard>
 
       <SectionCard title="防抖参数" hint="固定规则，暂不开放调整">

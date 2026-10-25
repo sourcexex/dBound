@@ -22,6 +22,10 @@ export interface SettingsState {
   fullscreenTitleColor: string
   fullscreenSubtitleSize: number
   fullscreenSubtitleColor: string
+  /** Readout animation: rolling digits on/off, roll duration, refresh interval. */
+  readoutAnimation: boolean
+  rollingMs: number
+  readoutIntervalMs: number
   offset: number
   /** Reverse mode only: smooth over ~3 s so reading aloud does not flicker. */
   readingSmooth: boolean
@@ -39,6 +43,9 @@ export interface SettingsState {
   setFullscreenTitleColor: (color: string) => void
   setFullscreenSubtitleSize: (size: number) => void
   setFullscreenSubtitleColor: (color: string) => void
+  setReadoutAnimation: (enabled: boolean) => void
+  setRollingMs: (value: number) => void
+  setReadoutIntervalMs: (value: number) => void
   setOffset: (offset: number) => void
   setReadingSmooth: (value: boolean) => void
   setShowPeak: (value: boolean) => void
@@ -86,6 +93,9 @@ export const useSettingsStore = create<SettingsState>()(
       fullscreenTitleColor: initial.fullscreenTitleColor,
       fullscreenSubtitleSize: initial.fullscreenSubtitleSize,
       fullscreenSubtitleColor: initial.fullscreenSubtitleColor,
+      readoutAnimation: initial.readoutAnimation,
+      rollingMs: initial.rollingMs,
+      readoutIntervalMs: initial.readoutIntervalMs,
       offset: initial.offset,
       readingSmooth: initial.readingSmooth,
       showPeak: initial.showPeak,
@@ -102,6 +112,9 @@ export const useSettingsStore = create<SettingsState>()(
       setFullscreenTitleColor: (fullscreenTitleColor) => set({ fullscreenTitleColor }),
       setFullscreenSubtitleSize: (fullscreenSubtitleSize) => set({ fullscreenSubtitleSize }),
       setFullscreenSubtitleColor: (fullscreenSubtitleColor) => set({ fullscreenSubtitleColor }),
+      setReadoutAnimation: (readoutAnimation) => set({ readoutAnimation }),
+      setRollingMs: (rollingMs) => set({ rollingMs }),
+      setReadoutIntervalMs: (readoutIntervalMs) => set({ readoutIntervalMs }),
       setOffset: (offset) => set({ offset }),
       setReadingSmooth: (readingSmooth) => set({ readingSmooth }),
       setShowPeak: (showPeak) => set({ showPeak }),
@@ -156,6 +169,9 @@ export const useSettingsStore = create<SettingsState>()(
           fullscreenTitleColor: fresh.fullscreenTitleColor,
           fullscreenSubtitleSize: fresh.fullscreenSubtitleSize,
           fullscreenSubtitleColor: fresh.fullscreenSubtitleColor,
+          readoutAnimation: fresh.readoutAnimation,
+          rollingMs: fresh.rollingMs,
+          readoutIntervalMs: fresh.readoutIntervalMs,
           offset: fresh.offset,
           readingSmooth: fresh.readingSmooth,
           showPeak: fresh.showPeak,
@@ -178,6 +194,9 @@ export const useSettingsStore = create<SettingsState>()(
         fullscreenTitleColor: state.fullscreenTitleColor,
         fullscreenSubtitleSize: state.fullscreenSubtitleSize,
         fullscreenSubtitleColor: state.fullscreenSubtitleColor,
+        readoutAnimation: state.readoutAnimation,
+        rollingMs: state.rollingMs,
+        readoutIntervalMs: state.readoutIntervalMs,
         offset: state.offset,
         readingSmooth: state.readingSmooth,
         showPeak: state.showPeak,

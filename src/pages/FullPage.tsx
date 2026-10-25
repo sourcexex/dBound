@@ -19,6 +19,9 @@ const INITIAL: MiniState = {
   titleColor: '#17171A',
   subtitleSize: 13,
   subtitleColor: '#6B6B72',
+  readoutAnimation: true,
+  rollingMs: 600,
+  readoutIntervalMs: 1000,
   running: false,
   paused: false,
 }
@@ -178,6 +181,9 @@ export function FullPage() {
               </span>
               <RollingNumber
                 value={state.db}
+                animate={state.readoutAnimation}
+                durationMs={state.rollingMs}
+                refreshMs={state.readoutIntervalMs}
                 className="num font-semibold tracking-[-0.03em] transition-colors duration-300"
                 style={{ color: measuring ? accent : '#A9A8A1' }}
               />

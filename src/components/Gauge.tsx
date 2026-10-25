@@ -1,4 +1,5 @@
 import { RollingNumber } from './RollingNumber'
+import { useSettingsStore } from '../stores/settings'
 import type { CaptureStatus, Level } from '../lib/types'
 
 const STATUS_COPY: Record<CaptureStatus, string> = {
@@ -25,6 +26,9 @@ export function Gauge({
   status: CaptureStatus
 }) {
   const accent = activeLevel?.color ?? '#17171A'
+  const readoutAnimation = useSettingsStore((state) => state.readoutAnimation)
+  const rollingMs = useSettingsStore((state) => state.rollingMs)
+  const readoutIntervalMs = useSettingsStore((state) => state.readoutIntervalMs)
   const silentLabel = mode === 'forward' ? '安静' : '音量正常'
   const chipLabel = activeLevel?.name ?? silentLabel
   const chipNote = activeLevel?.note ?? null
@@ -68,6 +72,9 @@ export function Gauge({
             </span>
             <RollingNumber
               value={db}
+              animate={readoutAnimation}
+              durationMs={rollingMs}
+              refreshMs={readoutIntervalMs}
               className="num font-semibold tracking-[-0.03em] transition-colors duration-200"
               style={{ color: accent }}
             />

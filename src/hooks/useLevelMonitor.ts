@@ -49,6 +49,9 @@ export function useLevelMonitor() {
       titleColor: settings.fullscreenTitleColor,
       subtitleSize: settings.fullscreenSubtitleSize,
       subtitleColor: settings.fullscreenSubtitleColor,
+      readoutAnimation: settings.readoutAnimation,
+      rollingMs: settings.rollingMs,
+      readoutIntervalMs: settings.readoutIntervalMs,
       running: level.status === 'running',
       paused: level.status === 'idle' || level.status === 'error',
     })

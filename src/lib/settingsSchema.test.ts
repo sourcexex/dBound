@@ -15,6 +15,7 @@ import {
   SUBTITLE_SIZE_MIN,
   TITLE_SIZE_MAX,
 } from './titleFonts'
+import { READOUT_INTERVAL_MAX, ROLLING_MS_MIN } from './settingsSchema'
 import { DEFAULT_OFFSET } from './dsp'
 
 describe('settings schema', () => {
@@ -177,5 +178,30 @@ describe('settings schema', () => {
     })
     expect(broken.fullscreenSubtitleSize).toBe(SUBTITLE_SIZE_MIN)
     expect(broken.fullscreenSubtitleColor).toBe(DEFAULT_SUBTITLE_COLOR)
+  })
+
+  it('sanitizes the readout animation settings', () => {
+    const defaults = defaultSettings()
+    expect(defaults.readoutAnimation).toBe(true)
+    expect(defaults.rollingMs).toBe(600)
+    expect(defaults.readoutIntervalMs).toBe(1000)
+
+    const custom = sanitizeSettings({
+      modeLabels: { forward: '正向', reverse: '反向' },
+      readoutAnimation: false,
+      rollingMs: 900,
+      readoutIntervalMs: 1200,
+    })
+    expect(custom.readoutAnimation).toBe(false)
+    expect(custom.rollingMs).toBe(900)
+    expect(custom.readoutIntervalMs).toBe(1200)
+
+    const clamped = sanitizeSettings({
+      modeLabels: { forward: '正向', reverse: '反向' },
+      rollingMs: 50,
+      readoutIntervalMs: 99999,
+    })
+    expect(clamped.rollingMs).toBe(ROLLING_MS_MIN)
+    expect(clamped.readoutIntervalMs).toBe(READOUT_INTERVAL_MAX)
   })
 })

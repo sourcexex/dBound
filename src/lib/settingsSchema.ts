@@ -28,6 +28,15 @@ export const DEFAULT_MODE_LABELS: Record<Mode, string> = {
 export const DEFAULT_FULLSCREEN_TITLE = 'dBound'
 export const DEFAULT_FULLSCREEN_SUBTITLE = '实时响度估测'
 
+/** Readout animation: how often the digits refresh and how long they roll. */
+export const DEFAULT_READOUT_ANIMATION = true
+export const DEFAULT_ROLLING_MS = 600
+export const ROLLING_MS_MIN = 200
+export const ROLLING_MS_MAX = 900
+export const DEFAULT_READOUT_INTERVAL_MS = 1000
+export const READOUT_INTERVAL_MIN = 200
+export const READOUT_INTERVAL_MAX = 1200
+
 export interface PersistedSettings {
   mode: Mode
   /** User-facing name for each mode, e.g. 自习课模式 / 早读模式. */
@@ -40,6 +49,9 @@ export interface PersistedSettings {
   fullscreenTitleColor: string
   fullscreenSubtitleSize: number
   fullscreenSubtitleColor: string
+  readoutAnimation: boolean
+  rollingMs: number
+  readoutIntervalMs: number
   offset: number
   readingSmooth: boolean
   showPeak: boolean
@@ -58,6 +70,9 @@ export function defaultSettings(): PersistedSettings {
     fullscreenTitleColor: DEFAULT_TITLE_COLOR,
     fullscreenSubtitleSize: DEFAULT_SUBTITLE_SIZE,
     fullscreenSubtitleColor: DEFAULT_SUBTITLE_COLOR,
+    readoutAnimation: DEFAULT_READOUT_ANIMATION,
+    rollingMs: DEFAULT_ROLLING_MS,
+    readoutIntervalMs: DEFAULT_READOUT_INTERVAL_MS,
     offset: DEFAULT_OFFSET,
     readingSmooth: true,
     showPeak: true,
@@ -184,6 +199,14 @@ export function sanitizeSettings(value: unknown): PersistedSettings {
       /^#[0-9a-f]{6}$/i.test(value.fullscreenSubtitleColor)
         ? value.fullscreenSubtitleColor
         : DEFAULT_SUBTITLE_COLOR,
+    readoutAnimation: value.readoutAnimation !== false,
+    rollingMs: sanitizeNumber(value.rollingMs, DEFAULT_ROLLING_MS, ROLLING_MS_MIN, ROLLING_MS_MAX),
+    readoutIntervalMs: sanitizeNumber(
+      value.readoutIntervalMs,
+      DEFAULT_READOUT_INTERVAL_MS,
+      READOUT_INTERVAL_MIN,
+      READOUT_INTERVAL_MAX,
+    ),
     offset: Number.isFinite(offset) ? Math.min(125, Math.max(65, Math.round(offset * 2) / 2)) : DEFAULT_OFFSET,
     readingSmooth: value.readingSmooth !== false,
     showPeak: value.showPeak !== false,

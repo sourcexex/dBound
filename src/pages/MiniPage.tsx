@@ -16,6 +16,9 @@ const INITIAL: MiniState = {
   titleColor: '#17171A',
   subtitleSize: 13,
   subtitleColor: '#6B6B72',
+  readoutAnimation: true,
+  rollingMs: 600,
+  readoutIntervalMs: 1000,
   running: false,
   paused: false,
 }

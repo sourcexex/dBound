@@ -3,10 +3,7 @@ import type { CSSProperties } from 'react'
 
 const DIGITS = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9']
 
-/** Display refresh interval for the reels – smooth but not jittery. */
-const REFRESH_MS = 100
-
-function Digit({ digit }: { digit: number }) {
+function Digit({ digit, durationMs }: { digit: number; durationMs: number }) {
   return (
     <span
       className="relative inline-block overflow-hidden align-bottom"
@@ -16,7 +13,7 @@ function Digit({ digit }: { digit: number }) {
         className="absolute inset-x-0 top-0 flex flex-col will-change-transform"
         style={{
           transform: `translateY(-${digit}em)`,
-          transition: 'transform 420ms cubic-bezier(0.2, 0.8, 0.2, 1)',
+          transition: `transform ${durationMs}ms cubic-bezier(0.2, 0.8, 0.2, 1)`,
         }}
       >
         {DIGITS.map((value) => (
@@ -35,32 +32,41 @@ function Digit({ digit }: { digit: number }) {
 
 /**
  * Odometer style number: every digit is a vertical reel that slides to its new
- * value, so the readout moves continuously instead of snapping frame by frame.
+ * value. The refresh interval controls how often the displayed value moves, so
+ * the readout can trail behind the raw sensor instead of twitching constantly.
  */
 export function RollingNumber({
   value,
   decimals = 1,
+  animate = true,
+  durationMs = 600,
+  refreshMs = 400,
   className = '',
   style,
   placeholder = '––',
 }: {
   value: number | null
   decimals?: number
+  animate?: boolean
+  durationMs?: number
+  refreshMs?: number
   className?: string
   style?: CSSProperties
   placeholder?: string
 }) {
   const valueRef = useRef(value)
   valueRef.current = value
+  const refreshRef = useRef(refreshMs)
+  refreshRef.current = refreshMs
 
   const [display, setDisplay] = useState<number | null>(value)
 
-  // Throttle the reel updates; the sensor still runs at 30 Hz.
+  // Throttled display refresh – the sensor still runs at 30 Hz underneath.
   useEffect(() => {
     let frame = 0
     let last = 0
     const tick = (now: number) => {
-      if (now - last >= REFRESH_MS) {
+      if (now - last >= refreshRef.current) {
         last = now
         setDisplay(valueRef.current)
       }
@@ -76,6 +82,14 @@ export function RollingNumber({
     return (
       <span className={className} style={{ ...style, lineHeight: 1 }}>
         {placeholder}
+      </span>
+    )
+  }
+
+  if (!animate) {
+    return (
+      <span className={className} style={{ ...style, lineHeight: 1 }} aria-label={text}>
+        {text}
       </span>
     )
   }
@@ -96,7 +110,7 @@ export function RollingNumber({
             .
           </span>
         ) : (
-          <Digit key={`digit-${index}`} digit={Number(char)} />
+          <Digit key={`digit-${index}`} digit={Number(char)} durationMs={durationMs} />
         ),
       )}
     </span>
