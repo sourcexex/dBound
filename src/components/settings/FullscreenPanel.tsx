@@ -1,3 +1,4 @@
+import type { ReactNode } from 'react'
 import {
   DEFAULT_FULLSCREEN_SUBTITLE,
   DEFAULT_FULLSCREEN_TITLE,
@@ -5,9 +6,13 @@ import {
   FULLSCREEN_TITLE_MAX,
 } from '../../lib/settingsSchema'
 import {
+  DEFAULT_SUBTITLE_COLOR,
+  DEFAULT_SUBTITLE_SIZE,
   DEFAULT_TITLE_COLOR,
   DEFAULT_TITLE_FONT,
   DEFAULT_TITLE_SIZE,
+  SUBTITLE_SIZE_MAX,
+  SUBTITLE_SIZE_MIN,
   TITLE_FONTS,
   TITLE_SIZE_MAX,
   TITLE_SIZE_MIN,
@@ -21,18 +26,116 @@ const INPUT_CLASS =
 
 const LABEL_CLASS = 'mb-1 block text-[10.5px] text-ink-soft'
 
+const SWATCHES = [
+  '#17171A',
+  '#6B6B72',
+  '#DC2626',
+  '#EA580C',
+  '#CA8A04',
+  '#16A34A',
+  '#0891B2',
+  '#2563EB',
+  '#7C3AED',
+]
+
+function ColorRow({
+  value,
+  onChange,
+}: {
+  value: string
+  onChange: (color: string) => void
+}) {
+  return (
+    <div className="flex flex-wrap items-center gap-1.5">
+      {SWATCHES.map((item) => (
+        <button
+          key={item}
+          type="button"
+          aria-label={`颜色 ${item}`}
+          onClick={() => onChange(item)}
+          className={`h-[18px] w-[18px] rounded-full transition-transform duration-150 ${
+            value.toLowerCase() === item.toLowerCase()
+              ? 'scale-110 ring-2 ring-ink/45 ring-offset-1'
+              : 'hover:scale-105'
+          }`}
+          style={{ backgroundColor: item }}
+        />
+      ))}
+      <label
+        className="relative ml-1 grid h-[18px] w-[18px] cursor-pointer place-items-center overflow-hidden rounded-full border border-line"
+        title="自定义颜色"
+      >
+        <span
+          className="absolute inset-0"
+          style={{
+            background:
+              'conic-gradient(#DC2626, #CA8A04, #16A34A, #0891B2, #2563EB, #7C3AED, #DC2626)',
+          }}
+        />
+        <input
+          type="color"
+          value={value}
+          onChange={(event) => onChange(event.target.value)}
+          className="absolute inset-0 cursor-pointer opacity-0"
+        />
+      </label>
+      <span className="num ml-1 text-[10.5px] text-ink-faint">{value.toUpperCase()}</span>
+    </div>
+  )
+}
+
+function SizeSlider({
+  label,
+  value,
+  min,
+  max,
+  onChange,
+}: {
+  label: string
+  value: number
+  min: number
+  max: number
+  onChange: (size: number) => void
+}) {
+  return (
+    <div>
+      <div className="mb-1 flex items-baseline justify-between">
+        <span className="text-[10.5px] text-ink-soft">{label}</span>
+        <span className="num text-[11px] font-medium text-ink">{value}px</span>
+      </div>
+      <input
+        type="range"
+        className="dbound-range"
+        min={min}
+        max={max}
+        step={1}
+        value={value}
+        onChange={(event) => onChange(Number(event.target.value))}
+      />
+    </div>
+  )
+}
+
+function GroupTitle({ children }: { children: ReactNode }) {
+  return <div className="mt-3 mb-1.5 text-[10.5px] font-semibold text-ink">{children}</div>
+}
+
 export function FullscreenPanel() {
   const title = useSettingsStore((state) => state.fullscreenTitle)
   const subtitle = useSettingsStore((state) => state.fullscreenSubtitle)
   const font = useSettingsStore((state) => state.fullscreenTitleFont)
-  const size = useSettingsStore((state) => state.fullscreenTitleSize)
-  const color = useSettingsStore((state) => state.fullscreenTitleColor)
+  const titleSize = useSettingsStore((state) => state.fullscreenTitleSize)
+  const titleColor = useSettingsStore((state) => state.fullscreenTitleColor)
+  const subtitleSize = useSettingsStore((state) => state.fullscreenSubtitleSize)
+  const subtitleColor = useSettingsStore((state) => state.fullscreenSubtitleColor)
 
   const setTitle = useSettingsStore((state) => state.setFullscreenTitle)
   const setSubtitle = useSettingsStore((state) => state.setFullscreenSubtitle)
   const setFont = useSettingsStore((state) => state.setFullscreenTitleFont)
-  const setSize = useSettingsStore((state) => state.setFullscreenTitleSize)
-  const setColor = useSettingsStore((state) => state.setFullscreenTitleColor)
+  const setTitleSize = useSettingsStore((state) => state.setFullscreenTitleSize)
+  const setTitleColor = useSettingsStore((state) => state.setFullscreenTitleColor)
+  const setSubtitleSize = useSettingsStore((state) => state.setFullscreenSubtitleSize)
+  const setSubtitleColor = useSettingsStore((state) => state.setFullscreenSubtitleColor)
 
   const previewTitle = title.trim() || DEFAULT_FULLSCREEN_TITLE
   const previewSubtitle = subtitle.trim()
@@ -68,7 +171,7 @@ export function FullscreenPanel() {
 
         <div className="mb-2.5 grid grid-cols-2 gap-2">
           <label className="block">
-            <span className={LABEL_CLASS}>字体</span>
+            <span className={LABEL_CLASS}>字体（标题与副标题共用）</span>
             <select
               className={INPUT_CLASS}
               value={font}
@@ -82,75 +185,45 @@ export function FullscreenPanel() {
               ))}
             </select>
           </label>
-
-          <div>
-            <div className="mb-1 flex items-baseline justify-between">
-              <span className="text-[10.5px] text-ink-soft">字号</span>
-              <span className="num text-[11px] font-medium text-ink">{size}px</span>
-            </div>
-            <input
-              type="range"
-              className="dbound-range"
-              min={TITLE_SIZE_MIN}
-              max={TITLE_SIZE_MAX}
-              step={1}
-              value={size}
-              onChange={(event) => setSize(Number(event.target.value))}
-            />
-          </div>
+          <SizeSlider
+            label="标题字号"
+            value={titleSize}
+            min={TITLE_SIZE_MIN}
+            max={TITLE_SIZE_MAX}
+            onChange={setTitleSize}
+          />
         </div>
 
-        <div className="mb-2">
-          <span className={LABEL_CLASS}>颜色</span>
-          <div className="flex flex-wrap items-center gap-1.5">
-            {['#17171A', '#DC2626', '#EA580C', '#CA8A04', '#16A34A', '#0891B2', '#2563EB', '#7C3AED'].map(
-              (item) => (
-                <button
-                  key={item}
-                  type="button"
-                  aria-label={`颜色 ${item}`}
-                  onClick={() => setColor(item)}
-                  className={`h-[18px] w-[18px] rounded-full transition-transform duration-150 ${
-                    color.toLowerCase() === item.toLowerCase()
-                      ? 'scale-110 ring-2 ring-ink/45 ring-offset-1'
-                      : 'hover:scale-105'
-                  }`}
-                  style={{ backgroundColor: item }}
-                />
-              ),
-            )}
-            <label
-              className="relative ml-1 grid h-[18px] w-[18px] cursor-pointer place-items-center overflow-hidden rounded-full border border-line"
-              title="自定义颜色"
-            >
-              <span
-                className="absolute inset-0"
-                style={{
-                  background:
-                    'conic-gradient(#DC2626, #CA8A04, #16A34A, #0891B2, #2563EB, #7C3AED, #DC2626)',
-                }}
-              />
-              <input
-                type="color"
-                value={color}
-                onChange={(event) => setColor(event.target.value)}
-                className="absolute inset-0 cursor-pointer opacity-0"
-              />
-            </label>
-            <span className="num ml-1 text-[10.5px] text-ink-faint">{color.toUpperCase()}</span>
-          </div>
+        <div className="mb-1">
+          <span className={LABEL_CLASS}>标题颜色</span>
+          <ColorRow value={titleColor} onChange={setTitleColor} />
         </div>
 
-        <div className="flex items-center justify-between">
-          <p className="text-[10px] text-ink-faint">副标题留空则不显示，字号随标题自动缩放。</p>
+        <GroupTitle>副标题样式</GroupTitle>
+        <SizeSlider
+          label="副标题字号"
+          value={subtitleSize}
+          min={SUBTITLE_SIZE_MIN}
+          max={SUBTITLE_SIZE_MAX}
+          onChange={setSubtitleSize}
+        />
+        <div className="mt-2">
+          <span className={LABEL_CLASS}>副标题颜色</span>
+          <ColorRow value={subtitleColor} onChange={setSubtitleColor} />
+        </div>
+
+        <div className="mt-3 flex items-center justify-between">
+          <p className="text-[10px] text-ink-faint">副标题留空则不显示。</p>
           <button
             type="button"
             onClick={() => {
               setTitle(DEFAULT_FULLSCREEN_TITLE)
               setSubtitle(DEFAULT_FULLSCREEN_SUBTITLE)
               setFont(DEFAULT_TITLE_FONT)
-              setSize(DEFAULT_TITLE_SIZE)
-              setColor(DEFAULT_TITLE_COLOR)
+              setTitleSize(DEFAULT_TITLE_SIZE)
+              setTitleColor(DEFAULT_TITLE_COLOR)
+              setSubtitleSize(DEFAULT_SUBTITLE_SIZE)
+              setSubtitleColor(DEFAULT_SUBTITLE_COLOR)
             }}
             className="shrink-0 rounded-md px-2 py-1 text-[11px] text-ink-faint transition-colors hover:bg-black/[0.05] hover:text-ink"
           >
@@ -168,16 +241,17 @@ export function FullscreenPanel() {
             <div className="min-w-0">
               <div
                 className="truncate leading-tight font-semibold"
-                style={{ fontFamily: stack, fontSize: `${size}px`, color }}
+                style={{ fontFamily: stack, fontSize: `${titleSize}px`, color: titleColor }}
               >
                 {previewTitle}
               </div>
               {previewSubtitle ? (
                 <div
-                  className="mt-1 truncate font-medium text-ink-soft"
+                  className="mt-1 truncate font-medium"
                   style={{
                     fontFamily: stack,
-                    fontSize: `${Math.max(12, Math.round(size * 0.62))}px`,
+                    fontSize: `${subtitleSize}px`,
+                    color: subtitleColor,
                   }}
                 >
                   {previewSubtitle}
@@ -186,9 +260,6 @@ export function FullscreenPanel() {
             </div>
           </div>
         </div>
-        <p className="mt-2 text-[10px] text-ink-faint">
-          提示：颜色同时用于标题文字；若选了深色底图请改用浅色。
-        </p>
       </SectionCard>
     </div>
   )

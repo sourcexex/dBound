@@ -20,6 +20,8 @@ export interface SettingsState {
   fullscreenTitleFont: string
   fullscreenTitleSize: number
   fullscreenTitleColor: string
+  fullscreenSubtitleSize: number
+  fullscreenSubtitleColor: string
   offset: number
   /** Reverse mode only: smooth over ~3 s so reading aloud does not flicker. */
   readingSmooth: boolean
@@ -35,6 +37,8 @@ export interface SettingsState {
   setFullscreenTitleFont: (font: string) => void
   setFullscreenTitleSize: (size: number) => void
   setFullscreenTitleColor: (color: string) => void
+  setFullscreenSubtitleSize: (size: number) => void
+  setFullscreenSubtitleColor: (color: string) => void
   setOffset: (offset: number) => void
   setReadingSmooth: (value: boolean) => void
   setShowPeak: (value: boolean) => void
@@ -80,6 +84,8 @@ export const useSettingsStore = create<SettingsState>()(
       fullscreenTitleFont: initial.fullscreenTitleFont,
       fullscreenTitleSize: initial.fullscreenTitleSize,
       fullscreenTitleColor: initial.fullscreenTitleColor,
+      fullscreenSubtitleSize: initial.fullscreenSubtitleSize,
+      fullscreenSubtitleColor: initial.fullscreenSubtitleColor,
       offset: initial.offset,
       readingSmooth: initial.readingSmooth,
       showPeak: initial.showPeak,
@@ -94,6 +100,8 @@ export const useSettingsStore = create<SettingsState>()(
       setFullscreenTitleFont: (fullscreenTitleFont) => set({ fullscreenTitleFont }),
       setFullscreenTitleSize: (fullscreenTitleSize) => set({ fullscreenTitleSize }),
       setFullscreenTitleColor: (fullscreenTitleColor) => set({ fullscreenTitleColor }),
+      setFullscreenSubtitleSize: (fullscreenSubtitleSize) => set({ fullscreenSubtitleSize }),
+      setFullscreenSubtitleColor: (fullscreenSubtitleColor) => set({ fullscreenSubtitleColor }),
       setOffset: (offset) => set({ offset }),
       setReadingSmooth: (readingSmooth) => set({ readingSmooth }),
       setShowPeak: (showPeak) => set({ showPeak }),
@@ -146,6 +154,8 @@ export const useSettingsStore = create<SettingsState>()(
           fullscreenTitleFont: fresh.fullscreenTitleFont,
           fullscreenTitleSize: fresh.fullscreenTitleSize,
           fullscreenTitleColor: fresh.fullscreenTitleColor,
+          fullscreenSubtitleSize: fresh.fullscreenSubtitleSize,
+          fullscreenSubtitleColor: fresh.fullscreenSubtitleColor,
           offset: fresh.offset,
           readingSmooth: fresh.readingSmooth,
           showPeak: fresh.showPeak,
@@ -166,6 +176,8 @@ export const useSettingsStore = create<SettingsState>()(
         fullscreenTitleFont: state.fullscreenTitleFont,
         fullscreenTitleSize: state.fullscreenTitleSize,
         fullscreenTitleColor: state.fullscreenTitleColor,
+        fullscreenSubtitleSize: state.fullscreenSubtitleSize,
+        fullscreenSubtitleColor: state.fullscreenSubtitleColor,
         offset: state.offset,
         readingSmooth: state.readingSmooth,
         showPeak: state.showPeak,

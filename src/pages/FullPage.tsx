@@ -16,6 +16,8 @@ const INITIAL: MiniState = {
   titleFont: 'system',
   titleSize: 20,
   titleColor: '#17171A',
+  subtitleSize: 13,
+  subtitleColor: '#6B6B72',
   running: false,
   paused: false,
 }
@@ -124,10 +126,11 @@ export function FullPage() {
             </h1>
             {state.subtitle ? (
               <p
-                className="mt-1 truncate font-medium tracking-[0.02em] text-ink-soft"
+                className="mt-1 truncate font-medium tracking-[0.02em]"
                 style={{
                   fontFamily: fontStackFor(state.titleFont),
-                  fontSize: `${Math.max(12, Math.round(state.titleSize * 0.62))}px`,
+                  fontSize: `${state.subtitleSize}px`,
+                  color: state.subtitleColor,
                 }}
               >
                 {state.subtitle}

@@ -47,6 +47,8 @@ export function useLevelMonitor() {
       titleFont: settings.fullscreenTitleFont,
       titleSize: settings.fullscreenTitleSize,
       titleColor: settings.fullscreenTitleColor,
+      subtitleSize: settings.fullscreenSubtitleSize,
+      subtitleColor: settings.fullscreenSubtitleColor,
       running: level.status === 'running',
       paused: level.status === 'idle' || level.status === 'error',
     })

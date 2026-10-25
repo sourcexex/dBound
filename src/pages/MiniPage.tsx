@@ -14,6 +14,8 @@ const INITIAL: MiniState = {
   titleFont: 'system',
   titleSize: 20,
   titleColor: '#17171A',
+  subtitleSize: 13,
+  subtitleColor: '#6B6B72',
   running: false,
   paused: false,
 }

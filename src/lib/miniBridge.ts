@@ -18,6 +18,8 @@ export interface MiniState {
   titleFont: string
   titleSize: number
   titleColor: string
+  subtitleSize: number
+  subtitleColor: string
   running: boolean
   paused: boolean
 }

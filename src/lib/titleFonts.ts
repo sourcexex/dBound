@@ -22,6 +22,11 @@ export const TITLE_SIZE_MAX = 56
 export const DEFAULT_TITLE_SIZE = 20
 export const DEFAULT_TITLE_COLOR = '#17171A'
 
+export const SUBTITLE_SIZE_MIN = 10
+export const SUBTITLE_SIZE_MAX = 40
+export const DEFAULT_SUBTITLE_SIZE = 13
+export const DEFAULT_SUBTITLE_COLOR = '#6B6B72'
+
 export function fontStackFor(id: string): string {
   return TITLE_FONTS.find((font) => font.id === id)?.stack ?? TITLE_FONTS[0].stack
 }

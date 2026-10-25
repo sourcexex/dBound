@@ -1,9 +1,13 @@
 import { DEFAULT_OFFSET } from './dsp'
 import { LEVEL_PALETTE, defaultLevels } from './presets'
 import {
+  DEFAULT_SUBTITLE_COLOR,
+  DEFAULT_SUBTITLE_SIZE,
   DEFAULT_TITLE_COLOR,
   DEFAULT_TITLE_FONT,
   DEFAULT_TITLE_SIZE,
+  SUBTITLE_SIZE_MAX,
+  SUBTITLE_SIZE_MIN,
   TITLE_SIZE_MAX,
   TITLE_SIZE_MIN,
   isKnownTitleFont,
@@ -34,6 +38,8 @@ export interface PersistedSettings {
   fullscreenTitleFont: string
   fullscreenTitleSize: number
   fullscreenTitleColor: string
+  fullscreenSubtitleSize: number
+  fullscreenSubtitleColor: string
   offset: number
   readingSmooth: boolean
   showPeak: boolean
@@ -50,6 +56,8 @@ export function defaultSettings(): PersistedSettings {
     fullscreenTitleFont: DEFAULT_TITLE_FONT,
     fullscreenTitleSize: DEFAULT_TITLE_SIZE,
     fullscreenTitleColor: DEFAULT_TITLE_COLOR,
+    fullscreenSubtitleSize: DEFAULT_SUBTITLE_SIZE,
+    fullscreenSubtitleColor: DEFAULT_SUBTITLE_COLOR,
     offset: DEFAULT_OFFSET,
     readingSmooth: true,
     showPeak: true,
@@ -165,6 +173,17 @@ export function sanitizeSettings(value: unknown): PersistedSettings {
       /^#[0-9a-f]{6}$/i.test(value.fullscreenTitleColor)
         ? value.fullscreenTitleColor
         : DEFAULT_TITLE_COLOR,
+    fullscreenSubtitleSize: sanitizeNumber(
+      value.fullscreenSubtitleSize,
+      DEFAULT_SUBTITLE_SIZE,
+      SUBTITLE_SIZE_MIN,
+      SUBTITLE_SIZE_MAX,
+    ),
+    fullscreenSubtitleColor:
+      typeof value.fullscreenSubtitleColor === 'string' &&
+      /^#[0-9a-f]{6}$/i.test(value.fullscreenSubtitleColor)
+        ? value.fullscreenSubtitleColor
+        : DEFAULT_SUBTITLE_COLOR,
     offset: Number.isFinite(offset) ? Math.min(125, Math.max(65, Math.round(offset * 2) / 2)) : DEFAULT_OFFSET,
     readingSmooth: value.readingSmooth !== false,
     showPeak: value.showPeak !== false,

@@ -145,6 +145,7 @@ if (-not $OnlySettings) {
   # 字体 -> 楷体 (系统默认 + 3 次下移)，字号拖到约 35px，颜色选红色。
   Click-Css 117 312
   Start-Sleep -Milliseconds 500
+  Send-Key 0x24
   Send-Key 0x28
   Send-Key 0x28
   Send-Key 0x28
@@ -152,7 +153,12 @@ if (-not $OnlySettings) {
   Start-Sleep -Milliseconds 400
   Click-Css 300 308
   Start-Sleep -Milliseconds 400
-  Click-Css 65 366
+  Click-Css 88 366
+  Start-Sleep -Milliseconds 400
+  # 副标题：字号拖到约 28px，颜色选绿色
+  Click-Css 247 438
+  Start-Sleep -Milliseconds 400
+  Click-Css 162 489
   Start-Sleep -Milliseconds 400
   Save-Shot 'f2-settings-filled.png'
 
