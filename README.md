@@ -116,7 +116,7 @@ pnpm tauri build --debug --no-bundle
 
 ![激活](docs-images/activation.png)
 
-> 关于页：设置 → 关于，可查看当前版本与作者信息（设计 / 创意 / 开发 | 作者：Source X）。
+> 关于页：设置 → 关于，可查看当前版本与作者信息（设计 / 创意 / 开发 | 作者：Sourcex）。
 
 ## 使用
 
@@ -189,7 +189,7 @@ tauri-plugin-window-state / dialog
 
 ## 作者
 
-设计 / 创意 / 开发 | 作者：Source X
+设计 / 创意 / 开发 | 作者：Sourcex
 
 ## License
 

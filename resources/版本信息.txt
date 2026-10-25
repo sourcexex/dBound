@@ -1,7 +1,7 @@
 dBound
 
 版本：v0.2.0
-设计 / 创意 / 开发 | 作者：Source X
+设计 / 创意 / 开发 | 作者：Sourcex
 
 平台：Windows 10 1809+ / Windows 11 (x64)
 

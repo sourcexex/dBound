@@ -345,3 +345,9 @@ $env:VITE_DBOUND_SIM='72'; $env:VITE_DBOUND_SIM_MODE='forward'; pnpm tauri build
   - `SetWindowRgn(CreateRoundRectRgn(...))` 把窗口裁成与 UI 一致的 15px 圆角矩形，
     Win10 上也得到圆角并裁掉方形原生边框；DPI 变化时重新计算
 - 主窗与迷你窗应用处理，全屏窗口不裁圆角；配合 `shadow: false`，外围不再出现系统描边
+
+### 作者名统一为 Sourcex
+
+- 应用内「关于」、安装包 publisher/copyright、`resources/版本信息.txt`、`resources/LICENSE.txt`、
+  README 作者信息统一为 **Sourcex**（原「Source X」）
+- `Cargo.toml` 的 `authors` 同步为 `Sourcex`

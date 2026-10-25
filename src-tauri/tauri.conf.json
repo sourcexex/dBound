@@ -114,8 +114,8 @@
       "../src/assets/fluent-emoji/*.png": "resources/emoji/",
       "../src/assets/emoji/*.png": "resources/emoji-reward/"
     },
-    "publisher": "Source X",
-    "copyright": "Copyright © 2026 Source X. All rights reserved.",
+    "publisher": "Sourcex",
+    "copyright": "Copyright © 2026 Sourcex. All rights reserved.",
     "shortDescription": "dBound · 桌面音量哨兵",
     "longDescription": "dBound 是面向课堂与自习场景的桌面响度提示工具：实时估测麦克风响度、按级别提醒、全屏投屏、证据录制。"
   }

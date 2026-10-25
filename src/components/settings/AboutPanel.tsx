@@ -21,7 +21,7 @@ export function AboutPanel() {
       </SectionCard>
 
       <div className="px-1 pt-1 text-center text-[10.5px] leading-relaxed text-ink-faint">
-        设计 / 创意 / 开发 | 作者：Source X
+        设计 / 创意 / 开发 | 作者：Sourcex
         <br />
         dBound · 桌面音量哨兵
         <br />
