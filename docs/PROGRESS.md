@@ -268,3 +268,9 @@ $env:VITE_DBOUND_SIM='72'; $env:VITE_DBOUND_SIM_MODE='forward'; pnpm tauri build
   庆祝（🎉🎊🎈🎁🏆🥇👑🚀⭐🌟✨）、自然与动物（🌈☀️🌻🌸🍀🐱🐶）
 - 奖励池改用这 40 个高分辨率 3D PNG（`src/assets/emoji/`，约 1.3MB）；
   文字 emoji 的完整 Fluent 图片集保持不变，level 名称里的任意 emoji 仍与 Win10/Win11 一致
+
+### 数字光晕放大
+
+- 主界面与全屏的数字光晕改为「内层亮光 + 外层柔光」两层径向渐变，
+  横向/纵向范围分别扩大到约 188%/176%（主窗）和 132%/52%（全屏），
+  命中级别时更明显，未命中时保持克制

@@ -73,9 +73,16 @@ export function Gauge({
           <span className="relative inline-flex items-center" style={{ fontSize: '108px' }}>
             <span
               aria-hidden
-              className="pointer-events-none absolute top-1/2 left-1/2 h-[112px] w-[146%] -translate-x-1/2 -translate-y-1/2 rounded-full transition-opacity duration-500"
+              className="pointer-events-none absolute top-1/2 left-1/2 h-[176px] w-[188%] -translate-x-1/2 -translate-y-1/2 rounded-full transition-opacity duration-500"
               style={{
-                background: `radial-gradient(closest-side, ${accent}${activeLevel ? '52' : '26'} 0%, transparent 78%)`,
+                background: `radial-gradient(closest-side, ${accent}${activeLevel ? '5C' : '2E'} 0%, transparent 80%)`,
+              }}
+            />
+            <span
+              aria-hidden
+              className="pointer-events-none absolute top-1/2 left-1/2 h-[292px] w-[272%] -translate-x-1/2 -translate-y-1/2 rounded-full transition-opacity duration-700"
+              style={{
+                background: `radial-gradient(closest-side, ${accent}${activeLevel ? '26' : '10'} 0%, transparent 76%)`,
               }}
             />
             <span

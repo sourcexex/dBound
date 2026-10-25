@@ -351,13 +351,22 @@ export function FullPage() {
       <main className="absolute inset-0 flex flex-col items-center justify-center">
         <div className="relative flex items-start justify-center">
           {value !== null ? (
-            <span
-              aria-hidden
-              className="pointer-events-none absolute top-1/2 left-1/2 h-[38%] w-[104%] -translate-x-1/2 -translate-y-1/2 rounded-full transition-opacity duration-700"
-              style={{
-                background: `radial-gradient(closest-side, ${measuring ? accent : accentFallback(state.darkMode)}${state.name ? '4D' : '26'} 0%, transparent 78%)`,
-              }}
-            />
+            <>
+              <span
+                aria-hidden
+                className="pointer-events-none absolute top-1/2 left-1/2 h-[52%] w-[132%] -translate-x-1/2 -translate-y-1/2 rounded-full transition-opacity duration-700"
+                style={{
+                  background: `radial-gradient(closest-side, ${measuring ? accent : accentFallback(state.darkMode)}${state.name ? '5C' : '2E'} 0%, transparent 80%)`,
+                }}
+              />
+              <span
+                aria-hidden
+                className="pointer-events-none absolute top-1/2 left-1/2 h-[74%] w-[168%] -translate-x-1/2 -translate-y-1/2 rounded-full transition-opacity duration-1000"
+                style={{
+                  background: `radial-gradient(closest-side, ${measuring ? accent : accentFallback(state.darkMode)}${state.name ? '26' : '12'} 0%, transparent 74%)`,
+                }}
+              />
+            </>
           ) : null}
           {value === null ? (
             <span
