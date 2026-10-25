@@ -235,3 +235,15 @@ $env:VITE_DBOUND_SIM='72'; $env:VITE_DBOUND_SIM_MODE='forward'; pnpm tauri build
 - 与机器绑定的项不写入默认值：证据保存目录（空 → 应用数据目录）、麦克风 / 摄像头设备（默认）
 - 验证：`scripts/verify-fresh-defaults.ps1` 临时替换 WebView 配置目录，以全新配置启动并截图，
   确认以上默认值生效后恢复原配置
+
+### 性能与表情资源
+
+- GPU 优化（全屏 2560×1600 / 150% 缩放下，WebView2 GPU 引擎占用合计）：
+  - 优化前：主界面 ~105%，全屏 ~105%
+  - 优化后：主界面 ~31%，全屏 ~30%
+  - 措施：把「5 层 filter:blur() + transform 动画」的极光背景改成单层静态径向渐变网格；
+    数字光晕由 filter blur 改为 radial-gradient；去掉 backdrop-filter；
+    隐藏窗口（托盘 / 关闭全屏）暂停所有 CSS 动画、RollingNumber 的 rAF、波形绘制与 React 状态更新
+- 表情包：内置 20 个 Microsoft Fluent Emoji 3D PNG（MIT），全屏奖励改用图片渲染，
+  Win10/Win11 显示一致；素材位于 `src/assets/emoji/`
+- 验收：`scripts/verify-emoji-assets.ps1`（全屏表情截图）、GPU 采样方法见提交说明

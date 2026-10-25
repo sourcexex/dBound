@@ -122,7 +122,7 @@ export function MainPage({
         ) : null}
 
         {status === 'suspended' ? (
-          <div className="absolute inset-0 z-20 grid place-items-center bg-paper/78 backdrop-blur-[2px]">
+          <div className="absolute inset-0 z-20 grid place-items-center bg-paper/90">
             <div className="flex flex-col items-center gap-3">
               <button
                 type="button"
@@ -140,7 +140,7 @@ export function MainPage({
         ) : null}
 
         {status === 'error' && errorCopy ? (
-          <div className="absolute inset-0 z-20 grid place-items-center bg-paper/92 backdrop-blur-[3px]">
+          <div className="absolute inset-0 z-20 grid place-items-center bg-paper/96">
             <div className="mx-2 flex max-w-[300px] flex-col items-center gap-2.5 text-center">
               <span className="grid h-11 w-11 place-items-center rounded-full bg-[#FEE2E2] text-[#DC2626]">
                 <MicOff size={19} strokeWidth={2} />

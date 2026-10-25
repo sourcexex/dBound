@@ -1,57 +1,62 @@
 import type { ThemeId } from '../lib/theme'
 
-interface BlobGeometry {
-  left: string
-  top: string
-  size: string
-  blur: number
-  /** Which drift animation to use. */
-  anim: 0 | 1
-  delay: number
-  duration: number
+interface Palette {
+  base: string
+  colors: [string, string, string, string, string]
+  alphas: [string, string, string, string, string]
 }
 
-const WINDOW_LAYOUT: BlobGeometry[] = [
-  { left: '-20%', top: '-16%', size: '300px', blur: 74, anim: 0, delay: 0, duration: 26 },
-  { left: '56%', top: '-10%', size: '260px', blur: 80, anim: 1, delay: 3, duration: 30 },
-  { left: '-14%', top: '56%', size: '300px', blur: 86, anim: 1, delay: 6, duration: 32 },
-  { left: '60%', top: '50%', size: '280px', blur: 82, anim: 0, delay: 2, duration: 28 },
-  { left: '26%', top: '24%', size: '240px', blur: 92, anim: 1, delay: 5, duration: 34 },
-]
+interface BlobGeometry {
+  x: number
+  y: number
+  rx: number
+  ry: number
+}
 
-const FULLSCREEN_LAYOUT: BlobGeometry[] = [
-  { left: '-12%', top: '-20%', size: '54vw', blur: 165, anim: 0, delay: 0, duration: 38 },
-  { left: '64%', top: '-16%', size: '48vw', blur: 175, anim: 1, delay: 4, duration: 44 },
-  { left: '-16%', top: '60%', size: '52vw', blur: 185, anim: 1, delay: 8, duration: 46 },
-  { left: '56%', top: '52%', size: '56vw', blur: 180, anim: 0, delay: 2, duration: 40 },
-  { left: '24%', top: '16%', size: '40vw', blur: 195, anim: 1, delay: 6, duration: 50 },
-]
-
-const PALETTES: Record<string, { colors: string[]; opacity: number[] }> = {
+/**
+ * Static mesh gradients: every blob is a plain radial-gradient painted once.
+ * Earlier versions used huge `filter: blur()` layers that were animated with
+ * transforms — on integrated GPUs that alone could saturate the WebView2
+ * compositor. Gradients look nearly identical and cost no per-frame GPU work.
+ */
+const PALETTES: Record<string, Palette> = {
   'aurora-light': {
+    base: 'linear-gradient(165deg, #FCFBF8 0%, #F7F5EF 52%, #F4F1E9 100%)',
     colors: ['#A5B4FC', '#FDBA74', '#86EFAC', '#C4B5FD', '#F9A8D4'],
-    opacity: [0.62, 0.52, 0.46, 0.5, 0.4],
+    alphas: ['7A', '55', '4D', '5C', '42'],
   },
   'ocean-light': {
+    base: 'linear-gradient(165deg, #F9FDFC 0%, #F1FAF7 52%, #EDF6F2 100%)',
     colors: ['#93C5FD', '#5EEAD4', '#6EE7B7', '#A7F3D0', '#67E8F9'],
-    opacity: [0.6, 0.5, 0.46, 0.44, 0.4],
+    alphas: ['7A', '59', '52', '4D', '42'],
   },
   'aurora-dark': {
+    base: 'linear-gradient(165deg, #0C0D11 0%, #0E1116 52%, #0A0C10 100%)',
     colors: ['#6366F1', '#F97316', '#10B981', '#8B5CF6', '#EC4899'],
-    opacity: [0.42, 0.3, 0.26, 0.34, 0.24],
+    alphas: ['59', '3D', '33', '47', '2E'],
   },
   'ocean-dark': {
+    base: 'linear-gradient(165deg, #071211 0%, #08161A 52%, #06100F 100%)',
     colors: ['#0EA5E9', '#14B8A6', '#10B981', '#22D3EE', '#6366F1'],
-    opacity: [0.42, 0.34, 0.3, 0.3, 0.24],
+    alphas: ['59', '47', '40', '40', '2E'],
   },
 }
 
-const BASE: Record<string, string> = {
-  'aurora-light': 'linear-gradient(165deg, #FCFBF8 0%, #F7F5EF 52%, #F4F1E9 100%)',
-  'ocean-light': 'linear-gradient(165deg, #F9FDFC 0%, #F1FAF7 52%, #EDF6F2 100%)',
-  'aurora-dark': 'linear-gradient(165deg, #0C0D11 0%, #0E1116 52%, #0A0C10 100%)',
-  'ocean-dark': 'linear-gradient(165deg, #071211 0%, #08161A 52%, #06100F 100%)',
-}
+const WINDOW_GEOMETRY: BlobGeometry[] = [
+  { x: -8, y: -10, rx: 62, ry: 56 },
+  { x: 64, y: -6, rx: 52, ry: 48 },
+  { x: -6, y: 62, rx: 64, ry: 58 },
+  { x: 70, y: 56, rx: 58, ry: 52 },
+  { x: 36, y: 32, rx: 50, ry: 46 },
+]
+
+const FULLSCREEN_GEOMETRY: BlobGeometry[] = [
+  { x: -10, y: -14, rx: 70, ry: 62 },
+  { x: 72, y: -10, rx: 60, ry: 58 },
+  { x: -12, y: 66, rx: 70, ry: 64 },
+  { x: 64, y: 60, rx: 66, ry: 60 },
+  { x: 34, y: 24, rx: 52, ry: 50 },
+]
 
 const VEIL: Record<string, string> = {
   'aurora-light':
@@ -67,9 +72,20 @@ const VEIL: Record<string, string> = {
 const NOISE_URL =
   "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.55'/%3E%3C/svg%3E\")"
 
+function backgroundFor(key: string, geometry: BlobGeometry[]): string {
+  const palette = PALETTES[key] ?? PALETTES['aurora-light']
+  const layers = geometry.map(
+    (blob, index) =>
+      `radial-gradient(${blob.rx}% ${blob.ry}% at ${blob.x}% ${blob.y}%, ${
+        palette.colors[index % palette.colors.length]
+      }${palette.alphas[index % palette.alphas.length]} 0%, transparent 70%)`,
+  )
+  return [...layers, palette.base].join(', ')
+}
+
 /**
  * Soft colourful aurora / mesh-gradient background.
- * Large blurred blobs drift very slowly behind the UI; nothing is interactive.
+ * Static by design: no animated blur layers, so the GPU stays idle while idle.
  */
 export function AuroraBackground({
   variant = 'window',
@@ -81,37 +97,15 @@ export function AuroraBackground({
   dark?: boolean
 }) {
   const key = `${theme}-${dark ? 'dark' : 'light'}`
-  const palette = PALETTES[key] ?? PALETTES['aurora-light']
-  const layout = variant === 'fullscreen' ? FULLSCREEN_LAYOUT : WINDOW_LAYOUT
+  const geometry = variant === 'fullscreen' ? FULLSCREEN_GEOMETRY : WINDOW_GEOMETRY
 
   return (
     <div aria-hidden className="pointer-events-none absolute inset-0 overflow-hidden">
-      <div className="absolute inset-0" style={{ background: BASE[key] ?? BASE['aurora-light'] }} />
-
-      {layout.map((geometry, index) => (
-        <span
-          key={index}
-          className="dbound-aurora-blob absolute rounded-full will-change-transform"
-          style={{
-            left: geometry.left,
-            top: geometry.top,
-            width: geometry.size,
-            height: geometry.size,
-            backgroundColor: palette.colors[index % palette.colors.length],
-            opacity: palette.opacity[index % palette.opacity.length],
-            filter: `blur(${geometry.blur}px)`,
-            animation: `dbound-drift-${geometry.anim === 0 ? 'a' : 'b'} ${geometry.duration}s ease-in-out ${geometry.delay}s infinite`,
-          }}
-        />
-      ))}
-
-      {/* soft veil keeps the centre readable */}
       <div
         className="absolute inset-0"
-        style={{ background: VEIL[key] ?? VEIL['aurora-light'] }}
+        style={{ backgroundImage: backgroundFor(key, geometry) }}
       />
-
-      {/* fine grain for a printed, premium feel */}
+      <div className="absolute inset-0" style={{ background: VEIL[key] ?? VEIL['aurora-light'] }} />
       <div
         className="absolute inset-0 mix-blend-soft-light"
         style={{

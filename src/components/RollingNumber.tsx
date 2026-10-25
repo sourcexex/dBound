@@ -62,18 +62,44 @@ export function RollingNumber({
   const [display, setDisplay] = useState<number | null>(value)
 
   // Throttled display refresh – the sensor still runs at 30 Hz underneath.
+  // The loop is parked while the window is hidden so a tray/minimised window
+  // costs no GPU/CPU for transitions.
   useEffect(() => {
     let frame = 0
     let last = 0
+    let running = false
     const tick = (now: number) => {
+      if (!running) return
       if (now - last >= refreshRef.current) {
         last = now
         setDisplay(valueRef.current)
       }
       frame = requestAnimationFrame(tick)
     }
-    frame = requestAnimationFrame(tick)
-    return () => cancelAnimationFrame(frame)
+    const start = () => {
+      if (running) return
+      running = true
+      last = 0
+      frame = requestAnimationFrame(tick)
+    }
+    const stop = () => {
+      running = false
+      cancelAnimationFrame(frame)
+    }
+    const onVisibility = () => {
+      if (document.visibilityState === 'hidden') {
+        stop()
+      } else {
+        setDisplay(valueRef.current)
+        start()
+      }
+    }
+    start()
+    document.addEventListener('visibilitychange', onVisibility)
+    return () => {
+      stop()
+      document.removeEventListener('visibilitychange', onVisibility)
+    }
   }, [])
 
   const text = display === null || !Number.isFinite(display) ? null : display.toFixed(decimals)

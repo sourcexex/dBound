@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { MINI_COMMAND_EVENT, MINI_STATE_EVENT, type MiniState } from '../lib/miniBridge'
 import { accentFallback, dimmedNumber, mutedFallback } from '../lib/theme'
 import { isTauri } from '../lib/tauri'
@@ -38,6 +38,7 @@ const INITIAL: MiniState = {
 
 export function MiniPage() {
   const [state, setState] = useState<MiniState>(INITIAL)
+  const latestRef = useRef<MiniState | null>(null)
   const [ready, setReady] = useState(false)
 
   useEffect(() => {
@@ -51,7 +52,12 @@ export function MiniPage() {
     void (async () => {
       const { listen, emit } = await import('@tauri-apps/api/event')
       unlisten = await listen<MiniState>(MINI_STATE_EVENT, (event) => {
-        if (!disposed) setState(event.payload)
+        if (disposed) return
+        if (document.visibilityState === 'hidden') {
+          latestRef.current = event.payload
+        } else {
+          setState(event.payload)
+        }
       })
       await emit(MINI_COMMAND_EVENT, { command: 'mini-ready' })
       if (!disposed) setReady(true)

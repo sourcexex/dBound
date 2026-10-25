@@ -6,17 +6,14 @@ import { Toast } from '../components/Toast'
 import { MINI_STATE_EVENT, type MiniState } from '../lib/miniBridge'
 import { EMOJI_MAX } from '../lib/settingsSchema'
 import { isTauri } from '../lib/tauri'
+import { randomEmoji } from '../lib/emojiAssets'
 import { accentFallback, dimmedNumber, mutedFallback } from '../lib/theme'
 import { fontStackFor } from '../lib/titleFonts'
-
-const EMOJI_POOL = [
-  '😀', '😄', '😁', '😊', '🥳', '🤩', '😍', '😎', '🤗', '😆',
-  '🎉', '👏', '🌟', '💪', '🐱', '🐶', '🌈', '☀️', '👍', '✨',
-]
 
 interface EmojiItem {
   id: number
   char: string
+  src?: string
   x: number
   y: number
   size: number
@@ -39,9 +36,11 @@ function makeEmoji(existing: EmojiItem[] = []): EmojiItem {
   emojiSeq += 1
   // Size relative to the viewport so the faces stay chunky on big screens.
   const unit = (typeof window === 'undefined' ? 1280 : window.innerWidth) / 100
+  const { char, src } = randomEmoji()
   return {
     id: emojiSeq,
-    char: EMOJI_POOL[Math.floor(Math.random() * EMOJI_POOL.length)],
+    char,
+    src,
     x: pickX(existing),
     y: 2 + Math.random() * 24,
     size: Math.round((2.8 + Math.random() * 2.8) * unit),
@@ -94,6 +93,7 @@ const CHROME_HIDE_MS = 3200
 
 export function FullPage() {
   const [state, setState] = useState<MiniState>(INITIAL)
+  const latestRef = useRef<MiniState | null>(null)
   const [chromeVisible, setChromeVisible] = useState(true)
   const hideTimer = useRef(0)
 
@@ -117,6 +117,21 @@ export function FullPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
+  // While hidden (fullscreen dismissed) skip React updates and CSS animations.
+  useEffect(() => {
+    const sync = () => {
+      const hidden = document.visibilityState === 'hidden'
+      document.documentElement.dataset.hidden = hidden ? 'true' : 'false'
+      if (!hidden && latestRef.current) {
+        setState(latestRef.current)
+        latestRef.current = null
+      }
+    }
+    sync()
+    document.addEventListener('visibilitychange', sync)
+    return () => document.removeEventListener('visibilitychange', sync)
+  }, [])
+
   useEffect(() => {
     const onKeyDown = (event: KeyboardEvent) => {
       if (event.key === 'Escape') {
@@ -135,7 +150,12 @@ export function FullPage() {
     void (async () => {
       const { listen } = await import('@tauri-apps/api/event')
       unlisten = await listen<MiniState>(MINI_STATE_EVENT, (event) => {
-        if (!disposed) setState(event.payload)
+        if (disposed) return
+        if (document.visibilityState === 'hidden') {
+          latestRef.current = event.payload
+        } else {
+          setState(event.payload)
+        }
       })
     })()
     return () => {
@@ -300,13 +320,27 @@ export function FullPage() {
               <span
                 className="inline-block select-none"
                 style={{
-                  fontSize: `${emoji.size}px`,
-                  lineHeight: 1,
-                  fontFamily: '"Segoe UI Emoji", "Apple Color Emoji", sans-serif',
                   animation: 'dbound-emoji-pop 520ms cubic-bezier(0.34, 1.56, 0.64, 1) both',
                 }}
               >
-                {emoji.char}
+                {emoji.src ? (
+                  <img
+                    src={emoji.src}
+                    alt=""
+                    draggable={false}
+                    style={{ width: emoji.size, height: emoji.size, display: 'block' }}
+                  />
+                ) : (
+                  <span
+                    style={{
+                      fontSize: `${emoji.size}px`,
+                      lineHeight: 1,
+                      fontFamily: '"Segoe UI Emoji", "Apple Color Emoji", sans-serif',
+                    }}
+                  >
+                    {emoji.char}
+                  </span>
+                )}
               </span>
             </span>
           </span>
@@ -318,10 +352,9 @@ export function FullPage() {
           {value !== null ? (
             <span
               aria-hidden
-              className="pointer-events-none absolute top-1/2 left-1/2 h-[38%] w-[104%] -translate-x-1/2 -translate-y-1/2 rounded-full blur-[95px] transition-opacity duration-700"
+              className="pointer-events-none absolute top-1/2 left-1/2 h-[38%] w-[104%] -translate-x-1/2 -translate-y-1/2 rounded-full transition-opacity duration-700"
               style={{
-                backgroundColor: measuring ? accent : accentFallback(state.darkMode),
-                opacity: state.name ? 0.26 : 0.13,
+                background: `radial-gradient(closest-side, ${measuring ? accent : accentFallback(state.darkMode)}${state.name ? '4D' : '26'} 0%, transparent 78%)`,
               }}
             />
           ) : null}

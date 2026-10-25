@@ -129,26 +129,6 @@
   }
 }
 
-@keyframes dbound-drift-a {
-  0%,
-  100% {
-    transform: translate3d(0, 0, 0) scale(1);
-  }
-  50% {
-    transform: translate3d(3.5%, -4.5%, 0) scale(1.07);
-  }
-}
-
-@keyframes dbound-drift-b {
-  0%,
-  100% {
-    transform: translate3d(0, 0, 0) scale(1.04);
-  }
-  50% {
-    transform: translate3d(-4%, 3.5%, 0) scale(0.96);
-  }
-}
-
 @keyframes dbound-rise {
   from {
     opacity: 0;
@@ -176,6 +156,15 @@
   }
 }
 
+/* While the webview is hidden (tray / dismissed fullscreen) stop all CSS
+   animations; the JS loops are parked separately where relevant. */
+html[data-hidden='true'] *,
+html[data-hidden='true'] *::before,
+html[data-hidden='true'] *::after {
+  animation-play-state: paused !important;
+  transition: none !important;
+}
+
 /* Hide the native scrollbar; the overlay thumb in ScrollArea replaces it. */
 .scrollbar-none {
   scrollbar-width: none;
@@ -184,18 +173,6 @@
 
 .scrollbar-none::-webkit-scrollbar {
   display: none;
-}
-
-/* Pause the slow drift while a list is being scrolled (keeps dragging smooth). */
-html[data-scrolling='true'] .dbound-aurora-blob {
-  animation-play-state: paused;
-}
-
-/* Aurora blobs: freeze the drift for reduced-motion users. */
-@media (prefers-reduced-motion: reduce) {
-  .dbound-aurora-blob {
-    animation: none !important;
-  }
 }
 
 .dbound-range {

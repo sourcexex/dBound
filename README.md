@@ -168,6 +168,10 @@ Tauri 2 ｜ React 19 ｜ TypeScript ｜ Vite ｜ Tailwind CSS v4 ｜ zustand ｜
 Web Audio API（AnalyserNode + RMS）｜ cpal 未使用，采集完全在前端完成 ｜
 tauri-plugin-window-state / dialog
 
+## 第三方素材
+
+- [Microsoft Fluent Emoji](https://github.com/microsoft/fluentui-emoji)（MIT License）
+
 ## 作者
 
 设计 / 创意 / 开发 | 作者：Source X

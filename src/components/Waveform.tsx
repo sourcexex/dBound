@@ -33,6 +33,7 @@ export function Waveform({
   const wrapRef = useRef<HTMLDivElement>(null)
 
   const draw = useCallback(() => {
+    if (document.visibilityState === 'hidden') return
     const canvas = canvasRef.current
     const wrap = wrapRef.current
     if (!canvas || !wrap) return

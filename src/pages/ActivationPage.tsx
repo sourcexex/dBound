@@ -38,7 +38,7 @@ export function ActivationPage({ onActivated }: { onActivated: () => void }) {
 
   return (
     <div className="flex h-full w-full items-center justify-center px-6">
-      <div className="dbound-rise w-full max-w-[300px] rounded-2xl border border-line bg-surface/85 p-5 shadow-[0_18px_50px_rgba(0,0,0,0.16)] backdrop-blur">
+      <div className="dbound-rise w-full max-w-[300px] rounded-2xl border border-line bg-surface/92 p-5 shadow-[0_18px_50px_rgba(0,0,0,0.16)]">
         <div className="flex items-center gap-2">
           <span className="grid h-8 w-8 place-items-center rounded-[10px] bg-ink text-paper">
             <ShieldCheck size={16} strokeWidth={2.2} />

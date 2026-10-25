@@ -19,7 +19,7 @@ export function Toast({ bottom = '86px' }: { bottom?: string }) {
       className="pointer-events-none absolute inset-x-0 z-30 flex justify-center px-6"
       style={{ bottom }}
     >
-      <div className="dbound-rise max-w-full truncate rounded-full border border-line bg-surface/90 px-4 py-2 text-[12px] font-medium text-ink shadow-[0_8px_24px_rgba(0,0,0,0.14)] backdrop-blur">
+      <div className="dbound-rise max-w-full truncate rounded-full border border-line bg-surface/95 px-4 py-2 text-[12px] font-medium text-ink shadow-[0_8px_24px_rgba(0,0,0,0.14)]">
         {toast}
       </div>
     </div>

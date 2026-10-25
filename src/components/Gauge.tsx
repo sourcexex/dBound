@@ -72,8 +72,10 @@ export function Gauge({
           <span className="relative inline-flex items-center" style={{ fontSize: '108px' }}>
             <span
               aria-hidden
-              className="pointer-events-none absolute top-1/2 left-1/2 h-[104px] w-[142%] -translate-x-1/2 -translate-y-1/2 rounded-full blur-[52px] transition-all duration-500"
-              style={{ backgroundColor: accent, opacity: activeLevel ? 0.32 : 0.15 }}
+              className="pointer-events-none absolute top-1/2 left-1/2 h-[112px] w-[146%] -translate-x-1/2 -translate-y-1/2 rounded-full transition-opacity duration-500"
+              style={{
+                background: `radial-gradient(closest-side, ${accent}${activeLevel ? '52' : '26'} 0%, transparent 78%)`,
+              }}
             />
             <span
               aria-hidden
@@ -104,7 +106,7 @@ export function Gauge({
       <div className="mt-[18px] flex h-8 items-center">
         <div
           key={chipLabel + chipNote}
-          className={`dbound-rise flex items-center gap-2 rounded-full border border-black/[0.06] bg-surface/75 px-3.5 py-1.5 backdrop-blur-sm transition-opacity duration-300 ${
+          className={`dbound-rise flex items-center gap-2 rounded-full border border-black/[0.06] bg-surface/90 px-3.5 py-1.5 transition-opacity duration-300 ${
             dimmed ? 'opacity-50' : 'opacity-100'
           }`}
         >
