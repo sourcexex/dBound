@@ -195,7 +195,7 @@ pnpm tauri build      # ver:check + tsc + vite build + NSIS 打包
 
 - 当前状态：`docs/PROGRESS.md`「当前状态摘要」+「里程碑状态」。
 - 待办与批次：`docs/OPTIMIZATION.md` §6；需产品决策的 7 项见 §8。
-- 已完成：V-01/V-02（版本单一来源，v0.1.0）、V-05/D-05（GITHUB.md 删除）、V-08（verify 脚本不再写死版本路径）、
+- 已完成：V-01/V-02（版本单一来源，当前 v0.2.0）、V-05/D-05（GITHUB.md 删除）、V-08（verify 脚本不再写死版本路径）、
   Fluent Emoji 资源外置（安装目录 `resources/`，exe 约 3.5MB）。
 - 下一个建议任务：Batch 1 剩余项（图标统一 I-01～I-03、设置迁移/导入导出 S-01～S-04、单实例 E-11）。
 - 改动前先看对应 OPTIMIZATION 编号，避免重复踩坑；改动后按 §5.5 同步文档。

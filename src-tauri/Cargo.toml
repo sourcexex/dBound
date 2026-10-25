@@ -1,6 +1,6 @@
 [package]
 name = "dbound"
-version = "0.1.0"
+version = "0.2.0"
 description = "dBound – desktop loudness sentinel"
 authors = ["dBound"]
 edition = "2021"

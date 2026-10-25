@@ -322,3 +322,10 @@ $env:VITE_DBOUND_SIM='72'; $env:VITE_DBOUND_SIM_MODE='forward'; pnpm tauri build
   已有用户设置不会被覆盖，可在「设置 → 全屏 → 恢复默认」或重装后看到新默认
 - 单测同步更新（51 条通过）；截图：`output/screenshots/level-color-main.png`（标题栏）、
   `output/screenshots/perf-emoji-fullscreen.png`（全屏左上角）
+
+### 版本升级 v0.2.0
+
+- 版本号从 0.1.0 升到 **0.2.0**（`node scripts/version.mjs set 0.2.0`，四处同步）
+- 本版本包含：应用图标统一（标题栏 / 全屏 / 设置预览）、全屏默认标题改为 `dBound`、
+  Fluent Emoji 资源外置到安装目录 `resources/`、主程序体积降至约 3.5MB
+- 安装包与便携版文件名随版本变为 `dBound_0.2.0_x64-setup.exe`、`dBound-0.2.0-portable.zip`

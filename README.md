@@ -2,7 +2,7 @@
 
 **桌面音量哨兵** —— 用麦克风实时估测环境响度，太吵或（朗读时）太小声，一眼就能看见。
 
-Windows 10 1809+ / Windows 11 · Tauri 2 + React 19 + TypeScript · 当前版本 **v0.1.0**
+Windows 10 1809+ / Windows 11 · Tauri 2 + React 19 + TypeScript · 当前版本 **v0.2.0**
 
 ![主界面](docs-images/main-quiet.png)
 
