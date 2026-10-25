@@ -49,6 +49,8 @@ export function useLevelMonitor() {
       titleColor: settings.fullscreenTitleColor,
       subtitleSize: settings.fullscreenSubtitleSize,
       subtitleColor: settings.fullscreenSubtitleColor,
+      statusFont: settings.statusFont,
+      statusSize: settings.statusSize,
       readoutAnimation: settings.readoutAnimation,
       rollingMs: settings.rollingMs,
       readoutIntervalMs: settings.readoutIntervalMs,

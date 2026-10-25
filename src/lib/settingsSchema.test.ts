@@ -15,7 +15,7 @@ import {
   SUBTITLE_SIZE_MIN,
   TITLE_SIZE_MAX,
 } from './titleFonts'
-import { READOUT_INTERVAL_MAX, ROLLING_MS_MIN } from './settingsSchema'
+import { DEFAULT_STATUS_FONT, READOUT_INTERVAL_MAX, ROLLING_MS_MIN, STATUS_SIZE_MAX } from './settingsSchema'
 import { DEFAULT_OFFSET } from './dsp'
 
 describe('settings schema', () => {
@@ -203,6 +203,24 @@ describe('settings schema', () => {
     })
     expect(clamped.rollingMs).toBe(ROLLING_MS_MIN)
     expect(clamped.readoutIntervalMs).toBe(READOUT_INTERVAL_MAX)
+  })
+
+  it('sanitizes the status typography', () => {
+    const custom = sanitizeSettings({
+      modeLabels: { forward: '正向', reverse: '反向' },
+      statusFont: 'kaiti',
+      statusSize: 22,
+    })
+    expect(custom.statusFont).toBe('kaiti')
+    expect(custom.statusSize).toBe(22)
+
+    const broken = sanitizeSettings({
+      modeLabels: { forward: '正向', reverse: '反向' },
+      statusFont: 'comic',
+      statusSize: 999,
+    })
+    expect(broken.statusFont).toBe(DEFAULT_STATUS_FONT)
+    expect(broken.statusSize).toBe(STATUS_SIZE_MAX)
   })
 
   it('sanitizes the emoji reward rules', () => {

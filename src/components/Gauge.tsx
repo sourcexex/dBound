@@ -38,19 +38,12 @@ export function Gauge({
   return (
     <section className="relative flex flex-col items-center">
       {activeLevel ? (
-        <>
-          <div
-            aria-hidden
-            className="pointer-events-none absolute top-[44%] left-1/2 h-[260px] w-[260px] -translate-x-1/2 -translate-y-1/2 rounded-full blur-[110px] transition-all duration-500"
-            style={{ backgroundColor: accent, opacity: 0.18 }}
-          />
-          <span
-            key={activeLevel.id}
-            aria-hidden
-            className="dbound-ripple pointer-events-none absolute top-[44%] left-1/2 h-[168px] w-[168px] -translate-x-1/2 -translate-y-1/2 rounded-full border-2"
-            style={{ borderColor: accent }}
-          />
-        </>
+        <span
+          key={activeLevel.id}
+          aria-hidden
+          className="dbound-ripple pointer-events-none absolute top-[44%] left-1/2 h-[168px] w-[168px] -translate-x-1/2 -translate-y-1/2 rounded-full border-2"
+          style={{ borderColor: accent }}
+        />
       ) : null}
 
       <div
@@ -64,6 +57,11 @@ export function Gauge({
           </span>
         ) : (
           <span className="relative inline-flex items-center" style={{ fontSize: '108px' }}>
+            <span
+              aria-hidden
+              className="pointer-events-none absolute top-1/2 left-1/2 h-[104px] w-[142%] -translate-x-1/2 -translate-y-1/2 rounded-full blur-[52px] transition-all duration-500"
+              style={{ backgroundColor: accent, opacity: activeLevel ? 0.32 : 0.15 }}
+            />
             <span
               aria-hidden
               className="absolute top-[0.14em] right-full pr-[0.18em] text-[0.176em] font-normal text-ink-faint"

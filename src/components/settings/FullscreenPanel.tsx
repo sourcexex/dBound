@@ -10,6 +10,8 @@ import {
   EMOJI_THRESHOLD_MIN,
   FULLSCREEN_SUBTITLE_MAX,
   FULLSCREEN_TITLE_MAX,
+  STATUS_SIZE_MAX,
+  STATUS_SIZE_MIN,
 } from '../../lib/settingsSchema'
 import type { Mode } from '../../lib/types'
 import {
@@ -146,6 +148,10 @@ export function FullscreenPanel() {
   const setSubtitleSize = useSettingsStore((state) => state.setFullscreenSubtitleSize)
   const setSubtitleColor = useSettingsStore((state) => state.setFullscreenSubtitleColor)
   const emoji = useSettingsStore((state) => state.emoji)
+  const statusFont = useSettingsStore((state) => state.statusFont)
+  const statusSize = useSettingsStore((state) => state.statusSize)
+  const setStatusFont = useSettingsStore((state) => state.setStatusFont)
+  const setStatusSize = useSettingsStore((state) => state.setStatusSize)
   const modeLabels = useSettingsStore((state) => state.modeLabels)
   const updateEmojiRule = useSettingsStore((state) => state.updateEmojiRule)
 
@@ -241,6 +247,33 @@ export function FullscreenPanel() {
           >
             恢复默认
           </button>
+        </div>
+      </SectionCard>
+
+      <SectionCard title="状态文字" hint="大数字下方的「音量正常 / 级别名」文字">
+        <div className="grid grid-cols-2 gap-2">
+          <label className="block">
+            <span className={LABEL_CLASS}>字体</span>
+            <select
+              className={INPUT_CLASS}
+              value={statusFont}
+              onChange={(event) => setStatusFont(event.target.value)}
+              style={{ fontFamily: fontStackFor(statusFont) }}
+            >
+              {TITLE_FONTS.map((item) => (
+                <option key={item.id} value={item.id} style={{ fontFamily: item.stack }}>
+                  {item.label}
+                </option>
+              ))}
+            </select>
+          </label>
+          <SizeSlider
+            label="字号"
+            value={statusSize}
+            min={STATUS_SIZE_MIN}
+            max={STATUS_SIZE_MAX}
+            onChange={setStatusSize}
+          />
         </div>
       </SectionCard>
 

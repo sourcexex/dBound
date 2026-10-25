@@ -24,6 +24,9 @@ export interface SettingsState {
   fullscreenTitleColor: string
   fullscreenSubtitleSize: number
   fullscreenSubtitleColor: string
+  /** Fullscreen status line typography. */
+  statusFont: string
+  statusSize: number
   /** Readout animation: rolling digits on/off, roll duration, refresh interval. */
   readoutAnimation: boolean
   rollingMs: number
@@ -47,6 +50,8 @@ export interface SettingsState {
   setFullscreenTitleColor: (color: string) => void
   setFullscreenSubtitleSize: (size: number) => void
   setFullscreenSubtitleColor: (color: string) => void
+  setStatusFont: (font: string) => void
+  setStatusSize: (size: number) => void
   setReadoutAnimation: (enabled: boolean) => void
   setRollingMs: (value: number) => void
   setReadoutIntervalMs: (value: number) => void
@@ -98,6 +103,8 @@ export const useSettingsStore = create<SettingsState>()(
       fullscreenTitleColor: initial.fullscreenTitleColor,
       fullscreenSubtitleSize: initial.fullscreenSubtitleSize,
       fullscreenSubtitleColor: initial.fullscreenSubtitleColor,
+      statusFont: initial.statusFont,
+      statusSize: initial.statusSize,
       readoutAnimation: initial.readoutAnimation,
       rollingMs: initial.rollingMs,
       readoutIntervalMs: initial.readoutIntervalMs,
@@ -118,6 +125,8 @@ export const useSettingsStore = create<SettingsState>()(
       setFullscreenTitleColor: (fullscreenTitleColor) => set({ fullscreenTitleColor }),
       setFullscreenSubtitleSize: (fullscreenSubtitleSize) => set({ fullscreenSubtitleSize }),
       setFullscreenSubtitleColor: (fullscreenSubtitleColor) => set({ fullscreenSubtitleColor }),
+      setStatusFont: (statusFont) => set({ statusFont }),
+      setStatusSize: (statusSize) => set({ statusSize }),
       setReadoutAnimation: (readoutAnimation) => set({ readoutAnimation }),
       setRollingMs: (rollingMs) => set({ rollingMs }),
       setReadoutIntervalMs: (readoutIntervalMs) => set({ readoutIntervalMs }),
@@ -177,6 +186,8 @@ export const useSettingsStore = create<SettingsState>()(
           fullscreenTitleColor: fresh.fullscreenTitleColor,
           fullscreenSubtitleSize: fresh.fullscreenSubtitleSize,
           fullscreenSubtitleColor: fresh.fullscreenSubtitleColor,
+          statusFont: fresh.statusFont,
+          statusSize: fresh.statusSize,
           readoutAnimation: fresh.readoutAnimation,
           rollingMs: fresh.rollingMs,
           readoutIntervalMs: fresh.readoutIntervalMs,
@@ -203,6 +214,8 @@ export const useSettingsStore = create<SettingsState>()(
         fullscreenTitleColor: state.fullscreenTitleColor,
         fullscreenSubtitleSize: state.fullscreenSubtitleSize,
         fullscreenSubtitleColor: state.fullscreenSubtitleColor,
+        statusFont: state.statusFont,
+        statusSize: state.statusSize,
         readoutAnimation: state.readoutAnimation,
         rollingMs: state.rollingMs,
         readoutIntervalMs: state.readoutIntervalMs,

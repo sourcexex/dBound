@@ -66,6 +66,12 @@ export const DEFAULT_EMOJI_SETTINGS: EmojiSettings = {
   reverse: { enabled: true, threshold: 70, holdSeconds: 5, initial: 3 },
 }
 
+/** Fullscreen status line ("音量正常" / level name) typography. */
+export const DEFAULT_STATUS_FONT = 'system'
+export const STATUS_SIZE_MIN = 10
+export const STATUS_SIZE_MAX = 32
+export const DEFAULT_STATUS_SIZE = 15
+
 export interface PersistedSettings {
   mode: Mode
   /** User-facing name for each mode, e.g. 自习课模式 / 早读模式. */
@@ -78,6 +84,8 @@ export interface PersistedSettings {
   fullscreenTitleColor: string
   fullscreenSubtitleSize: number
   fullscreenSubtitleColor: string
+  statusFont: string
+  statusSize: number
   readoutAnimation: boolean
   rollingMs: number
   readoutIntervalMs: number
@@ -100,6 +108,8 @@ export function defaultSettings(): PersistedSettings {
     fullscreenTitleColor: DEFAULT_TITLE_COLOR,
     fullscreenSubtitleSize: DEFAULT_SUBTITLE_SIZE,
     fullscreenSubtitleColor: DEFAULT_SUBTITLE_COLOR,
+    statusFont: DEFAULT_STATUS_FONT,
+    statusSize: DEFAULT_STATUS_SIZE,
     readoutAnimation: DEFAULT_READOUT_ANIMATION,
     rollingMs: DEFAULT_ROLLING_MS,
     readoutIntervalMs: DEFAULT_READOUT_INTERVAL_MS,
@@ -256,6 +266,8 @@ export function sanitizeSettings(value: unknown): PersistedSettings {
       /^#[0-9a-f]{6}$/i.test(value.fullscreenSubtitleColor)
         ? value.fullscreenSubtitleColor
         : DEFAULT_SUBTITLE_COLOR,
+    statusFont: isKnownTitleFont(value.statusFont) ? value.statusFont : DEFAULT_STATUS_FONT,
+    statusSize: sanitizeNumber(value.statusSize, DEFAULT_STATUS_SIZE, STATUS_SIZE_MIN, STATUS_SIZE_MAX),
     readoutAnimation: value.readoutAnimation !== false,
     rollingMs: sanitizeNumber(value.rollingMs, DEFAULT_ROLLING_MS, ROLLING_MS_MIN, ROLLING_MS_MAX),
     readoutIntervalMs: sanitizeNumber(

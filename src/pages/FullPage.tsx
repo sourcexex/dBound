@@ -68,6 +68,8 @@ const INITIAL: MiniState = {
   titleColor: '#17171A',
   subtitleSize: 13,
   subtitleColor: '#6B6B72',
+  statusFont: 'system',
+  statusSize: 15,
   readoutAnimation: true,
   rollingMs: 600,
   readoutIntervalMs: 1000,
@@ -207,10 +209,7 @@ export function FullPage() {
         }}
       />
 
-      <header
-        className="absolute inset-x-0 top-0 z-10 flex items-center justify-between px-9 py-7 transition-opacity duration-500"
-        style={{ opacity: chromeVisible ? 1 : 0 }}
-      >
+      <header className="absolute inset-x-0 top-0 z-10 flex items-center justify-between px-9 py-7">
         <div className="flex min-w-0 items-start gap-2.5">
           <span className="relative mt-[3px] grid h-5 w-5 shrink-0 place-items-center rounded-[7px] bg-ink">
             <span className="h-[7px] w-[7px] rounded-full bg-[#F2C94C]" />
@@ -241,7 +240,10 @@ export function FullPage() {
           </div>
         </div>
 
-        <div className="flex items-center gap-4">
+        <div
+          className="flex items-center gap-4 transition-opacity duration-500"
+          style={{ opacity: chromeVisible ? 1 : 0 }}
+        >
           <span className="text-[11px] tracking-[0.06em] text-ink-faint">按 ESC 退出</span>
           <button
             type="button"
@@ -293,7 +295,17 @@ export function FullPage() {
       </div>
 
       <main className="absolute inset-0 flex flex-col items-center justify-center">
-        <div className="flex items-start justify-center">
+        <div className="relative flex items-start justify-center">
+          {value !== null ? (
+            <span
+              aria-hidden
+              className="pointer-events-none absolute top-1/2 left-1/2 h-[38%] w-[104%] -translate-x-1/2 -translate-y-1/2 rounded-full blur-[95px] transition-opacity duration-700"
+              style={{
+                backgroundColor: measuring ? accent : '#17171A',
+                opacity: state.name ? 0.26 : 0.13,
+              }}
+            />
+          ) : null}
           {value === null ? (
             <span
               className="num font-semibold tracking-[0.06em] text-[#CBCAC3]"
@@ -336,9 +348,23 @@ export function FullPage() {
             className="h-[9px] w-[9px] rounded-full transition-colors duration-300"
             style={{ backgroundColor: state.name ? accent : '#C7C6BE' }}
           />
-          <span className="text-[15px] font-semibold text-ink">{statusText}</span>
+          <span
+            className="font-semibold text-ink"
+            style={{
+              fontFamily: fontStackFor(state.statusFont),
+              fontSize: `${state.statusSize}px`,
+            }}
+          >
+            {statusText}
+          </span>
           {state.name ? (
-            <span className="text-[13.5px] text-ink-soft">
+            <span
+              className="text-ink-soft"
+              style={{
+                fontFamily: fontStackFor(state.statusFont),
+                fontSize: `${Math.max(11, Math.round(state.statusSize * 0.9))}px`,
+              }}
+            >
               · {state.mode === 'forward' ? '声音偏大' : '声音偏小'}
             </span>
           ) : null}
