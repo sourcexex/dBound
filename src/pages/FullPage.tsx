@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import { X } from 'lucide-react'
 import { MINI_STATE_EVENT, type MiniState } from '../lib/miniBridge'
 import { isTauri } from '../lib/tauri'
+import { fontStackFor } from '../lib/titleFonts'
 
 const INITIAL: MiniState = {
   db: null,
@@ -12,6 +13,9 @@ const INITIAL: MiniState = {
   modeLabel: '正向',
   title: 'dBound',
   subtitle: '实时响度估测',
+  titleFont: 'system',
+  titleSize: 20,
+  titleColor: '#17171A',
   running: false,
   paused: false,
 }
@@ -108,11 +112,24 @@ export function FullPage() {
             <span className="h-[7px] w-[7px] rounded-full bg-[#F2C94C]" />
           </span>
           <div className="min-w-0">
-            <h1 className="truncate text-[19px] leading-tight font-semibold tracking-[0.01em] text-ink">
+            <h1
+              className="truncate leading-tight font-semibold tracking-[0.01em]"
+              style={{
+                fontFamily: fontStackFor(state.titleFont),
+                fontSize: `${state.titleSize}px`,
+                color: state.titleColor,
+              }}
+            >
               {state.title || 'dBound'}
             </h1>
             {state.subtitle ? (
-              <p className="mt-1 truncate text-[12px] font-medium tracking-[0.02em] text-ink-soft">
+              <p
+                className="mt-1 truncate font-medium tracking-[0.02em] text-ink-soft"
+                style={{
+                  fontFamily: fontStackFor(state.titleFont),
+                  fontSize: `${Math.max(12, Math.round(state.titleSize * 0.62))}px`,
+                }}
+              >
                 {state.subtitle}
               </p>
             ) : null}

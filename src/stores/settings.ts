@@ -17,6 +17,9 @@ export interface SettingsState {
   /** Title / subtitle shown in the top-left corner of fullscreen mode. */
   fullscreenTitle: string
   fullscreenSubtitle: string
+  fullscreenTitleFont: string
+  fullscreenTitleSize: number
+  fullscreenTitleColor: string
   offset: number
   /** Reverse mode only: smooth over ~3 s so reading aloud does not flicker. */
   readingSmooth: boolean
@@ -29,6 +32,9 @@ export interface SettingsState {
   setModeLabel: (mode: Mode, label: string) => void
   setFullscreenTitle: (title: string) => void
   setFullscreenSubtitle: (subtitle: string) => void
+  setFullscreenTitleFont: (font: string) => void
+  setFullscreenTitleSize: (size: number) => void
+  setFullscreenTitleColor: (color: string) => void
   setOffset: (offset: number) => void
   setReadingSmooth: (value: boolean) => void
   setShowPeak: (value: boolean) => void
@@ -71,6 +77,9 @@ export const useSettingsStore = create<SettingsState>()(
       modeLabels: initial.modeLabels,
       fullscreenTitle: initial.fullscreenTitle,
       fullscreenSubtitle: initial.fullscreenSubtitle,
+      fullscreenTitleFont: initial.fullscreenTitleFont,
+      fullscreenTitleSize: initial.fullscreenTitleSize,
+      fullscreenTitleColor: initial.fullscreenTitleColor,
       offset: initial.offset,
       readingSmooth: initial.readingSmooth,
       showPeak: initial.showPeak,
@@ -82,6 +91,9 @@ export const useSettingsStore = create<SettingsState>()(
         set((state) => ({ modeLabels: { ...state.modeLabels, [mode]: label } })),
       setFullscreenTitle: (fullscreenTitle) => set({ fullscreenTitle }),
       setFullscreenSubtitle: (fullscreenSubtitle) => set({ fullscreenSubtitle }),
+      setFullscreenTitleFont: (fullscreenTitleFont) => set({ fullscreenTitleFont }),
+      setFullscreenTitleSize: (fullscreenTitleSize) => set({ fullscreenTitleSize }),
+      setFullscreenTitleColor: (fullscreenTitleColor) => set({ fullscreenTitleColor }),
       setOffset: (offset) => set({ offset }),
       setReadingSmooth: (readingSmooth) => set({ readingSmooth }),
       setShowPeak: (showPeak) => set({ showPeak }),
@@ -131,6 +143,9 @@ export const useSettingsStore = create<SettingsState>()(
           modeLabels: fresh.modeLabels,
           fullscreenTitle: fresh.fullscreenTitle,
           fullscreenSubtitle: fresh.fullscreenSubtitle,
+          fullscreenTitleFont: fresh.fullscreenTitleFont,
+          fullscreenTitleSize: fresh.fullscreenTitleSize,
+          fullscreenTitleColor: fresh.fullscreenTitleColor,
           offset: fresh.offset,
           readingSmooth: fresh.readingSmooth,
           showPeak: fresh.showPeak,
@@ -148,6 +163,9 @@ export const useSettingsStore = create<SettingsState>()(
         modeLabels: state.modeLabels,
         fullscreenTitle: state.fullscreenTitle,
         fullscreenSubtitle: state.fullscreenSubtitle,
+        fullscreenTitleFont: state.fullscreenTitleFont,
+        fullscreenTitleSize: state.fullscreenTitleSize,
+        fullscreenTitleColor: state.fullscreenTitleColor,
         offset: state.offset,
         readingSmooth: state.readingSmooth,
         showPeak: state.showPeak,

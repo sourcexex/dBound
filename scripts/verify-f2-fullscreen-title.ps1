@@ -129,11 +129,31 @@ Click-Css 243 62
 Start-Sleep -Milliseconds 600
 Save-Shot 'f2-settings.png'
 
+function Send-Key([byte]$vk) {
+  [F2Check]::keybd_event($vk, 0, 0, [UIntPtr]::Zero)
+  Start-Sleep -Milliseconds 60
+  [F2Check]::keybd_event($vk, 0, 2, [UIntPtr]::Zero)
+  Start-Sleep -Milliseconds 220
+}
+
 if (-not $OnlySettings) {
   Click-Css 210 191
   Paste-Text '520班分贝仪'
   Click-Css 210 251
   Paste-Text '让朗读声响起来'
+
+  # 字体 -> 楷体 (系统默认 + 3 次下移)，字号拖到约 35px，颜色选红色。
+  Click-Css 117 312
+  Start-Sleep -Milliseconds 500
+  Send-Key 0x28
+  Send-Key 0x28
+  Send-Key 0x28
+  Send-Key 0x0D
+  Start-Sleep -Milliseconds 400
+  Click-Css 300 308
+  Start-Sleep -Milliseconds 400
+  Click-Css 65 366
+  Start-Sleep -Milliseconds 400
   Save-Shot 'f2-settings-filled.png'
 
   # Back, then F11 into fullscreen.
@@ -147,7 +167,7 @@ if (-not $OnlySettings) {
 
   $full = Find-Window $process.Id 'dBound Fullscreen'
   if ($full -ne [IntPtr]::Zero) {
-    Save-WindowRect $full 'f2-fullscreen.png'
+    Save-WindowRect $full 'f2-fullscreen-styled.png'
     [void][F2Check]::SetForegroundWindow($full)
     Start-Sleep -Milliseconds 300
     [F2Check]::keybd_event(0x1B, 0, 0, [UIntPtr]::Zero)

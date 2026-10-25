@@ -44,6 +44,9 @@ export function useLevelMonitor() {
       modeLabel: settings.modeLabels[settings.mode],
       title: settings.fullscreenTitle,
       subtitle: settings.fullscreenSubtitle,
+      titleFont: settings.fullscreenTitleFont,
+      titleSize: settings.fullscreenTitleSize,
+      titleColor: settings.fullscreenTitleColor,
       running: level.status === 'running',
       paused: level.status === 'idle' || level.status === 'error',
     })

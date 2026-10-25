@@ -11,6 +11,9 @@ const INITIAL: MiniState = {
   modeLabel: '正向',
   title: 'dBound',
   subtitle: '',
+  titleFont: 'system',
+  titleSize: 20,
+  titleColor: '#17171A',
   running: false,
   paused: false,
 }

@@ -8,6 +8,7 @@ import {
   migrateSettings,
   sanitizeSettings,
 } from './settingsSchema'
+import { DEFAULT_TITLE_COLOR, DEFAULT_TITLE_FONT, TITLE_SIZE_MAX } from './titleFonts'
 import { DEFAULT_OFFSET } from './dsp'
 
 describe('settings schema', () => {
@@ -130,5 +131,27 @@ describe('settings schema', () => {
       fullscreenSubtitle: '',
     })
     expect(emptySubtitle.fullscreenSubtitle).toBe('')
+  })
+
+  it('sanitizes the title font, size and colour', () => {
+    const custom = sanitizeSettings({
+      modeLabels: { forward: '正向', reverse: '反向' },
+      fullscreenTitleFont: 'kaiti',
+      fullscreenTitleSize: 35,
+      fullscreenTitleColor: '#DC2626',
+    })
+    expect(custom.fullscreenTitleFont).toBe('kaiti')
+    expect(custom.fullscreenTitleSize).toBe(35)
+    expect(custom.fullscreenTitleColor).toBe('#DC2626')
+
+    const broken = sanitizeSettings({
+      modeLabels: { forward: '正向', reverse: '反向' },
+      fullscreenTitleFont: 'comic-sans',
+      fullscreenTitleSize: 999,
+      fullscreenTitleColor: 'red',
+    })
+    expect(broken.fullscreenTitleFont).toBe(DEFAULT_TITLE_FONT)
+    expect(broken.fullscreenTitleSize).toBe(TITLE_SIZE_MAX)
+    expect(broken.fullscreenTitleColor).toBe(DEFAULT_TITLE_COLOR)
   })
 })

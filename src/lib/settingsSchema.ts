@@ -1,5 +1,13 @@
 import { DEFAULT_OFFSET } from './dsp'
 import { LEVEL_PALETTE, defaultLevels } from './presets'
+import {
+  DEFAULT_TITLE_COLOR,
+  DEFAULT_TITLE_FONT,
+  DEFAULT_TITLE_SIZE,
+  TITLE_SIZE_MAX,
+  TITLE_SIZE_MIN,
+  isKnownTitleFont,
+} from './titleFonts'
 import type { Level, Mode } from './types'
 
 export const SETTINGS_VERSION = 2
@@ -23,6 +31,9 @@ export interface PersistedSettings {
   /** Title / subtitle shown in the top-left corner of fullscreen mode. */
   fullscreenTitle: string
   fullscreenSubtitle: string
+  fullscreenTitleFont: string
+  fullscreenTitleSize: number
+  fullscreenTitleColor: string
   offset: number
   readingSmooth: boolean
   showPeak: boolean
@@ -36,6 +47,9 @@ export function defaultSettings(): PersistedSettings {
     modeLabels: { ...DEFAULT_MODE_LABELS },
     fullscreenTitle: DEFAULT_FULLSCREEN_TITLE,
     fullscreenSubtitle: DEFAULT_FULLSCREEN_SUBTITLE,
+    fullscreenTitleFont: DEFAULT_TITLE_FONT,
+    fullscreenTitleSize: DEFAULT_TITLE_SIZE,
+    fullscreenTitleColor: DEFAULT_TITLE_COLOR,
     offset: DEFAULT_OFFSET,
     readingSmooth: true,
     showPeak: true,
@@ -101,6 +115,12 @@ function sanitizeText(value: unknown, fallback: string, max: number, allowEmpty:
   return allowEmpty ? trimmed : trimmed.length > 0 ? trimmed : fallback
 }
 
+function sanitizeNumber(value: unknown, fallback: number, min: number, max: number): number {
+  const parsed = Number(value)
+  if (!Number.isFinite(parsed)) return fallback
+  return Math.min(max, Math.max(min, Math.round(parsed)))
+}
+
 /** Keep only well-formed settings; fall back to defaults for anything broken. */
 export function sanitizeSettings(value: unknown): PersistedSettings {
   const fallback = defaultSettings()
@@ -131,6 +151,20 @@ export function sanitizeSettings(value: unknown): PersistedSettings {
       FULLSCREEN_SUBTITLE_MAX,
       true,
     ),
+    fullscreenTitleFont: isKnownTitleFont(value.fullscreenTitleFont)
+      ? value.fullscreenTitleFont
+      : DEFAULT_TITLE_FONT,
+    fullscreenTitleSize: sanitizeNumber(
+      value.fullscreenTitleSize,
+      DEFAULT_TITLE_SIZE,
+      TITLE_SIZE_MIN,
+      TITLE_SIZE_MAX,
+    ),
+    fullscreenTitleColor:
+      typeof value.fullscreenTitleColor === 'string' &&
+      /^#[0-9a-f]{6}$/i.test(value.fullscreenTitleColor)
+        ? value.fullscreenTitleColor
+        : DEFAULT_TITLE_COLOR,
     offset: Number.isFinite(offset) ? Math.min(125, Math.max(65, Math.round(offset * 2) / 2)) : DEFAULT_OFFSET,
     readingSmooth: value.readingSmooth !== false,
     showPeak: value.showPeak !== false,

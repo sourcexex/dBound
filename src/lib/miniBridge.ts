@@ -15,6 +15,9 @@ export interface MiniState {
   /** Fullscreen title / subtitle configured in settings. */
   title: string
   subtitle: string
+  titleFont: string
+  titleSize: number
+  titleColor: string
   running: boolean
   paused: boolean
 }
