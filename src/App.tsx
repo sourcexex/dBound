@@ -124,15 +124,8 @@ export default function App() {
     </div>
   )
 
-  if (license === 'checking') {
-    return shell(
-      <div className="grid h-full place-items-center text-[11.5px] text-ink-soft">正在检查授权…</div>,
-    )
-  }
-
-  if (license === 'locked') {
-    return shell(<ActivationPage onActivated={() => setLicense('ok')} />)
-  }
-
-  return shell(content)
+  // Render immediately (the license read takes ~1 ms); the activation gate only
+  // replaces the UI when the marker is actually missing.
+  const body = license === 'locked' ? <ActivationPage onActivated={() => setLicense('ok')} /> : content
+  return shell(body)
 }

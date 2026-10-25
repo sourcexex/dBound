@@ -1,43 +1,54 @@
-use std::process::Command;
+use std::sync::atomic::{AtomicBool, Ordering};
+use std::sync::OnceLock;
+
+use winreg::enums::{HKEY_CURRENT_USER, KEY_READ};
+use winreg::RegKey;
 
 const SERIAL: &str = "142857";
-const REG_KEY: &str = "HKCU\\Software\\dBound";
+const REG_KEY: &str = "Software\\dBound";
 const REG_VALUE: &str = "License";
 
-fn registry_has_license() -> bool {
-    Command::new("reg")
-        .args(["query", REG_KEY, "/v", REG_VALUE])
-        .output()
-        .map(|output| output.status.success())
+/// Read once, then answer instantly: spawning `reg.exe` on every start was the
+/// slow part of opening the app.
+static LICENSE_OK: AtomicBool = AtomicBool::new(false);
+static CHECKED: OnceLock<()> = OnceLock::new();
+
+fn read_marker() -> bool {
+    RegKey::predef(HKEY_CURRENT_USER)
+        .open_subkey_with_flags(REG_KEY, KEY_READ)
+        .and_then(|key| key.get_value::<String, _>(REG_VALUE))
+        .map(|value| !value.trim().is_empty())
         .unwrap_or(false)
+}
+
+fn ensure_checked() -> bool {
+    CHECKED.get_or_init(|| LICENSE_OK.store(read_marker(), Ordering::Relaxed));
+    LICENSE_OK.load(Ordering::Relaxed)
+}
+
+/// Called from the app setup so the value is already warm when the UI asks.
+pub fn prime() {
+    ensure_checked();
 }
 
 #[tauri::command]
 pub fn license_status() -> bool {
-    registry_has_license()
+    ensure_checked()
 }
 
-/// Writes the activation marker that the NSIS installer also creates.
-/// Copying an installed folder to another machine leaves this key behind,
-/// so the app asks for the serial again.
 #[tauri::command]
 pub fn activate_license(serial: String) -> Result<bool, String> {
     if serial.trim() != SERIAL {
         return Ok(false);
     }
-    let status = Command::new("reg")
-        .args([
-            "add",
-            REG_KEY,
-            "/v",
-            REG_VALUE,
-            "/t",
-            "REG_SZ",
-            "/d",
-            "1",
-            "/f",
-        ])
-        .status()
+    let key = RegKey::predef(HKEY_CURRENT_USER)
+        .create_subkey(REG_KEY)
         .map_err(|error| error.to_string())?;
-    Ok(status.success())
+    key.0
+        .set_value(REG_VALUE, &"1".to_string())
+        .map_err(|error| error.to_string())?;
+    // Also allow runtime activation without a restart.
+    LICENSE_OK.store(true, Ordering::Relaxed);
+    let _ = CHECKED.set(());
+    Ok(true)
 }

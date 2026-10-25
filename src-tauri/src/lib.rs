@@ -33,6 +33,8 @@ pub fn run() {
             logs::log_dir
         ])
         .setup(|app| {
+            // Warm the license cache before the webview asks for it (no reg.exe spawn).
+            license::prime();
             build_tray(app.handle())?;
             // Secondary windows are configured as hidden; make sure that still holds
             // even if a previous session left them on screen.

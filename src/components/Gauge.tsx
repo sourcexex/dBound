@@ -117,7 +117,7 @@ export function Gauge({
             style={{
               fontFamily: fontStackFor(statusFont),
               fontSize: `${activeLevel ? levelNameSize : Math.max(10, Math.min(24, statusSize))}px`,
-              color: statusTextColor,
+              color: activeLevel ? activeLevel.color : statusTextColor,
             }}
           >
             {chipLabel}
@@ -130,6 +130,7 @@ export function Gauge({
                 style={{
                   fontFamily: fontStackFor(statusFont),
                   fontSize: `${levelNoteSize}px`,
+                  color: activeLevel?.color,
                 }}
               >
                 {chipNote}

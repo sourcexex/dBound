@@ -373,7 +373,7 @@ export function FullPage() {
             style={{
               fontFamily: fontStackFor(state.statusFont),
               fontSize: `${state.name ? state.levelNameSize : state.statusSize}px`,
-              color: state.statusColor || undefined,
+              color: state.name ? state.color : state.statusColor || undefined,
             }}
           >
             {statusText}
@@ -384,6 +384,7 @@ export function FullPage() {
               style={{
                 fontFamily: fontStackFor(state.statusFont),
                 fontSize: `${state.levelNoteSize}px`,
+                color: state.name ? state.color : undefined,
               }}
             >
               · {state.mode === 'forward' ? '声音偏大' : '声音偏小'}
