@@ -37,6 +37,35 @@ export const DEFAULT_READOUT_INTERVAL_MS = 1000
 export const READOUT_INTERVAL_MIN = 200
 export const READOUT_INTERVAL_MAX = 1200
 
+/** Emoji reward shown in fullscreen when the room meets the mode's goal. */
+export interface EmojiRule {
+  enabled: boolean
+  /** dB threshold: reverse mode rewards "loud enough", forward rewards "quiet enough". */
+  threshold: number
+  /** How long the condition must hold before one emoji pops in. */
+  holdSeconds: number
+  /** How many emoji are already on screen when fullscreen opens. */
+  initial: number
+}
+
+export interface EmojiSettings {
+  forward: EmojiRule
+  reverse: EmojiRule
+}
+
+export const EMOJI_MAX = 80
+export const EMOJI_THRESHOLD_MIN = 0
+export const EMOJI_THRESHOLD_MAX = 120
+export const EMOJI_HOLD_MIN = 1
+export const EMOJI_HOLD_MAX = 30
+export const EMOJI_INITIAL_MIN = 0
+export const EMOJI_INITIAL_MAX = 40
+
+export const DEFAULT_EMOJI_SETTINGS: EmojiSettings = {
+  forward: { enabled: true, threshold: 45, holdSeconds: 5, initial: 3 },
+  reverse: { enabled: true, threshold: 70, holdSeconds: 5, initial: 3 },
+}
+
 export interface PersistedSettings {
   mode: Mode
   /** User-facing name for each mode, e.g. 自习课模式 / 早读模式. */
@@ -52,6 +81,7 @@ export interface PersistedSettings {
   readoutAnimation: boolean
   rollingMs: number
   readoutIntervalMs: number
+  emoji: EmojiSettings
   offset: number
   readingSmooth: boolean
   showPeak: boolean
@@ -73,6 +103,10 @@ export function defaultSettings(): PersistedSettings {
     readoutAnimation: DEFAULT_READOUT_ANIMATION,
     rollingMs: DEFAULT_ROLLING_MS,
     readoutIntervalMs: DEFAULT_READOUT_INTERVAL_MS,
+    emoji: {
+      forward: { ...DEFAULT_EMOJI_SETTINGS.forward },
+      reverse: { ...DEFAULT_EMOJI_SETTINGS.reverse },
+    },
     offset: DEFAULT_OFFSET,
     readingSmooth: true,
     showPeak: true,
@@ -144,6 +178,29 @@ function sanitizeNumber(value: unknown, fallback: number, min: number, max: numb
   return Math.min(max, Math.max(min, Math.round(parsed)))
 }
 
+function sanitizeEmojiRule(value: unknown, fallback: EmojiRule): EmojiRule {
+  const raw = isRecord(value) ? value : {}
+  return {
+    enabled: raw.enabled !== false,
+    threshold: sanitizeNumber(
+      raw.threshold,
+      fallback.threshold,
+      EMOJI_THRESHOLD_MIN,
+      EMOJI_THRESHOLD_MAX,
+    ),
+    holdSeconds: sanitizeNumber(raw.holdSeconds, fallback.holdSeconds, EMOJI_HOLD_MIN, EMOJI_HOLD_MAX),
+    initial: sanitizeNumber(raw.initial, fallback.initial, EMOJI_INITIAL_MIN, EMOJI_INITIAL_MAX),
+  }
+}
+
+function sanitizeEmoji(value: unknown): EmojiSettings {
+  const raw = isRecord(value) ? value : {}
+  return {
+    forward: sanitizeEmojiRule(raw.forward, DEFAULT_EMOJI_SETTINGS.forward),
+    reverse: sanitizeEmojiRule(raw.reverse, DEFAULT_EMOJI_SETTINGS.reverse),
+  }
+}
+
 /** Keep only well-formed settings; fall back to defaults for anything broken. */
 export function sanitizeSettings(value: unknown): PersistedSettings {
   const fallback = defaultSettings()
@@ -207,6 +264,7 @@ export function sanitizeSettings(value: unknown): PersistedSettings {
       READOUT_INTERVAL_MIN,
       READOUT_INTERVAL_MAX,
     ),
+    emoji: sanitizeEmoji(value.emoji),
     offset: Number.isFinite(offset) ? Math.min(125, Math.max(65, Math.round(offset * 2) / 2)) : DEFAULT_OFFSET,
     readingSmooth: value.readingSmooth !== false,
     showPeak: value.showPeak !== false,

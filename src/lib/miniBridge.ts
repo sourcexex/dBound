@@ -1,4 +1,5 @@
 import { isTauri } from './tauri'
+import type { EmojiRule } from './settingsSchema'
 import type { Mode } from './types'
 
 export const MINI_STATE_EVENT = 'dbound:mini-state'
@@ -23,6 +24,8 @@ export interface MiniState {
   readoutAnimation: boolean
   rollingMs: number
   readoutIntervalMs: number
+  /** Emoji reward rule for the current mode. */
+  emojiRule: EmojiRule | null
   running: boolean
   paused: boolean
 }

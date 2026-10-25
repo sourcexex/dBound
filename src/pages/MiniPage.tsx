@@ -19,6 +19,7 @@ const INITIAL: MiniState = {
   readoutAnimation: true,
   rollingMs: 600,
   readoutIntervalMs: 1000,
+  emojiRule: null,
   running: false,
   paused: false,
 }

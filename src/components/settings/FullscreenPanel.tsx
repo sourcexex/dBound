@@ -2,9 +2,16 @@ import type { ReactNode } from 'react'
 import {
   DEFAULT_FULLSCREEN_SUBTITLE,
   DEFAULT_FULLSCREEN_TITLE,
+  EMOJI_HOLD_MAX,
+  EMOJI_HOLD_MIN,
+  EMOJI_INITIAL_MAX,
+  EMOJI_INITIAL_MIN,
+  EMOJI_THRESHOLD_MAX,
+  EMOJI_THRESHOLD_MIN,
   FULLSCREEN_SUBTITLE_MAX,
   FULLSCREEN_TITLE_MAX,
 } from '../../lib/settingsSchema'
+import type { Mode } from '../../lib/types'
 import {
   DEFAULT_SUBTITLE_COLOR,
   DEFAULT_SUBTITLE_SIZE,
@@ -20,6 +27,8 @@ import {
 } from '../../lib/titleFonts'
 import { useSettingsStore } from '../../stores/settings'
 import { SectionCard } from '../ui/SectionCard'
+import { Toggle } from '../ui/Toggle'
+import { ValueSlider } from '../ui/ValueSlider'
 
 const INPUT_CLASS =
   'w-full rounded-lg border border-line bg-white px-2.5 py-1.5 text-[12px] text-ink outline-none transition-colors placeholder:text-ink-faint focus:border-ink/30'
@@ -136,6 +145,9 @@ export function FullscreenPanel() {
   const setTitleColor = useSettingsStore((state) => state.setFullscreenTitleColor)
   const setSubtitleSize = useSettingsStore((state) => state.setFullscreenSubtitleSize)
   const setSubtitleColor = useSettingsStore((state) => state.setFullscreenSubtitleColor)
+  const emoji = useSettingsStore((state) => state.emoji)
+  const modeLabels = useSettingsStore((state) => state.modeLabels)
+  const updateEmojiRule = useSettingsStore((state) => state.updateEmojiRule)
 
   const previewTitle = title.trim() || DEFAULT_FULLSCREEN_TITLE
   const previewSubtitle = subtitle.trim()
@@ -230,6 +242,69 @@ export function FullscreenPanel() {
             恢复默认
           </button>
         </div>
+      </SectionCard>
+
+      <SectionCard title="表情互动" hint="达标后全屏底部随机蹦出一个表情，适合课堂激励">
+        {(['reverse', 'forward'] as Mode[]).map((key) => {
+          const rule = emoji[key]
+          return (
+            <div key={key} className={key === 'reverse' ? 'mb-3.5' : ''}>
+              <div className="flex items-center justify-between">
+                <div className="min-w-0">
+                  <div className="text-[12px] font-semibold text-ink">{modeLabels[key]}</div>
+                  <div className="text-[10px] text-ink-faint">
+                    {key === 'reverse'
+                      ? `声音 ≥ ${rule.threshold} dB 时奖励`
+                      : `保持 ≤ ${rule.threshold} dB 时奖励`}
+                  </div>
+                </div>
+                <Toggle
+                  checked={rule.enabled}
+                  label={`${modeLabels[key]} 表情`}
+                  onChange={(enabled) => updateEmojiRule(key, { enabled })}
+                />
+              </div>
+              <div className={`mt-2 space-y-2.5 ${rule.enabled ? '' : 'opacity-45'}`}>
+                <ValueSlider
+                  label="触发分贝"
+                  value={rule.threshold}
+                  min={EMOJI_THRESHOLD_MIN}
+                  max={EMOJI_THRESHOLD_MAX}
+                  step={1}
+                  unit="dB"
+                  disabled={!rule.enabled}
+                  onChange={(threshold) => updateEmojiRule(key, { threshold })}
+                  hint={key === 'reverse' ? '高于此值算达标' : '低于此值算达标'}
+                />
+                <ValueSlider
+                  label="持续时长"
+                  value={rule.holdSeconds}
+                  min={EMOJI_HOLD_MIN}
+                  max={EMOJI_HOLD_MAX}
+                  step={1}
+                  unit="秒"
+                  disabled={!rule.enabled}
+                  onChange={(holdSeconds) => updateEmojiRule(key, { holdSeconds })}
+                  hint="达标保持这么久，才冒出一个表情"
+                />
+                <ValueSlider
+                  label="初始数量"
+                  value={rule.initial}
+                  min={EMOJI_INITIAL_MIN}
+                  max={EMOJI_INITIAL_MAX}
+                  step={1}
+                  unit="个"
+                  disabled={!rule.enabled}
+                  onChange={(initial) => updateEmojiRule(key, { initial })}
+                  hint="进入全屏时底部已有的表情数"
+                />
+              </div>
+            </div>
+          )
+        })}
+        <p className="text-[10px] leading-relaxed text-ink-faint">
+          表情在切换模式时重新铺开，全屏期间持续累积；最多 80 个。
+        </p>
       </SectionCard>
 
       <SectionCard title="预览" hint="全屏左上角的实际效果">

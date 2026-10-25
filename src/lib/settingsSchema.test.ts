@@ -204,4 +204,32 @@ describe('settings schema', () => {
     expect(clamped.rollingMs).toBe(ROLLING_MS_MIN)
     expect(clamped.readoutIntervalMs).toBe(READOUT_INTERVAL_MAX)
   })
+
+  it('sanitizes the emoji reward rules', () => {
+    const defaults = defaultSettings().emoji
+    expect(defaults.reverse).toEqual({ enabled: true, threshold: 70, holdSeconds: 5, initial: 3 })
+    expect(defaults.forward).toEqual({ enabled: true, threshold: 45, holdSeconds: 5, initial: 3 })
+
+    const custom = sanitizeSettings({
+      modeLabels: { forward: '正向', reverse: '反向' },
+      emoji: {
+        reverse: { enabled: false, threshold: 80, holdSeconds: 8, initial: 10 },
+      },
+    })
+    expect(custom.emoji.reverse).toEqual({
+      enabled: false,
+      threshold: 80,
+      holdSeconds: 8,
+      initial: 10,
+    })
+    expect(custom.emoji.forward).toEqual(defaults.forward)
+
+    const clamped = sanitizeSettings({
+      modeLabels: { forward: '正向', reverse: '反向' },
+      emoji: { forward: { threshold: 999, holdSeconds: 0, initial: -3 } },
+    })
+    expect(clamped.emoji.forward.threshold).toBe(120)
+    expect(clamped.emoji.forward.holdSeconds).toBe(1)
+    expect(clamped.emoji.forward.initial).toBe(0)
+  })
 })

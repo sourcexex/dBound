@@ -2,8 +2,57 @@ import { useEffect, useRef, useState } from 'react'
 import { X } from 'lucide-react'
 import { RollingNumber } from '../components/RollingNumber'
 import { MINI_STATE_EVENT, type MiniState } from '../lib/miniBridge'
+import { EMOJI_MAX } from '../lib/settingsSchema'
 import { isTauri } from '../lib/tauri'
 import { fontStackFor } from '../lib/titleFonts'
+
+const EMOJI_POOL = [
+  '😀', '😄', '😁', '😊', '🥳', '🤩', '😍', '😎', '🤗', '😆',
+  '🎉', '👏', '🌟', '💪', '🐱', '🐶', '🌈', '☀️', '👍', '✨',
+]
+
+interface EmojiItem {
+  id: number
+  char: string
+  x: number
+  y: number
+  size: number
+  rot: number
+  delay: number
+  bob: number
+}
+
+let emojiSeq = 0
+
+function pickX(existing: EmojiItem[]): number {
+  for (let attempt = 0; attempt < 24; attempt += 1) {
+    const candidate = 4 + Math.random() * 87
+    if (existing.every((emoji) => Math.abs(emoji.x - candidate) > 5)) return candidate
+  }
+  return 4 + Math.random() * 87
+}
+
+function makeEmoji(existing: EmojiItem[] = []): EmojiItem {
+  emojiSeq += 1
+  // Size relative to the viewport so the faces stay chunky on big screens.
+  const unit = (typeof window === 'undefined' ? 1280 : window.innerWidth) / 100
+  return {
+    id: emojiSeq,
+    char: EMOJI_POOL[Math.floor(Math.random() * EMOJI_POOL.length)],
+    x: pickX(existing),
+    y: 2 + Math.random() * 24,
+    size: Math.round((2.8 + Math.random() * 2.8) * unit),
+    rot: -10 + Math.random() * 20,
+    delay: Math.random() * 1.2,
+    bob: 1.9 + Math.random() * 1.2,
+  }
+}
+
+function seedEmoji(count: number): EmojiItem[] {
+  const list: EmojiItem[] = []
+  for (let index = 0; index < count; index += 1) list.push(makeEmoji(list))
+  return list
+}
 
 const INITIAL: MiniState = {
   db: null,
@@ -22,6 +71,7 @@ const INITIAL: MiniState = {
   readoutAnimation: true,
   rollingMs: 600,
   readoutIntervalMs: 1000,
+  emojiRule: null,
   running: false,
   paused: false,
 }
@@ -83,6 +133,54 @@ export function FullPage() {
   const measuring = state.running && !state.paused
   const accent = state.name ? state.color : '#17171A'
   const value = state.db === null ? null : state.db.toFixed(1)
+
+  const [emojis, setEmojis] = useState<EmojiItem[]>([])
+  const holdSinceRef = useRef<number | null>(null)
+  const emojiRule = state.emojiRule
+
+  // Reset + seed the bottom row whenever the mode (or its initial count) changes.
+  useEffect(() => {
+    holdSinceRef.current = null
+    const initial = Math.min(emojiRule?.initial ?? 0, EMOJI_MAX)
+    setEmojis(seedEmoji(initial))
+  }, [state.mode, emojiRule?.initial])
+
+  // Reward: hold the goal for N seconds → one more emoji pops in.
+  useEffect(() => {
+    // Only reward while the fullscreen window is actually on screen.
+    if (
+      document.visibilityState !== 'visible' ||
+      !emojiRule ||
+      !emojiRule.enabled ||
+      !measuring ||
+      state.db === null
+    ) {
+      holdSinceRef.current = null
+      return
+    }
+
+    const qualifies =
+      state.mode === 'reverse' ? state.db >= emojiRule.threshold : state.db <= emojiRule.threshold
+
+    if (!qualifies) {
+      holdSinceRef.current = null
+      return
+    }
+
+    const now = performance.now()
+    if (holdSinceRef.current === null) {
+      holdSinceRef.current = now
+      return
+    }
+
+    if (now - holdSinceRef.current >= emojiRule.holdSeconds * 1000) {
+      holdSinceRef.current = now
+      setEmojis((previous) =>
+        previous.length >= EMOJI_MAX ? previous : [...previous, makeEmoji(previous)],
+      )
+    }
+  }, [state.db, state.mode, measuring, emojiRule])
+
   const statusText = !state.running
     ? state.paused
       ? '已暂停'
@@ -158,6 +256,41 @@ export function FullPage() {
           </button>
         </div>
       </header>
+
+      {/* emoji reward row */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-x-0 bottom-0 z-0 h-[34vh] overflow-hidden"
+      >
+        {emojis.map((emoji) => (
+          <span
+            key={emoji.id}
+            className="absolute"
+            style={{
+              left: `${emoji.x}%`,
+              bottom: `${emoji.y}%`,
+              transform: `rotate(${emoji.rot}deg)`,
+            }}
+          >
+            <span
+              className="inline-block"
+              style={{ animation: `dbound-emoji-bob ${emoji.bob}s ease-in-out ${emoji.delay}s infinite` }}
+            >
+              <span
+                className="inline-block select-none"
+                style={{
+                  fontSize: `${emoji.size}px`,
+                  lineHeight: 1,
+                  fontFamily: '"Segoe UI Emoji", "Apple Color Emoji", sans-serif',
+                  animation: 'dbound-emoji-pop 520ms cubic-bezier(0.34, 1.56, 0.64, 1) both',
+                }}
+              >
+                {emoji.char}
+              </span>
+            </span>
+          </span>
+        ))}
+      </div>
 
       <main className="absolute inset-0 flex flex-col items-center justify-center">
         <div className="flex items-start justify-center">

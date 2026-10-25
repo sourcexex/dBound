@@ -6,6 +6,8 @@ import {
   SETTINGS_VERSION,
   defaultSettings,
   migrateSettings,
+  type EmojiRule,
+  type EmojiSettings,
   type PersistedSettings,
 } from '../lib/settingsSchema'
 import type { Level, Mode } from '../lib/types'
@@ -26,6 +28,8 @@ export interface SettingsState {
   readoutAnimation: boolean
   rollingMs: number
   readoutIntervalMs: number
+  /** Fullscreen emoji reward rules, per mode. */
+  emoji: EmojiSettings
   offset: number
   /** Reverse mode only: smooth over ~3 s so reading aloud does not flicker. */
   readingSmooth: boolean
@@ -46,6 +50,7 @@ export interface SettingsState {
   setReadoutAnimation: (enabled: boolean) => void
   setRollingMs: (value: number) => void
   setReadoutIntervalMs: (value: number) => void
+  updateEmojiRule: (mode: Mode, patch: Partial<EmojiRule>) => void
   setOffset: (offset: number) => void
   setReadingSmooth: (value: boolean) => void
   setShowPeak: (value: boolean) => void
@@ -96,6 +101,7 @@ export const useSettingsStore = create<SettingsState>()(
       readoutAnimation: initial.readoutAnimation,
       rollingMs: initial.rollingMs,
       readoutIntervalMs: initial.readoutIntervalMs,
+      emoji: initial.emoji,
       offset: initial.offset,
       readingSmooth: initial.readingSmooth,
       showPeak: initial.showPeak,
@@ -115,6 +121,8 @@ export const useSettingsStore = create<SettingsState>()(
       setReadoutAnimation: (readoutAnimation) => set({ readoutAnimation }),
       setRollingMs: (rollingMs) => set({ rollingMs }),
       setReadoutIntervalMs: (readoutIntervalMs) => set({ readoutIntervalMs }),
+      updateEmojiRule: (mode, patch) =>
+        set((state) => ({ emoji: { ...state.emoji, [mode]: { ...state.emoji[mode], ...patch } } })),
       setOffset: (offset) => set({ offset }),
       setReadingSmooth: (readingSmooth) => set({ readingSmooth }),
       setShowPeak: (showPeak) => set({ showPeak }),
@@ -172,6 +180,7 @@ export const useSettingsStore = create<SettingsState>()(
           readoutAnimation: fresh.readoutAnimation,
           rollingMs: fresh.rollingMs,
           readoutIntervalMs: fresh.readoutIntervalMs,
+          emoji: fresh.emoji,
           offset: fresh.offset,
           readingSmooth: fresh.readingSmooth,
           showPeak: fresh.showPeak,
@@ -197,6 +206,7 @@ export const useSettingsStore = create<SettingsState>()(
         readoutAnimation: state.readoutAnimation,
         rollingMs: state.rollingMs,
         readoutIntervalMs: state.readoutIntervalMs,
+        emoji: state.emoji,
         offset: state.offset,
         readingSmooth: state.readingSmooth,
         showPeak: state.showPeak,
