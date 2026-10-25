@@ -81,7 +81,7 @@ export function MainPage({
   }, [status])
 
   return (
-    <div className="relative flex h-full flex-col overflow-hidden rounded-[15px] border border-black/[0.07] bg-paper">
+    <div className="flex h-full flex-col overflow-hidden">
       <TitleBar
         onOpenSettings={onOpenSettings}
         onOpenMini={onOpenMini}

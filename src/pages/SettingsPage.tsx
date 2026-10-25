@@ -28,7 +28,7 @@ export function SettingsPage({
   const [tab, setTab] = useState<TabId>('mode')
 
   return (
-    <div className="flex h-full flex-col overflow-hidden rounded-[15px] border border-black/[0.07] bg-paper">
+    <div className="flex h-full flex-col overflow-hidden">
       <header className="flex h-12 shrink-0 items-center gap-1 pl-2 pr-4">
         <button
           type="button"

@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
+import { AuroraBackground } from './components/AuroraBackground'
 import { useLevelMonitor } from './hooks/useLevelMonitor'
 import { flushLogs, initLogFlushHooks, logSystem } from './lib/logger'
 import { showFullscreen, showMiniWindow } from './lib/miniBridge'
@@ -38,41 +39,43 @@ export default function App() {
     return () => window.removeEventListener('keydown', onKeyDown)
   }, [])
 
-  if (view === 'settings') {
-    return (
+  const content =
+    view === 'settings' ? (
       <SettingsPage
         onBack={() => setView('main')}
         onRestartDevice={(deviceId) => {
           void restartDevice(deviceId)
         }}
       />
+    ) : view === 'logs' ? (
+      <LogsPage onBack={() => setView('main')} />
+    ) : (
+      <MainPage
+        onToggle={() => {
+          void toggle()
+        }}
+        onStart={() => {
+          void start()
+        }}
+        onOpenSettings={() => setView('settings')}
+        onOpenMini={() => {
+          void showMiniWindow()
+        }}
+        onOpenFullscreen={() => {
+          void showFullscreen()
+        }}
+        onOpenLogs={() => {
+          useLevelStore.getState().clearUnseenAlerts()
+          setView('logs')
+        }}
+        unseenLogs={unseenAlerts > 0}
+      />
     )
-  }
-
-  if (view === 'logs') {
-    return <LogsPage onBack={() => setView('main')} />
-  }
 
   return (
-    <MainPage
-      onToggle={() => {
-        void toggle()
-      }}
-      onStart={() => {
-        void start()
-      }}
-      onOpenSettings={() => setView('settings')}
-      onOpenMini={() => {
-        void showMiniWindow()
-      }}
-      onOpenFullscreen={() => {
-        void showFullscreen()
-      }}
-      onOpenLogs={() => {
-        useLevelStore.getState().clearUnseenAlerts()
-        setView('logs')
-      }}
-      unseenLogs={unseenAlerts > 0}
-    />
+    <div className="relative h-full w-full overflow-hidden rounded-[15px] border border-black/[0.07]">
+      <AuroraBackground />
+      <div className="relative z-10 h-full">{content}</div>
+    </div>
   )
 }

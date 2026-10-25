@@ -112,6 +112,26 @@
   }
 }
 
+@keyframes dbound-drift-a {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+  50% {
+    transform: translate3d(3.5%, -4.5%, 0) scale(1.07);
+  }
+}
+
+@keyframes dbound-drift-b {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0) scale(1.04);
+  }
+  50% {
+    transform: translate3d(-4%, 3.5%, 0) scale(0.96);
+  }
+}
+
 @keyframes dbound-rise {
   from {
     opacity: 0;
@@ -135,6 +155,13 @@
   }
 
   .dbound-emoji-bob {
+    animation: none !important;
+  }
+}
+
+/* Aurora blobs: freeze the drift for reduced-motion users. */
+@media (prefers-reduced-motion: reduce) {
+  .dbound-aurora-blob {
     animation: none !important;
   }
 }

@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { X } from 'lucide-react'
+import { AuroraBackground } from '../components/AuroraBackground'
 import { RollingNumber } from '../components/RollingNumber'
 import { MINI_STATE_EVENT, type MiniState } from '../lib/miniBridge'
 import { EMOJI_MAX } from '../lib/settingsSchema'
@@ -197,8 +198,9 @@ export function FullPage() {
     <div
       onMouseMove={revealChrome}
       onClick={revealChrome}
-      className="relative h-screen w-screen overflow-hidden bg-paper"
+      className="relative h-screen w-screen overflow-hidden"
     >
+      <AuroraBackground variant="fullscreen" />
       {/* soft colour wash driven by the active level */}
       <div
         aria-hidden
