@@ -117,7 +117,7 @@ export default function App() {
     <div
       data-appearance={darkMode ? 'dark' : 'light'}
       data-theme={theme}
-      className="relative h-full w-full overflow-hidden rounded-[15px] border border-ink/[0.08]"
+      className="relative h-full w-full overflow-hidden rounded-[15px]"
     >
       <AuroraBackground theme={theme} dark={darkMode} />
       <div className="relative z-10 h-full">{body}</div>

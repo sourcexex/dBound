@@ -329,3 +329,9 @@ $env:VITE_DBOUND_SIM='72'; $env:VITE_DBOUND_SIM_MODE='forward'; pnpm tauri build
 - 本版本包含：应用图标统一（标题栏 / 全屏 / 设置预览）、全屏默认标题改为 `dBound`、
   Fluent Emoji 资源外置到安装目录 `resources/`、主程序体积降至约 3.5MB
 - 安装包与便携版文件名随版本变为 `dBound_0.2.0_x64-setup.exe`、`dBound-0.2.0-portable.zip`
+
+### 主窗口去边框
+
+- 去掉主窗口外壳的 1px `border`（`App.tsx` 的 shell），并关闭主窗口的 DWM 阴影（`shadow: false`），
+  消除窗口外围的细微灰/黑描边；圆角与透明背景保持不变
+- 迷你窗与全屏窗口不受影响（迷你窗自身有描边与投影设计）
