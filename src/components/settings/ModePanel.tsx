@@ -7,6 +7,7 @@ import {
   ROLLING_MS_MIN,
 } from '../../lib/settingsSchema'
 import type { Mode } from '../../lib/types'
+import { EmojiText } from '../EmojiText'
 import { useSettingsStore } from '../../stores/settings'
 import { Row, SectionCard } from '../ui/SectionCard'
 import { Toggle } from '../ui/Toggle'
@@ -100,7 +101,7 @@ export function ModePanel() {
                 }`}
               >
                 <div className="flex items-center justify-between">
-                  <span className="text-[12.5px] font-semibold text-ink">{modeLabels[key]}</span>
+                  <span className="text-[12.5px] font-semibold text-ink"><EmojiText text={modeLabels[key]} /></span>
                   <span
                     className={`grid h-4 w-4 place-items-center rounded-full border ${
                       selected ? 'border-ink bg-ink' : 'border-[#C9C8C1]'

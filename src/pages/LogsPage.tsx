@@ -1,3 +1,4 @@
+import { EmojiText } from '../components/EmojiText'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { ArrowLeft, Download, RefreshCw, Trash2 } from 'lucide-react'
 import { localDay, type LogEntry, type LogKind } from '../lib/logger'
@@ -325,13 +326,13 @@ export function LogsPage({ onBack }: { onBack: () => void }) {
                       className="shrink-0 text-[11px] font-semibold"
                       style={{ color: entry.kind === 'alert' ? '#DC2626' : '#6B6B72' }}
                     >
-                      {entry.level}
+                      <EmojiText text={entry.level} />
                     </span>
                   ) : (
                     <span className="shrink-0 text-[10.5px] text-ink-faint">{KIND_LABEL[entry.kind]}</span>
                   )}
                   <span className="min-w-0 flex-1 truncate text-[11px] text-ink-soft">
-                    {entry.text || (entry.kind === 'sample' ? '·' : '')}
+                    <EmojiText text={entry.text || (entry.kind === 'sample' ? '·' : '')} />
                   </span>
                   {entry.db !== null ? (
                     <span className="num shrink-0 text-[10.5px] text-ink-soft">{entry.db.toFixed(1)}</span>

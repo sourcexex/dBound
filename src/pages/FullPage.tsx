@@ -1,3 +1,4 @@
+import { EmojiText } from '../components/EmojiText'
 import { useEffect, useRef, useState } from 'react'
 import { X } from 'lucide-react'
 import { AuroraBackground } from '../components/AuroraBackground'
@@ -260,7 +261,7 @@ export function FullPage() {
                 color: titleColor,
               }}
             >
-              {state.title || 'dBound'}
+              <EmojiText text={state.title || 'dBound'} />
             </h1>
             {state.subtitle ? (
               <p
@@ -271,7 +272,7 @@ export function FullPage() {
                   color: subtitleColor,
                 }}
               >
-                {state.subtitle}
+                <EmojiText text={state.subtitle} />
               </p>
             ) : null}
           </div>
@@ -410,7 +411,7 @@ export function FullPage() {
                   color: state.color,
                 }}
               >
-                {state.name}
+                <EmojiText text={state.name} />
               </span>
               {state.levelNote ? (
                 <>
@@ -423,7 +424,7 @@ export function FullPage() {
                       color: state.color,
                     }}
                   >
-                    {state.levelNote}
+                    <EmojiText text={state.levelNote} />
                   </span>
                 </>
               ) : null}

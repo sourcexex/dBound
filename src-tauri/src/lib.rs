@@ -20,6 +20,7 @@ pub fn run() {
         .invoke_handler(tauri::generate_handler![
             show_mini,
             show_main_window,
+            quit_app,
             show_fullscreen,
             evidence::evidence_default_dir,
             license::activate_license,
@@ -49,6 +50,11 @@ pub fn run() {
             // Closing the main window parks the app in the tray instead of quitting.
             if let tauri::WindowEvent::CloseRequested { api, .. } = event {
                 if window.label() == "main" {
+                    if !license::is_active() {
+                        // Not activated yet: closing the window must quit the app.
+                        window.app_handle().exit(0);
+                        return;
+                    }
                     api.prevent_close();
                     let _ = window.hide();
                 }
@@ -93,7 +99,15 @@ fn show_main_window(app: AppHandle) {
 }
 
 #[tauri::command]
+fn quit_app(app: AppHandle) {
+    app.exit(0);
+}
+
+#[tauri::command]
 fn show_fullscreen(app: AppHandle) -> Result<(), String> {
+    if !license::is_active() {
+        return Err("软件尚未激活".into());
+    }
     let full = app
         .get_webview_window(FULL_LABEL)
         .ok_or_else(|| "fullscreen window is not configured".to_string())?;
@@ -112,6 +126,9 @@ fn show_fullscreen(app: AppHandle) -> Result<(), String> {
 
 #[tauri::command]
 fn show_mini(app: AppHandle) -> Result<(), String> {
+    if !license::is_active() {
+        return Err("软件尚未激活".into());
+    }
     let mini = app
         .get_webview_window(MINI_LABEL)
         .ok_or_else(|| "mini window is not configured".to_string())?;

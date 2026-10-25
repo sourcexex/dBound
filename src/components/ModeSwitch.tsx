@@ -1,4 +1,5 @@
 import type { Mode } from '../lib/types'
+import { EmojiText } from './EmojiText'
 
 export function ModeSwitch({
   mode,
@@ -34,7 +35,7 @@ export function ModeSwitch({
                 active ? 'font-semibold text-ink' : 'font-medium text-ink-soft hover:text-ink'
               }`}
             >
-              {option.label}
+              <EmojiText text={option.label} />
             </button>
           )
         })}

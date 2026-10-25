@@ -11,8 +11,8 @@
 
   --font-sans: "Segoe UI Variable Text", "Segoe UI", "Microsoft YaHei UI", "PingFang SC",
     system-ui, sans-serif;
-  --font-num: "Segoe UI Variable Display", "Segoe UI", "Microsoft YaHei UI", system-ui,
-    sans-serif;
+  --font-num: "Segoe UI Variable Display", "Segoe UI", "Microsoft YaHei UI",
+    system-ui, sans-serif;
 }
 
 /* Dark appearance: overriding the token values flips every utility that uses them. */

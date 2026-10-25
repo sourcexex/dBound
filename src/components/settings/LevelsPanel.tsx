@@ -1,3 +1,4 @@
+import { EmojiText } from '../EmojiText'
 import { useState } from 'react'
 import { ChevronDown, Plus, RotateCcw, Trash2 } from 'lucide-react'
 import { sortLevels, validateLevels } from '../../lib/dsp'
@@ -74,14 +75,14 @@ function LevelRow({
         <button type="button" onClick={onToggleExpand} className="min-w-0 flex-1 text-left">
           <div className="flex items-baseline gap-2">
             <span className={`text-[12.5px] font-semibold ${level.enabled ? 'text-ink' : 'text-ink-faint'}`}>
-              {level.name || '未命名'}
+              <EmojiText text={level.name || '未命名'} />
             </span>
             <span className="num text-[11px] text-ink-soft">
               {symbol} {level.threshold.toFixed(1)} dB
             </span>
           </div>
           <div className="mt-0.5 truncate text-[10.5px] text-ink-faint">
-            {level.note || '未设置提示文字'}
+            <EmojiText text={level.note || '未设置提示文字'} />
           </div>
         </button>
         <Toggle

@@ -1,3 +1,4 @@
+import { EmojiText } from '../EmojiText'
 import { useEffect, useState } from 'react'
 import { FolderOpen, RotateCcw } from 'lucide-react'
 import {
@@ -155,7 +156,7 @@ export function SystemPanel() {
                 className="flex items-center justify-between rounded-lg border border-line bg-surface px-2 py-1.5"
               >
                 <span className="min-w-0 truncate text-[11px] font-medium text-ink">
-                  {modeLabels[key]}
+                  <EmojiText text={modeLabels[key]} />
                 </span>
                 <Toggle
                   checked={evidenceModes[key]}

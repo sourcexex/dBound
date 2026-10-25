@@ -79,35 +79,33 @@ pnpm tauri build --debug --no-bundle
 
 ## 安装（Windows 安装包）
 
-发布包：`release/dBound_1.0.1_x64-setup.exe`
+发布包：`release/dBound_1.0.1_x64-setup.exe`（内置完整 Fluent Emoji 素材，体积约 16MB）
 
-1. 运行安装包，**安装过程中必须输入序列号**（序列号 `142857`）。
-2. 安装向导支持**自定义安装目录**（默认 `%LOCALAPPDATA%\dBound`）。
+1. 运行安装包，按向导选择**自定义安装目录**（默认 `%LOCALAPPDATA%\dBound`），安装过程中不需要激活码。
+2. **首次启动**会要求输入激活码（`142857`），验证后本机永久记住，之后启动直接进入软件。
 3. 安装完成后是完整的软件文件夹，而不是单个 exe：
 
    ```
    dBound\
      dbound.exe
      uninstall.exe
-     license.dat
      文档\
        使用说明.txt
        版本信息.txt
        LICENSE.txt
    ```
 
-4. 安装器会写入激活标记；首次启动软件会再次校验。把安装目录直接拷贝到别的电脑后，
-   软件会要求重新输入序列号激活。
-5. 静默安装（批量部署）：`dBound_1.0.1_x64-setup.exe /S /SERIAL=142857 /D=C:\dBound`
-   （`/D` 必须是最后一个参数；不传或序列号错误时安装会以错误码 2 退出）。
+4. 激活标记保存在本机注册表。把安装目录直接拷贝到别的电脑后，首次打开会要求重新输入激活码。
+5. 静默安装（批量部署）：`dBound_1.0.1_x64-setup.exe /S /D=C:\dBound`
+   （`/D` 必须是最后一个参数；首次启动仍需激活）。
 
 | 证据录制与现场快照 | 快照触发提示 |
 | --- | --- |
 | ![证据设置](docs/images/snapshot-settings.png) | ![快照提示](docs/images/snapshot-toast.png) |
 
-| 安装向导（序列号页） | 首次激活界面 |
-| --- | --- |
-| ![安装序列号](docs/images/installer-serial.png) | ![激活](docs/images/activation.png) |
+首次启动激活界面：
+
+![激活](docs/images/activation.png)
 
 > 关于页：设置 → 关于，可查看版本（1.0.1 Beta2）与作者信息（设计 / 创意 / 开发 | 作者：Source X）。
 
@@ -170,7 +168,7 @@ tauri-plugin-window-state / dialog
 
 ## 第三方素材
 
-- [Microsoft Fluent Emoji](https://github.com/microsoft/fluentui-emoji)（MIT License）
+- [Microsoft Fluent Emoji](https://github.com/microsoft/fluentui-emoji)（MIT License，3D 图片素材）
 
 ## 作者
 

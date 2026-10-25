@@ -16,12 +16,12 @@ const APP_VERSION = '1.0.1 Beta2'
 
 export default function App() {
   const [view, setView] = useState<'main' | 'settings' | 'logs'>('main')
-  const { toggle, start, restartDevice } = useLevelMonitor()
+  const [license, setLicense] = useState<'checking' | 'ok' | 'locked'>('checking')
+  const { toggle, start, restartDevice } = useLevelMonitor({ enabled: license === 'ok' })
   const unseenAlerts = useLevelStore((state) => state.unseenAlerts)
   const theme = useSettingsStore((state) => state.theme)
   const darkMode = useSettingsStore((state) => state.darkMode)
   const started = useRef(false)
-  const [license, setLicense] = useState<'checking' | 'ok' | 'locked'>('checking')
 
   useEffect(() => {
     let cancelled = false
@@ -69,6 +69,7 @@ export default function App() {
   }, [])
 
   useEffect(() => {
+    if (license !== 'ok') return
     const onKeyDown = (event: KeyboardEvent) => {
       if (event.key === 'F11') {
         event.preventDefault()
@@ -77,7 +78,7 @@ export default function App() {
     }
     window.addEventListener('keydown', onKeyDown)
     return () => window.removeEventListener('keydown', onKeyDown)
-  }, [])
+  }, [license])
 
   const content =
     view === 'settings' ? (

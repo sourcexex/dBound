@@ -1,3 +1,4 @@
+import { EmojiText } from './EmojiText'
 import { RollingNumber } from './RollingNumber'
 import { useSettingsStore } from '../stores/settings'
 import { accentFallback, mutedFallback } from '../lib/theme'
@@ -122,7 +123,7 @@ export function Gauge({
               color: activeLevel ? activeLevel.color : statusTextColor,
             }}
           >
-            {chipLabel}
+            <EmojiText text={chipLabel} />
           </span>
           {chipNote ? (
             <>
@@ -135,7 +136,7 @@ export function Gauge({
                   color: activeLevel?.color,
                 }}
               >
-                {chipNote}
+                <EmojiText text={chipNote} />
               </span>
             </>
           ) : null}

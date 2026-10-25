@@ -28,6 +28,7 @@ import {
   TITLE_SIZE_MIN,
   fontStackFor,
 } from '../../lib/titleFonts'
+import { EmojiText } from '../EmojiText'
 import { useSettingsStore } from '../../stores/settings'
 import { SectionCard } from '../ui/SectionCard'
 import { Toggle } from '../ui/Toggle'
@@ -334,7 +335,7 @@ export function FullscreenPanel() {
             <div key={key} className={key === 'reverse' ? 'mb-3.5' : ''}>
               <div className="flex items-center justify-between">
                 <div className="min-w-0">
-                  <div className="text-[12px] font-semibold text-ink">{modeLabels[key]}</div>
+                  <div className="text-[12px] font-semibold text-ink"><EmojiText text={modeLabels[key]} /></div>
                   <div className="text-[10px] text-ink-faint">
                     {key === 'reverse'
                       ? `声音 ≥ ${rule.threshold} dB 时奖励`
@@ -401,7 +402,7 @@ export function FullscreenPanel() {
                 className="truncate leading-tight font-semibold"
                 style={{ fontFamily: stack, fontSize: `${titleSize}px`, color: titleColor }}
               >
-                {previewTitle}
+                <EmojiText text={previewTitle} />
               </div>
               {previewSubtitle ? (
                 <div
@@ -412,7 +413,7 @@ export function FullscreenPanel() {
                     color: subtitleColor,
                   }}
                 >
-                  {previewSubtitle}
+                  <EmojiText text={previewSubtitle} />
                 </div>
               ) : null}
             </div>

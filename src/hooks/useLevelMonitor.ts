@@ -23,7 +23,7 @@ const SIMULATION = Number.isFinite(SIM_DB) && SIM_DB > 0
  * frame EMA (0.72/0.28, same as the reference monitor) → display time weighting
  * (125 ms / 1 s / 3 s) → alert engine (dwell + hysteresis) → stores.
  */
-export function useLevelMonitor() {
+export function useLevelMonitor({ enabled = true }: { enabled?: boolean } = {}) {
   const audioRef = useRef<AudioEngine | null>(null)
   const alertRef = useRef<AlertEngine | null>(null)
   const frameRef = useRef(Number.NaN)
@@ -365,7 +365,7 @@ export function useLevelMonitor() {
   // Start once on mount. A suspended AudioContext (first launch, no gesture yet)
   // surfaces as status 'suspended' and the UI asks for one click.
   useEffect(() => {
-    if (SIMULATION) return
+    if (SIMULATION || !enabled) return
     let cancelled = false
     const audio = getAudio()
     const timer = window.setTimeout(() => {
@@ -380,7 +380,7 @@ export function useLevelMonitor() {
       audio.stop()
       audioRef.current = null
     }
-  }, [getAudio])
+  }, [enabled, getAudio])
 
   // Synthetic signal for UI previews and screenshots (no microphone involved).
   useEffect(() => {

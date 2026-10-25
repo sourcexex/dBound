@@ -78,8 +78,22 @@ export function ActivationPage({ onActivated }: { onActivated: () => void }) {
           {busy ? '验证中…' : '激活'}
         </button>
 
+        <button
+          type="button"
+          onClick={() => {
+            void (async () => {
+              if (!isTauri()) return
+              const { invoke } = await import('@tauri-apps/api/core')
+              await invoke('quit_app')
+            })()
+          }}
+          className="mt-2 w-full rounded-lg border border-line bg-surface py-2 text-[11.5px] font-medium text-ink-soft transition-colors hover:text-ink"
+        >
+          退出软件
+        </button>
+
         <p className="mt-3 text-center text-[9.5px] leading-relaxed text-ink-faint">
-          序列号仅用于本机校验，不会上传。分发给他人前请确认授权范围。
+          未激活时无法使用软件。序列号仅用于本机校验，不会上传。
         </p>
       </div>
     </div>

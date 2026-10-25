@@ -247,3 +247,16 @@ $env:VITE_DBOUND_SIM='72'; $env:VITE_DBOUND_SIM_MODE='forward'; pnpm tauri build
 - 表情包：内置 20 个 Microsoft Fluent Emoji 3D PNG（MIT），全屏奖励改用图片渲染，
   Win10/Win11 显示一致；素材位于 `src/assets/emoji/`
 - 验收：`scripts/verify-emoji-assets.ps1`（全屏表情截图）、GPU 采样方法见提交说明
+
+### 激活流程改版 + 全量彩色 Emoji 字体
+
+- 安装流程不再要求激活码：移除自定义 NSIS 序列号页与 `/SERIAL` 静默参数，
+  `license.dat` 也不再生成；安装器仅保留图标、自定义目录、文档与开始菜单
+- 首次启动激活：未激活时显示激活页并停止麦克风采集，关闭窗口/点「退出软件」直接退出应用；
+  输入 142857 后写入 HKCU 注册表，本机永久记住，后续启动不再询问
+- 复制安装目录到其他电脑（无注册表标记）时，首次启动重新要求激活；
+  卸载时通过 NSIS hooks 清理激活标记
+- 全量 Fluent Emoji：内置 Microsoft Fluent Emoji 3D 素材（MIT，1595 个，96px，约 13.5MB），
+  通过 `<EmojiText>` 把界面文字里的 emoji 渲染成内置图片，Win10/Win11 一致；
+  输入框内编辑时仍使用系统 emoji 字体（原生 input 限制），保存后显示为 Fluent 图片
+- 验收：`scripts/verify-first-run.ps1`（安装 → 首次激活 → 重启免激活 → 删除标记后重新要求激活）

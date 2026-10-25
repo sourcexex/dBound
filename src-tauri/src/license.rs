@@ -31,6 +31,12 @@ pub fn prime() {
     ensure_checked();
 }
 
+/// Used by the window/tray handlers: a locked install may not open the
+/// mini or fullscreen windows, and closing the window quits the app.
+pub fn is_active() -> bool {
+    ensure_checked()
+}
+
 #[tauri::command]
 pub fn license_status() -> bool {
     ensure_checked()
