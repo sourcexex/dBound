@@ -4,7 +4,7 @@
 
 Windows 10 1809+ / Windows 11 · Tauri 2 + React 19 + TypeScript · 当前版本 **v0.1.0**
 
-![主界面](docs/images/main-quiet.png)
+![主界面](docs-images/main-quiet.png)
 
 ## 它能做什么
 
@@ -46,15 +46,15 @@ Windows 10 1809+ / Windows 11 · Tauri 2 + React 19 + TypeScript · 当前版本
 
 | 命中「危险」 | 级别编辑器 |
 | --- | --- |
-| ![危险](docs/images/alert-danger.png) | ![级别](docs/images/settings-levels.png) |
+| ![危险](docs-images/alert-danger.png) | ![级别](docs-images/settings-levels.png) |
 
 | 日志中心 | 迷你胶囊 |
 | --- | --- |
-| ![日志](docs/images/logs.png) | ![迷你窗](docs/images/mini.png) |
+| ![日志](docs-images/logs.png) | ![迷你窗](docs-images/mini.png) |
 
 全屏模式（F11 / 标题栏 ⛶ 进入，ESC 退出）：
 
-![全屏模式](docs/images/fullscreen.png)
+![全屏模式](docs-images/fullscreen.png)
 
 ## 快速开始
 
@@ -101,11 +101,11 @@ pnpm tauri build --debug --no-bundle
 
 | 证据录制与现场快照 | 快照触发提示 |
 | --- | --- |
-| ![证据设置](docs/images/snapshot-settings.png) | ![快照提示](docs/images/snapshot-toast.png) |
+| ![证据设置](docs-images/snapshot-settings.png) | ![快照提示](docs-images/snapshot-toast.png) |
 
 首次启动激活界面：
 
-![激活](docs/images/activation.png)
+![激活](docs-images/activation.png)
 
 > 关于页：设置 → 关于，可查看当前版本与作者信息（设计 / 创意 / 开发 | 作者：Source X）。
 

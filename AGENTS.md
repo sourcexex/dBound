@@ -109,8 +109,8 @@ pnpm tauri build      # ver:check + tsc + vite build + NSIS 打包
 | `docs/PRD.md` | 需求规格（设计意图） | 设计基线 | 需求变更先改此处，并维护顶部「实现状态核对」 |
 | `docs/PROGRESS.md` | 里程碑完成情况、验证证据、版本一览 | 历史 | 只追加；当前状态用顶部摘要 |
 | `docs/OPTIMIZATION.md` | 优化项审计与整改批次 | 评审基线（只读） | 整改后在对应项追加状态，不改原始结论 |
-| `docs/images/` | 文档截图 | 活跃 | 仅放被引用或登记在截图库的图 |
-| `docs/images/archive/` | 过期/历史截图 | 归档 | 不再新增；仅供历史对照 |
+| `docs-images/` | 文档截图（本地资产，已 gitignore，不提交） | 活跃 | 仅放被引用或登记在截图库的图 |
+| `docs-images/archive/` | 过期/历史截图（本地，不提交） | 归档 | 不再新增；仅供历史对照 |
 
 - 新增文档：先在 `docs/README.md` 登记（文件、职责、状态），再写内容。
 - 归档文档：移入 `docs/archive/`，在 `docs/README.md` 变更记录里说明原因。
@@ -139,10 +139,11 @@ pnpm tauri build      # ver:check + tsc + vite build + NSIS 打包
 
 ### 5.4 图片规范
 
-- 位置：`docs/images/`；命名 kebab-case，前缀表示用途：`main-`、`fullscreen-`、`settings-`、`mini-`、`alert-`、`logs-`、`diagram-`。
+- 位置：仓库根 `docs-images/`（**已被 .gitignore 忽略，不提交**）；命名 kebab-case，前缀表示用途：`main-`、`fullscreen-`、`settings-`、`mini-`、`alert-`、`logs-`、`diagram-`。
+- 文档中引用时按文件位置写相对路径：根 README 用 `docs-images/...`，`docs/*.md` 用 `../docs-images/...`。
 - 要求：反映当前实现（版本、默认值、主题）；宽度 ≤1280px；**新增图片**单张 ≤500KB（超出转 WebP/JPEG）；现存超限图按 OPTIMIZATION D-06 逐步压缩，不阻塞文档改动；不得含个人信息或临时调试 UI。
-- 只保留**被文档引用**或**登记在 `docs/README.md` 截图库**的图；过期图移入 `docs/images/archive/` 并在索引注明原因。
-- 验收/取证截图统一输出到 `output/screenshots/`（gitignored），不要直接写入 `docs/images/`。
+- 只保留**被文档引用**或**登记在 `docs/README.md` 截图库**的图；过期图移入 `docs-images/archive/` 并在索引注明原因。
+- 验收/取证截图统一输出到 `output/screenshots/`（gitignored），不要直接写入 `docs-images/`。
 - 抓图前让动画落定（滚筒数字、呼吸环），避免半帧/残影（参见 D-01）。
 
 ### 5.5 变更同步矩阵
@@ -173,9 +174,9 @@ pnpm tauri build      # ver:check + tsc + vite build + NSIS 打包
 1. `docs/` 下每个 Markdown 都在 `docs/README.md` 索引中出现；
 2. 所有 Markdown 相对链接/图片目标存在（跳过 http、锚点）；
 3. 禁止 Markdown 链接指向 `release/` 或 `output/`；
-4. 根 README 与 docs 中引用的 `docs/images/**` 文件存在；
-5. `docs/images/**` 中每个文件都在某份 Markdown 中被提及（含截图库/归档说明）；
-6. 警告项：根 README、`docs/README.md`、`docs/PRD.md` 中出现疑似写死的应用版本号；`docs/images/` 中活动截图超过 500KB（压缩计划见 D-06，不阻塞）。
+4. 根 README 与 docs 中引用的 `docs-images/**` 文件在本地存在（该目录不入库，干净克隆下跳过）；
+5. `docs-images/**` 中每个文件都在某份 Markdown 中被提及（含截图库/归档说明，目录存在时检查）；
+6. 警告项：根 README、`docs/README.md`、`docs/PRD.md` 中出现疑似写死的应用版本号；`docs-images/` 中活动截图超过 500KB（压缩计划见 D-06，不阻塞）。
 
 失败时退出码非 0，输出 `FAIL <文件>:<行>: <原因>`；成功输出 `PASS`。文档改动提交前必须通过。
 

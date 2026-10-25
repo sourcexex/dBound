@@ -15,3 +15,6 @@ src-tauri/gen/schemas
 .vscode/*
 !.vscode/extensions.json
 .idea
+
+# Documentation screenshots are kept locally and intentionally not committed.
+/docs-images/

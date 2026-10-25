@@ -76,8 +76,8 @@ foreach ($md in $mdFiles) {
   }
 }
 
-# 4. Image paths written as inline code (e.g. screenshot tables) must exist too.
-$imagePattern = [regex]'(?<![\w/.-])(?:docs/)?images/[A-Za-z0-9._/-]+\.(?:png|jpe?g|webp|gif)'
+# 4. Image paths written as inline code (e.g. screenshot tables) must exist locally.
+$imagePattern = [regex]'(?<![\w/.-])(?:\.\./)?docs-images/[A-Za-z0-9._/-]+\.(?:png|jpe?g|webp|gif)'
 foreach ($md in $mdFiles) {
   $base = [System.IO.Path]::GetDirectoryName($md.FullName)
   $lines = Get-Content -LiteralPath $md.FullName -Encoding UTF8
@@ -99,14 +99,14 @@ foreach ($md in $mdFiles) {
   }
 }
 
-# 5. Every file under docs/images must be mentioned by name in some Markdown file.
-$imagesDir = Join-Path $docsDir 'images'
+# 5. Every file under docs-images must be mentioned by name in some Markdown file (local asset dir).
+$imagesDir = Join-Path $Root 'docs-images'
 if (Test-Path -LiteralPath $imagesDir) {
   $allText = ($mdText.Values -join "`n")
   foreach ($image in Get-ChildItem -LiteralPath $imagesDir -Recurse -File) {
     if ($image.Extension -notmatch '^\.(png|jpe?g|webp|gif)$') { continue }
     if ($allText -notmatch [regex]::Escape($image.Name)) {
-      Add-Failure "docs/images/$($image.Name)" 0 'image is not referenced or registered in docs/README.md'
+      Add-Failure "docs-images/$($image.Name)" 0 'image is not referenced or registered in docs/README.md'
     }
   }
 }
@@ -119,7 +119,7 @@ if (Test-Path -LiteralPath $imagesDir) {
     if ($image.FullName.Contains($archiveSegment)) { continue }
     if ($image.Extension -notmatch '^\.(png|jpe?g|webp|gif)$') { continue }
     if ($image.Length -gt $sizeLimitBytes) {
-      $warnings.Add("WARN docs/images/$($image.Name): $([math]::Round($image.Length / 1KB)) KB (>500 KB; compression plan D-06)")
+      $warnings.Add("WARN docs-images/$($image.Name): $([math]::Round($image.Length / 1KB)) KB (>500 KB; compression plan D-06)")
     }
   }
 }
