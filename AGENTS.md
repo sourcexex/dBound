@@ -76,6 +76,9 @@ pnpm tauri build      # ver:check + tsc + vite build + NSIS 打包
   改版本用 `node scripts/version.mjs set <x.y.z>`，不要手改多个文件（V-01/V-02 已整改）。
 - `additionalBrowserArgs` 目前在三窗口重复（E-02），改动需三处同步，直到收敛。
 - `window-state` 只恢复 `POSITION | SIZE`，**不要恢复可见性**（否则迷你窗/全屏窗会在下次启动时自己弹出）。
+- **资源外置**：Fluent Emoji 图片放在 `src/assets/`，安装时由 `bundle.resources` 释放到
+  `<安装目录>\resources\emoji`（及 `emoji-reward`），前端通过 asset 协议（`$RESOURCE/**`）读取；
+  不要把表情重新 `import.meta.glob` 回 bundle，否则 exe 会重新变大。
 
 ### 4.3 安全红线
 
@@ -192,6 +195,7 @@ pnpm tauri build      # ver:check + tsc + vite build + NSIS 打包
 
 - 当前状态：`docs/PROGRESS.md`「当前状态摘要」+「里程碑状态」。
 - 待办与批次：`docs/OPTIMIZATION.md` §6；需产品决策的 7 项见 §8。
-- 已完成：V-01/V-02（版本单一来源，v0.1.0）、V-05/D-05（GITHUB.md 删除）、V-08（verify 脚本不再写死版本路径）。
+- 已完成：V-01/V-02（版本单一来源，v0.1.0）、V-05/D-05（GITHUB.md 删除）、V-08（verify 脚本不再写死版本路径）、
+  Fluent Emoji 资源外置（安装目录 `resources/`，exe 约 3.5MB）。
 - 下一个建议任务：Batch 1 剩余项（图标统一 I-01～I-03、设置迁移/导入导出 S-01～S-04、单实例 E-11）。
 - 改动前先看对应 OPTIMIZATION 编号，避免重复踩坑；改动后按 §5.5 同步文档。

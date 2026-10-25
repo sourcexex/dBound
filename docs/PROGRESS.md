@@ -301,3 +301,15 @@ $env:VITE_DBOUND_SIM='72'; $env:VITE_DBOUND_SIM_MODE='forward'; pnpm tauri build
   关于页 / 激活页 / 启动日志统一显示 `v0.1.0`
 - 清理 `docs/GITHUB.md`（与 README 重复且内容过期，docs/README 早已标注合并删除）
 - 注意：从 1.0.1 覆盖安装 0.1.0 会触发 NSIS 降级保护，需先卸载旧版本再安装
+
+### 资源外置（安装目录带 resources 文件夹）
+
+- 背景：Tauri 默认把前端 dist 与图片全部编译进 `dbound.exe`，安装目录只有 exe + 卸载器；
+  用户期望安装后能看到常规的 `resources` 文件结构。
+- 表情素材改为外置：1595 个 Fluent Emoji + 40 个奖励表情从二进制移到安装目录
+  `resources/emoji/`、`resources/emoji-reward/`，通过 Tauri asset 协议（scope `$RESOURCE/**`）读取；
+  `dbound.exe` 从约 19MB 降到约 3.5MB，安装包体积基本不变（资源改由安装器释放）。
+- 启动时 `initResourceAssets()` 解析资源目录；找不到资源时自动退回系统 emoji（便携单 exe 场景）。
+- 便携版改为 zip：`dBound-<版本>-portable.zip`（exe + resources + 文档），不再提供单 exe 便携版。
+- 验收：静默安装后目录 1639 个文件（`resources/emoji` 1594、`resources/emoji-reward` 40、文档 3）；
+  主界面与全屏奖励表情均从外置目录正常加载（截图见 `output/screenshots/ext-resources-main.png`）。

@@ -7,8 +7,7 @@ $ErrorActionPreference = 'Stop'
 
 $root = Split-Path $PSScriptRoot -Parent
 if (-not $Exe) {
-  $Exe = (Get-ChildItem (Join-Path $root 'release') -Filter 'dBound-*-portable.exe' |
-    Sort-Object LastWriteTime -Descending | Select-Object -First 1).FullName
+  $Exe = Join-Path $root 'src-tauri\target\release\dbound.exe'
 }
 if (-not $Exe -or -not (Test-Path $Exe)) { throw 'portable exe not found in release/' }
 reg add 'HKCU\Software\dBound' /v License /t REG_SZ /d 1 /f | Out-Null

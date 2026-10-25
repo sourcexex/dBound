@@ -1,21 +1,11 @@
 import emojiRegex from 'emoji-regex'
-
-/** Bundled Microsoft Fluent Emoji (MIT) images, keyed by codepoint sequence. */
-const modules = import.meta.glob<string>('../assets/fluent-emoji/*.png', {
-  eager: true,
-  import: 'default',
-})
-
-const byKey: Record<string, string> = {}
-for (const [path, url] of Object.entries(modules)) {
-  const name = path.split('/').pop()?.replace(/\.png$/i, '') ?? ''
-  if (name) byKey[name] = url
-}
+import { emojiFileUrl } from './resourceAssets'
 
 const SKIN_TONES = new Set([0x1f3fb, 0x1f3fc, 0x1f3fd, 0x1f3fe, 0x1f3ff])
 const hex = (value: number) => value.toString(16)
 
-function keysFor(char: string): string[] {
+/** Candidate resource file names for an emoji sequence (loose files on disk). */
+export function emojiKeys(char: string): string[] {
   const codepoints = Array.from(char).map((codePoint) => codePoint.codePointAt(0)!)
   const withoutFe0f = codepoints.filter((value) => value !== 0xfe0f)
   const withoutSkin = codepoints.filter((value) => !SKIN_TONES.has(value))
@@ -29,9 +19,10 @@ function keysFor(char: string): string[] {
   return [...keys].filter(Boolean)
 }
 
+/** Resolve an emoji to a Fluent image URL from <install>/resources/emoji. */
 export function fluentEmojiImage(char: string): string | undefined {
-  for (const key of keysFor(char)) {
-    const url = byKey[key]
+  for (const key of emojiKeys(char)) {
+    const url = emojiFileUrl(key)
     if (url) return url
   }
   return undefined

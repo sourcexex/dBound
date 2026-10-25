@@ -69,7 +69,13 @@
       }
     ],
     "security": {
-      "csp": null
+      "csp": null,
+      "assetProtocol": {
+        "enable": true,
+        "scope": [
+          "$RESOURCE/**"
+        ]
+      }
     }
   },
   "bundle": {
@@ -104,7 +110,9 @@
     "resources": {
       "../resources/使用说明.txt": "文档/使用说明.txt",
       "../resources/版本信息.txt": "文档/版本信息.txt",
-      "../resources/LICENSE.txt": "文档/LICENSE.txt"
+      "../resources/LICENSE.txt": "文档/LICENSE.txt",
+      "../src/assets/fluent-emoji/*.png": "resources/emoji/",
+      "../src/assets/emoji/*.png": "resources/emoji-reward/"
     },
     "publisher": "Source X",
     "copyright": "Copyright © 2026 Source X. All rights reserved.",

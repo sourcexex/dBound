@@ -79,7 +79,7 @@ pnpm tauri build --debug --no-bundle
 
 ## 安装（Windows 安装包）
 
-发布包见 GitHub Releases 最新版本（内置完整 Fluent Emoji 素材，体积约 16MB）。
+发布包见 GitHub Releases 最新版本（表情素材以 `resources\` 文件夹随包分发，安装包约 16MB）。
 
 1. 运行安装包，按向导选择**自定义安装目录**（默认 `%LOCALAPPDATA%\dBound`），安装过程中不需要激活码。
 2. **首次启动**会要求输入激活码（`142857`），验证后本机永久记住，之后启动直接进入软件。
@@ -89,11 +89,20 @@ pnpm tauri build --debug --no-bundle
    dBound\
      dbound.exe
      uninstall.exe
+     resources\
+       emoji\           Fluent Emoji 表情素材（约 1600 个 png）
+       emoji-reward\    全屏奖励用的 40 个高清表情
      文档\
        使用说明.txt
        版本信息.txt
        LICENSE.txt
    ```
+
+   > `resources\` 目录需要保留：表情图片在运行时从该目录读取，删除后界面会退回系统 emoji 字体
+   > （Win10 / Win11 显示会不一致）。更新软件时请通过安装包覆盖，不要手动搬移单个 exe。
+
+   **便携版**：下载 `dBound-<版本>-portable.zip`，解压后保留整个文件夹（含 `resources\` 与 `文档\`），
+   运行 `dBound.exe` 即可，无需安装。
 
 4. 激活标记保存在本机注册表。把安装目录直接拷贝到别的电脑后，首次打开会要求重新输入激活码。
 5. 静默安装（批量部署）：`dBound_<版本>_x64-setup.exe /S /D=C:\dBound`

@@ -1,15 +1,19 @@
 import { describe, expect, it } from 'vitest'
-import { fluentEmojiImage } from './fluentEmoji'
+import { EMOJI_CHARS } from './emojiAssets'
+import { emojiKeys, fluentEmojiImage } from './fluentEmoji'
 
-describe('fluent emoji assets', () => {
-  it('maps common emoji to bundled files', () => {
-    expect(fluentEmojiImage('😀')).toBeTruthy()
-    expect(fluentEmojiImage('😤')).toBeTruthy()
-    expect(fluentEmojiImage('☀️')).toBeTruthy()
-    expect(fluentEmojiImage('🎉')).toBeTruthy()
+describe('emoji resources', () => {
+  it('derives codepoint file names for emoji sequences', () => {
+    expect(emojiKeys('😀')).toContain('1f600')
+    expect(emojiKeys('☀️')).toContain('2600-fe0f')
+    expect(emojiKeys('😤')).toContain('1f624')
   })
 
-  it('falls back for unsupported sequences', () => {
-    expect(fluentEmojiImage('a')).toBeUndefined()
+  it('keeps the curated 40 reward emoji', () => {
+    expect(EMOJI_CHARS).toHaveLength(40)
+  })
+
+  it('returns no URL before the resource dir is initialised', () => {
+    expect(fluentEmojiImage('😀')).toBeUndefined()
   })
 })

@@ -28,6 +28,13 @@ Get-ChildItem $dest -Recurse -File | Sort-Object FullName | ForEach-Object {
   $_.FullName.Substring($dest.Length + 1) + "  $($_.Length) bytes"
 }
 
+Write-Host '--- external resources ---'
+$emojiCount = (Get-ChildItem (Join-Path $dest 'resources\emoji') -File -ErrorAction SilentlyContinue | Measure-Object).Count
+$rewardCount = (Get-ChildItem (Join-Path $dest 'resources\emoji-reward') -File -ErrorAction SilentlyContinue | Measure-Object).Count
+Write-Host "resources/emoji: $emojiCount files  resources/emoji-reward: $rewardCount files"
+if ($emojiCount -lt 1500) { throw 'resources/emoji is missing or incomplete' }
+if ($rewardCount -lt 40) { throw 'resources/emoji-reward is missing or incomplete' }
+
 Write-Host '--- installer must not write an activation marker / license.dat ---'
 cmd /c 'reg query "HKCU\Software\dBound" /v License >nul 2>&1'
 Write-Host "marker present: $($LASTEXITCODE -eq 0)"

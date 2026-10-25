@@ -1,14 +1,4 @@
-/** Bundled Microsoft Fluent Emoji (3D) so Win10 and Win11 look identical. */
-const modules = import.meta.glob<string>('../assets/emoji/*.png', {
-  eager: true,
-  import: 'default',
-})
-
-const byKey: Record<string, string> = {}
-for (const [path, url] of Object.entries(modules)) {
-  const name = path.split('/').pop()?.replace(/\.png$/i, '') ?? ''
-  if (name) byKey[name] = url
-}
+import { rewardFileUrl } from './resourceAssets'
 
 function keyFor(char: string): string {
   return Array.from(char)
@@ -16,8 +6,9 @@ function keyFor(char: string): string {
     .join('-')
 }
 
+/** Reward art is loaded from <install>/resources/emoji-reward. */
 export function emojiImage(char: string): string | undefined {
-  return byKey[keyFor(char)]
+  return rewardFileUrl(keyFor(char))
 }
 
 /** Curated Fluent Emoji 3D set used for the fullscreen reward row. */
