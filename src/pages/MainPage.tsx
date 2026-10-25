@@ -104,6 +104,7 @@ export function MainPage({
           activeLevel={activeLevel}
           mode={mode}
           status={status}
+          onStart={onStart}
         />
 
         <div className="mt-9">

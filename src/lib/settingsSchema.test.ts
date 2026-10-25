@@ -15,7 +15,13 @@ import {
   SUBTITLE_SIZE_MIN,
   TITLE_SIZE_MAX,
 } from './titleFonts'
-import { DEFAULT_STATUS_FONT, READOUT_INTERVAL_MAX, ROLLING_MS_MIN, STATUS_SIZE_MAX } from './settingsSchema'
+import {
+  DEFAULT_STATUS_FONT,
+  IDLE_TEXT_MAX,
+  READOUT_INTERVAL_MAX,
+  ROLLING_MS_MIN,
+  STATUS_SIZE_MAX,
+} from './settingsSchema'
 import { DEFAULT_OFFSET } from './dsp'
 
 describe('settings schema', () => {
@@ -295,6 +301,41 @@ describe('settings schema', () => {
     })
     expect(broken.snapshotEnabled).toBe(false)
     expect(broken.snapshotSize).toBe('1080p')
+  })
+
+  it('sanitizes idle colours, idle copy and per-mode evidence', () => {
+    const defaults = defaultSettings()
+    expect(defaults.idleNumberColor).toBe('')
+    expect(defaults.statusColor).toBe('')
+    expect(defaults.idleText).toEqual({ forward: '安静', reverse: '音量正常' })
+    expect(defaults.evidenceModes).toEqual({ forward: true, reverse: true })
+
+    const custom = sanitizeSettings({
+      modeLabels: { forward: '正向', reverse: '反向' },
+      idleNumberColor: '#E11D48',
+      statusColor: '#2563EB',
+      idleText: { forward: ' 很安静 ', reverse: '声音正常' },
+      evidenceModes: { forward: true, reverse: false },
+    })
+    expect(custom.idleNumberColor).toBe('#E11D48')
+    expect(custom.statusColor).toBe('#2563EB')
+    expect(custom.idleText.forward).toBe('很安静')
+    expect(custom.idleText.reverse).toBe('声音正常')
+    expect(custom.evidenceModes).toEqual({ forward: true, reverse: false })
+
+    const broken = sanitizeSettings({
+      modeLabels: { forward: '正向', reverse: '反向' },
+      idleNumberColor: 'red',
+      statusColor: '#GGG',
+      idleText: { forward: '', reverse: 'x'.repeat(50) },
+      evidenceModes: { forward: false, reverse: 'no' },
+    })
+    expect(broken.idleNumberColor).toBe('')
+    expect(broken.statusColor).toBe('')
+    expect(broken.idleText.forward).toBe('安静')
+    expect(broken.idleText.reverse.length).toBe(IDLE_TEXT_MAX)
+    expect(broken.evidenceModes.forward).toBe(false)
+    expect(broken.evidenceModes.reverse).toBe(true)
   })
 
   it('sanitizes the emoji reward rules', () => {

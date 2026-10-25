@@ -6,7 +6,7 @@ import {
   PREROLL_MAX,
   PREROLL_MIN,
 } from '../../lib/settingsSchema'
-import { CameraMonitor, listCameras, type CameraDevice } from '../../lib/camera'
+import { CameraMonitor } from '../../lib/camera'
 import { evidenceStamp, saveEvidenceBytes } from '../../lib/evidence'
 import { logSystem } from '../../lib/logger'
 import { SNAPSHOT_SIZES, type SnapshotSize } from '../../lib/settingsSchema'
@@ -35,13 +35,14 @@ export function SystemPanel() {
   const setRecordingDir = useSettingsStore((state) => state.setRecordingDir)
   const setPrerollSeconds = useSettingsStore((state) => state.setPrerollSeconds)
   const setPostrollSeconds = useSettingsStore((state) => state.setPostrollSeconds)
+  const modeLabels = useSettingsStore((state) => state.modeLabels)
+  const evidenceModes = useSettingsStore((state) => state.evidenceModes)
+  const setEvidenceMode = useSettingsStore((state) => state.setEvidenceMode)
   const snapshotEnabled = useSettingsStore((state) => state.snapshotEnabled)
   const cameraId = useSettingsStore((state) => state.cameraId)
   const snapshotSize = useSettingsStore((state) => state.snapshotSize)
   const setSnapshotEnabled = useSettingsStore((state) => state.setSnapshotEnabled)
-  const setCameraId = useSettingsStore((state) => state.setCameraId)
   const setSnapshotSize = useSettingsStore((state) => state.setSnapshotSize)
-  const [cameras, setCameras] = useState<CameraDevice[]>([])
   const [testing, setTesting] = useState(false)
   const [cameraError, setCameraError] = useState('')
   const [confirming, setConfirming] = useState(false)
@@ -56,16 +57,6 @@ export function SystemPanel() {
       setDefaultDir(dir)
     })()
   }, [])
-
-  useEffect(() => {
-    let disposed = false
-    void listCameras().then((list) => {
-      if (!disposed) setCameras(list)
-    })
-    return () => {
-      disposed = true
-    }
-  }, [snapshotEnabled])
 
   const testPhoto = async () => {
     if (testing) return
@@ -82,7 +73,6 @@ export function SystemPanel() {
       )
       logSystem(`已保存测试照片（${Math.round(bytes.length / 1024)} KB）：${path}`)
       useLevelStore.getState().setToast(`已保存测试照片 · ${Math.round(bytes.length / 1024)} KB`)
-      setCameras(await listCameras())
     } catch (error) {
       const message = error instanceof Error ? error.message : String(error)
       setCameraError(`摄像头不可用：${message}`)
@@ -156,6 +146,30 @@ export function SystemPanel() {
           <Toggle checked={recordingEnabled} label="自动录制证据" onChange={setRecordingEnabled} />
         </Row>
 
+        <div className="mt-2 rounded-xl border border-line bg-surface/50 p-2.5">
+          <div className="mb-1.5 text-[10.5px] font-medium text-ink-soft">按模式启用（录音 + 照片）</div>
+          <div className="grid grid-cols-2 gap-2">
+            {(['forward', 'reverse'] as const).map((key) => (
+              <div
+                key={key}
+                className="flex items-center justify-between rounded-lg border border-line bg-surface px-2 py-1.5"
+              >
+                <span className="min-w-0 truncate text-[11px] font-medium text-ink">
+                  {modeLabels[key]}
+                </span>
+                <Toggle
+                  checked={evidenceModes[key]}
+                  label={`${modeLabels[key]} 证据录制`}
+                  onChange={(enabled) => setEvidenceMode(key, enabled)}
+                />
+              </div>
+            ))}
+          </div>
+          <p className="mt-1.5 text-[9.5px] leading-relaxed text-ink-faint">
+            关掉某个模式后，该模式触发警报时不保存录音和照片；另一个模式不受影响。
+          </p>
+        </div>
+
         <div className={`mt-2.5 ${recordingEnabled ? '' : 'opacity-45'}`}>
           <div className="mb-1 text-[10.5px] text-ink-soft">保存位置</div>
           <div className="flex items-center gap-1.5">
@@ -222,22 +236,6 @@ export function SystemPanel() {
             <div className={`mt-2 ${snapshotEnabled ? '' : 'opacity-45'}`}>
               <div className="grid grid-cols-2 gap-2">
                 <label className="block">
-                  <span className="mb-1 block text-[10.5px] text-ink-soft">摄像头</span>
-                  <select
-                    className={INPUT_CLASS}
-                    value={cameraId}
-                    disabled={!snapshotEnabled}
-                    onChange={(event) => setCameraId(event.target.value)}
-                  >
-                    <option value="default">默认摄像头</option>
-                    {cameras.map((camera) => (
-                      <option key={camera.deviceId} value={camera.deviceId}>
-                        {camera.label}
-                      </option>
-                    ))}
-                  </select>
-                </label>
-                <label className="block">
                   <span className="mb-1 block text-[10.5px] text-ink-soft">分辨率</span>
                   <select
                     className={INPUT_CLASS}
@@ -252,6 +250,11 @@ export function SystemPanel() {
                     ))}
                   </select>
                 </label>
+                <div className="flex items-end pb-1">
+                  <p className="text-[9.5px] leading-relaxed text-ink-faint">
+                    摄像头在「设备」页选择
+                  </p>
+                </div>
               </div>
 
               <div className="mt-2 flex items-center gap-2">

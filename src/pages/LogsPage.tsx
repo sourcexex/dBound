@@ -197,7 +197,7 @@ export function LogsPage({ onBack }: { onBack: () => void }) {
 
   return (
     <div className="flex h-full flex-col overflow-hidden">
-      <header className="flex h-12 shrink-0 items-center gap-1 pl-2 pr-2">
+      <header data-tauri-drag-region className="flex h-12 shrink-0 items-center gap-1 pl-2 pr-2">
         <button
           type="button"
           onClick={onBack}
@@ -207,7 +207,9 @@ export function LogsPage({ onBack }: { onBack: () => void }) {
           <ArrowLeft size={14} strokeWidth={2.2} />
           返回
         </button>
-        <h1 className="ml-1 flex-1 text-[13px] font-semibold text-ink">日志</h1>
+        <h1 data-tauri-drag-region className="ml-1 flex-1 self-stretch pt-[15px] text-[13px] font-semibold text-ink">
+          日志
+        </h1>
         <button
           type="button"
           onClick={() => void exportCsv()}

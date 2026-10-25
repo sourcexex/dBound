@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { ArrowLeft } from 'lucide-react'
 import { CalibrationPanel } from '../components/settings/CalibrationPanel'
 import { DevicesPanel } from '../components/settings/DevicesPanel'
@@ -28,10 +28,16 @@ export function SettingsPage({
   onRestartDevice: (deviceId: string) => void
 }) {
   const [tab, setTab] = useState<TabId>('mode')
+  const scrollRef = useRef<HTMLDivElement | null>(null)
+
+  // Each tab starts at the top instead of inheriting the previous scroll offset.
+  useEffect(() => {
+    scrollRef.current?.scrollTo({ top: 0 })
+  }, [tab])
 
   return (
     <div className="flex h-full flex-col overflow-hidden">
-      <header className="flex h-12 shrink-0 items-center gap-1 pl-2 pr-4">
+      <header data-tauri-drag-region className="flex h-12 shrink-0 items-center gap-1 pl-2 pr-4">
         <button
           type="button"
           onClick={onBack}
@@ -41,7 +47,9 @@ export function SettingsPage({
           <ArrowLeft size={14} strokeWidth={2.2} />
           返回
         </button>
-        <h1 className="ml-1 text-[13px] font-semibold text-ink">设置</h1>
+        <h1 data-tauri-drag-region className="ml-1 flex-1 self-stretch pt-[15px] text-[13px] font-semibold text-ink">
+          设置
+        </h1>
       </header>
 
       <nav className="shrink-0 px-3">
@@ -66,7 +74,7 @@ export function SettingsPage({
         </div>
       </nav>
 
-      <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain px-4 py-3">
+      <div ref={scrollRef} className="min-h-0 flex-1 overflow-y-auto overscroll-contain px-4 py-3">
         {tab === 'mode' ? <ModePanel /> : null}
         {tab === 'levels' ? <LevelsPanel /> : null}
         {tab === 'calibration' ? <CalibrationPanel /> : null}

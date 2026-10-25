@@ -21,6 +21,9 @@ export interface SettingsState {
   darkMode: boolean
   /** User-facing name for each mode (e.g. 自习课模式 / 早读模式). */
   modeLabels: Record<Mode, string>
+  idleNumberColor: string
+  statusColor: string
+  idleText: Record<Mode, string>
   /** Title / subtitle shown in the top-left corner of fullscreen mode. */
   fullscreenTitle: string
   fullscreenSubtitle: string
@@ -34,6 +37,7 @@ export interface SettingsState {
   statusSize: number
   /** Evidence recording time machine. */
   recordingEnabled: boolean
+  evidenceModes: Record<Mode, boolean>
   recordingDir: string
   prerollSeconds: number
   postrollSeconds: number
@@ -58,6 +62,10 @@ export interface SettingsState {
   setTheme: (theme: ThemeId) => void
   setDarkMode: (darkMode: boolean) => void
   setModeLabel: (mode: Mode, label: string) => void
+  setIdleNumberColor: (color: string) => void
+  setStatusColor: (color: string) => void
+  setIdleText: (mode: Mode, text: string) => void
+  setEvidenceMode: (mode: Mode, enabled: boolean) => void
   setFullscreenTitle: (title: string) => void
   setFullscreenSubtitle: (subtitle: string) => void
   setFullscreenTitleFont: (font: string) => void
@@ -120,6 +128,9 @@ export const useSettingsStore = create<SettingsState>()(
       theme: initial.theme,
       darkMode: initial.darkMode,
       modeLabels: initial.modeLabels,
+      idleNumberColor: initial.idleNumberColor,
+      statusColor: initial.statusColor,
+      idleText: initial.idleText,
       fullscreenTitle: initial.fullscreenTitle,
       fullscreenSubtitle: initial.fullscreenSubtitle,
       fullscreenTitleFont: initial.fullscreenTitleFont,
@@ -130,6 +141,7 @@ export const useSettingsStore = create<SettingsState>()(
       statusFont: initial.statusFont,
       statusSize: initial.statusSize,
       recordingEnabled: initial.recordingEnabled,
+      evidenceModes: initial.evidenceModes,
       recordingDir: initial.recordingDir,
       prerollSeconds: initial.prerollSeconds,
       postrollSeconds: initial.postrollSeconds,
@@ -149,6 +161,12 @@ export const useSettingsStore = create<SettingsState>()(
       setMode: (mode) => set({ mode }),
       setTheme: (theme) => set({ theme }),
       setDarkMode: (darkMode) => set({ darkMode }),
+      setIdleNumberColor: (idleNumberColor) => set({ idleNumberColor }),
+      setStatusColor: (statusColor) => set({ statusColor }),
+      setIdleText: (mode, text) =>
+        set((state) => ({ idleText: { ...state.idleText, [mode]: text } })),
+      setEvidenceMode: (mode, enabled) =>
+        set((state) => ({ evidenceModes: { ...state.evidenceModes, [mode]: enabled } })),
       setModeLabel: (mode, label) =>
         set((state) => ({ modeLabels: { ...state.modeLabels, [mode]: label } })),
       setFullscreenTitle: (fullscreenTitle) => set({ fullscreenTitle }),
@@ -221,6 +239,9 @@ export const useSettingsStore = create<SettingsState>()(
           theme: fresh.theme,
           darkMode: fresh.darkMode,
           modeLabels: fresh.modeLabels,
+          idleNumberColor: fresh.idleNumberColor,
+          statusColor: fresh.statusColor,
+          idleText: fresh.idleText,
           fullscreenTitle: fresh.fullscreenTitle,
           fullscreenSubtitle: fresh.fullscreenSubtitle,
           fullscreenTitleFont: fresh.fullscreenTitleFont,
@@ -231,6 +252,7 @@ export const useSettingsStore = create<SettingsState>()(
           statusFont: fresh.statusFont,
           statusSize: fresh.statusSize,
           recordingEnabled: fresh.recordingEnabled,
+          evidenceModes: fresh.evidenceModes,
           recordingDir: fresh.recordingDir,
           prerollSeconds: fresh.prerollSeconds,
           postrollSeconds: fresh.postrollSeconds,
@@ -258,6 +280,9 @@ export const useSettingsStore = create<SettingsState>()(
         theme: state.theme,
         darkMode: state.darkMode,
         modeLabels: state.modeLabels,
+        idleNumberColor: state.idleNumberColor,
+        statusColor: state.statusColor,
+        idleText: state.idleText,
         fullscreenTitle: state.fullscreenTitle,
         fullscreenSubtitle: state.fullscreenSubtitle,
         fullscreenTitleFont: state.fullscreenTitleFont,
@@ -268,6 +293,7 @@ export const useSettingsStore = create<SettingsState>()(
         statusFont: state.statusFont,
         statusSize: state.statusSize,
         recordingEnabled: state.recordingEnabled,
+        evidenceModes: state.evidenceModes,
         recordingDir: state.recordingDir,
         prerollSeconds: state.prerollSeconds,
         postrollSeconds: state.postrollSeconds,

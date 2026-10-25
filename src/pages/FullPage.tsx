@@ -75,6 +75,8 @@ const INITIAL: MiniState = {
   subtitleColor: '#6B6B72',
   statusFont: 'system',
   statusSize: 15,
+  statusColor: '',
+  idleText: '音量正常',
   readoutAnimation: true,
   rollingMs: 600,
   readoutIntervalMs: 1000,
@@ -199,9 +201,7 @@ export function FullPage() {
       : '未开始测量'
     : state.name
       ? `${state.name} · ${state.modeLabel}`
-      : state.mode === 'forward'
-        ? '安静'
-        : '音量正常'
+      : state.idleText || (state.mode === 'forward' ? '安静' : '音量正常')
 
   return (
     <div
@@ -368,6 +368,7 @@ export function FullPage() {
             style={{
               fontFamily: fontStackFor(state.statusFont),
               fontSize: `${state.statusSize}px`,
+              color: state.statusColor || undefined,
             }}
           >
             {statusText}

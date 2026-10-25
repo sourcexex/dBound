@@ -41,6 +41,10 @@ export function ModePanel() {
   const setRollingMs = useSettingsStore((state) => state.setRollingMs)
   const readoutIntervalMs = useSettingsStore((state) => state.readoutIntervalMs)
   const setReadoutIntervalMs = useSettingsStore((state) => state.setReadoutIntervalMs)
+  const darkMode = useSettingsStore((state) => state.darkMode)
+  const idleNumberColor = useSettingsStore((state) => state.idleNumberColor)
+  const setIdleNumberColor = useSettingsStore((state) => state.setIdleNumberColor)
+  const autoInk = darkMode ? '#F2F3F1' : '#17171A'
 
   return (
     <div className="space-y-3">
@@ -159,6 +163,34 @@ export function ModePanel() {
             onChange={setReadoutIntervalMs}
             hint="越大数字越稳、变化越滞后"
           />
+        </div>
+
+        <div className="mt-2.5 border-t border-line/70 pt-2.5">
+          <div className="mb-1 flex items-center justify-between">
+            <span className="text-[11.5px] font-medium text-ink">未命中时颜色</span>
+            <button
+              type="button"
+              onClick={() => setIdleNumberColor('')}
+              className="text-[10px] text-ink-faint transition-colors hover:text-ink"
+            >
+              自动
+            </button>
+          </div>
+          <div className="flex items-center gap-2">
+            <input
+              type="color"
+              value={idleNumberColor || autoInk}
+              onChange={(event) => setIdleNumberColor(event.target.value)}
+              className="h-7 w-10 cursor-pointer rounded border border-line bg-surface p-0.5"
+              aria-label="未命中时数字颜色"
+            />
+            <span className="num text-[10.5px] text-ink-faint">
+              {idleNumberColor ? idleNumberColor.toUpperCase() : '自动（跟随文字色）'}
+            </span>
+          </div>
+          <p className="mt-1 text-[9.5px] leading-relaxed text-ink-faint">
+            没有命中任何级别时，大数字与光晕使用这个颜色。
+          </p>
         </div>
       </SectionCard>
 

@@ -58,6 +58,8 @@ export function useLevelMonitor() {
       subtitleColor: settings.fullscreenSubtitleColor,
       statusFont: settings.statusFont,
       statusSize: settings.statusSize,
+      statusColor: settings.statusColor,
+      idleText: settings.idleText[settings.mode],
       readoutAnimation: settings.readoutAnimation,
       rollingMs: settings.rollingMs,
       readoutIntervalMs: settings.readoutIntervalMs,
@@ -149,6 +151,7 @@ export function useLevelMonitor() {
   const captureEvidenceFor = useCallback(
     async (levelName: string): Promise<void> => {
       const settings = useSettingsStore.getState()
+      if (!settings.evidenceModes[settings.mode]) return
       if (!settings.recordingEnabled && !settings.snapshotEnabled) return
 
       const stamp = evidenceStamp()

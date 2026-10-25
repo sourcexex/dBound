@@ -26,6 +26,13 @@ export const DEFAULT_MODE_LABELS: Record<Mode, string> = {
   reverse: '反向',
 }
 
+/** Copy shown when no level is hit. */
+export const IDLE_TEXT_MAX = 12
+export const DEFAULT_IDLE_TEXT: Record<Mode, string> = {
+  forward: '安静',
+  reverse: '音量正常',
+}
+
 export const DEFAULT_FULLSCREEN_TITLE = 'dBound'
 export const DEFAULT_FULLSCREEN_SUBTITLE = '实时响度估测'
 
@@ -100,6 +107,11 @@ export interface PersistedSettings {
   darkMode: boolean
   /** User-facing name for each mode, e.g. 自习课模式 / 早读模式. */
   modeLabels: Record<Mode, string>
+  /** Colour of the big number when no level is active; '' means automatic. */
+  idleNumberColor: string
+  /** Typography/copy of the status line (main window chip + fullscreen). */
+  statusColor: string
+  idleText: Record<Mode, string>
   /** Title / subtitle shown in the top-left corner of fullscreen mode. */
   fullscreenTitle: string
   fullscreenSubtitle: string
@@ -112,6 +124,8 @@ export interface PersistedSettings {
   statusSize: number
   /** Evidence recording: only triggered by an alert while buffering in RAM. */
   recordingEnabled: boolean
+  /** Per-mode master switch: turning a mode off skips both audio and photo. */
+  evidenceModes: Record<Mode, boolean>
   recordingDir: string
   prerollSeconds: number
   postrollSeconds: number
@@ -136,6 +150,9 @@ export function defaultSettings(): PersistedSettings {
     theme: DEFAULT_THEME,
     darkMode: DEFAULT_DARK_MODE,
     modeLabels: { ...DEFAULT_MODE_LABELS },
+    idleNumberColor: '',
+    statusColor: '',
+    idleText: { ...DEFAULT_IDLE_TEXT },
     fullscreenTitle: DEFAULT_FULLSCREEN_TITLE,
     fullscreenSubtitle: DEFAULT_FULLSCREEN_SUBTITLE,
     fullscreenTitleFont: DEFAULT_TITLE_FONT,
@@ -146,6 +163,7 @@ export function defaultSettings(): PersistedSettings {
     statusFont: DEFAULT_STATUS_FONT,
     statusSize: DEFAULT_STATUS_SIZE,
     recordingEnabled: DEFAULT_RECORDING_ENABLED,
+    evidenceModes: { forward: true, reverse: true },
     recordingDir: '',
     prerollSeconds: DEFAULT_PREROLL_SECONDS,
     postrollSeconds: DEFAULT_POSTROLL_SECONDS,
@@ -230,6 +248,21 @@ function sanitizeNumber(value: unknown, fallback: number, min: number, max: numb
   return Math.min(max, Math.max(min, Math.round(parsed)))
 }
 
+function sanitizeColorOrEmpty(value: unknown): string {
+  return typeof value === 'string' && /^#[0-9a-f]{6}$/i.test(value) ? value : ''
+}
+
+function sanitizeIdleText(value: unknown): Record<Mode, string> {
+  const raw = isRecord(value) ? value : {}
+  const pick = (mode: Mode): string => {
+    const text = raw[mode]
+    if (typeof text !== 'string') return DEFAULT_IDLE_TEXT[mode]
+    const trimmed = text.trim().slice(0, IDLE_TEXT_MAX)
+    return trimmed || DEFAULT_IDLE_TEXT[mode]
+  }
+  return { forward: pick('forward'), reverse: pick('reverse') }
+}
+
 function sanitizeEmojiRule(value: unknown, fallback: EmojiRule): EmojiRule {
   const raw = isRecord(value) ? value : {}
   return {
@@ -273,6 +306,9 @@ export function sanitizeSettings(value: unknown): PersistedSettings {
     theme: isThemeId(value.theme) ? value.theme : DEFAULT_THEME,
     darkMode: value.darkMode === true,
     modeLabels: sanitizeModeLabels(value.modeLabels),
+    idleNumberColor: sanitizeColorOrEmpty(value.idleNumberColor),
+    statusColor: sanitizeColorOrEmpty(value.statusColor),
+    idleText: sanitizeIdleText(value.idleText),
     fullscreenTitle: sanitizeText(
       value.fullscreenTitle,
       DEFAULT_FULLSCREEN_TITLE,
@@ -313,6 +349,10 @@ export function sanitizeSettings(value: unknown): PersistedSettings {
     statusFont: isKnownTitleFont(value.statusFont) ? value.statusFont : DEFAULT_STATUS_FONT,
     statusSize: sanitizeNumber(value.statusSize, DEFAULT_STATUS_SIZE, STATUS_SIZE_MIN, STATUS_SIZE_MAX),
     recordingEnabled: value.recordingEnabled !== false,
+    evidenceModes: {
+      forward: (isRecord(value.evidenceModes) ? value.evidenceModes.forward : undefined) !== false,
+      reverse: (isRecord(value.evidenceModes) ? value.evidenceModes.reverse : undefined) !== false,
+    },
     recordingDir: typeof value.recordingDir === 'string' ? value.recordingDir.trim() : '',
     prerollSeconds: sanitizeNumber(value.prerollSeconds, DEFAULT_PREROLL_SECONDS, PREROLL_MIN, PREROLL_MAX),
     postrollSeconds: sanitizeNumber(value.postrollSeconds, DEFAULT_POSTROLL_SECONDS, POSTROLL_MIN, POSTROLL_MAX),

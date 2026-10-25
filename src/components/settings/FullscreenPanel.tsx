@@ -10,6 +10,7 @@ import {
   EMOJI_THRESHOLD_MIN,
   FULLSCREEN_SUBTITLE_MAX,
   FULLSCREEN_TITLE_MAX,
+  IDLE_TEXT_MAX,
   STATUS_SIZE_MAX,
   STATUS_SIZE_MIN,
 } from '../../lib/settingsSchema'
@@ -150,8 +151,14 @@ export function FullscreenPanel() {
   const emoji = useSettingsStore((state) => state.emoji)
   const statusFont = useSettingsStore((state) => state.statusFont)
   const statusSize = useSettingsStore((state) => state.statusSize)
+  const statusColor = useSettingsStore((state) => state.statusColor)
+  const idleText = useSettingsStore((state) => state.idleText)
   const setStatusFont = useSettingsStore((state) => state.setStatusFont)
   const setStatusSize = useSettingsStore((state) => state.setStatusSize)
+  const setStatusColor = useSettingsStore((state) => state.setStatusColor)
+  const setIdleText = useSettingsStore((state) => state.setIdleText)
+  const darkMode = useSettingsStore((state) => state.darkMode)
+  const autoStatusColor = darkMode ? '#F2F3F1' : '#17171A'
   const modeLabels = useSettingsStore((state) => state.modeLabels)
   const updateEmojiRule = useSettingsStore((state) => state.updateEmojiRule)
 
@@ -250,7 +257,7 @@ export function FullscreenPanel() {
         </div>
       </SectionCard>
 
-      <SectionCard title="状态文字" hint="大数字下方的「音量正常 / 级别名」文字">
+      <SectionCard title="状态文字" hint="大数字下方「安静 / 音量正常 / 级别名」文字，主界面与全屏共用">
         <div className="grid grid-cols-2 gap-2">
           <label className="block">
             <span className={LABEL_CLASS}>字体</span>
@@ -275,6 +282,49 @@ export function FullscreenPanel() {
             onChange={setStatusSize}
           />
         </div>
+
+        <div className="mt-2.5">
+          <div className="mb-1 flex items-center justify-between">
+            <span className={LABEL_CLASS}>颜色</span>
+            <button
+              type="button"
+              onClick={() => setStatusColor('')}
+              className="text-[10px] text-ink-faint transition-colors hover:text-ink"
+            >
+              自动
+            </button>
+          </div>
+          <ColorRow value={statusColor || autoStatusColor} onChange={setStatusColor} />
+          {!statusColor ? (
+            <p className="mt-1 text-[9.5px] text-ink-faint">当前跟随文字色（自动）</p>
+          ) : null}
+        </div>
+
+        <div className="mt-2.5 grid grid-cols-2 gap-2">
+          <label className="block">
+            <span className={LABEL_CLASS}>自习课 · 未命中文字</span>
+            <input
+              className={INPUT_CLASS}
+              value={idleText.forward}
+              maxLength={IDLE_TEXT_MAX}
+              onChange={(event) => setIdleText('forward', event.target.value)}
+              placeholder="安静"
+            />
+          </label>
+          <label className="block">
+            <span className={LABEL_CLASS}>早读模式 · 未命中文字</span>
+            <input
+              className={INPUT_CLASS}
+              value={idleText.reverse}
+              maxLength={IDLE_TEXT_MAX}
+              onChange={(event) => setIdleText('reverse', event.target.value)}
+              placeholder="音量正常"
+            />
+          </label>
+        </div>
+        <p className="mt-1.5 text-[9.5px] leading-relaxed text-ink-faint">
+          未命中任何级别时显示这段文字；留空会恢复默认文案。
+        </p>
       </SectionCard>
 
       <SectionCard title="表情互动" hint="达标后全屏底部随机蹦出一个表情，适合课堂激励">

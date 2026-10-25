@@ -26,6 +26,8 @@ export interface MiniState {
   subtitleColor: string
   statusFont: string
   statusSize: number
+  statusColor: string
+  idleText: string
   readoutAnimation: boolean
   rollingMs: number
   readoutIntervalMs: number

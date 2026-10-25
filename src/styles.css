@@ -176,6 +176,11 @@
   }
 }
 
+/* Pause the slow drift while a list is being scrolled (keeps dragging smooth). */
+html[data-scrolling='true'] .dbound-aurora-blob {
+  animation-play-state: paused;
+}
+
 /* Aurora blobs: freeze the drift for reduced-motion users. */
 @media (prefers-reduced-motion: reduce) {
   .dbound-aurora-blob {

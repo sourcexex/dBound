@@ -52,6 +52,23 @@ export default function App() {
   }, [])
 
   useEffect(() => {
+    let timer = 0
+    const onScroll = () => {
+      document.documentElement.dataset.scrolling = 'true'
+      window.clearTimeout(timer)
+      timer = window.setTimeout(() => {
+        delete document.documentElement.dataset.scrolling
+      }, 180)
+    }
+    window.addEventListener('scroll', onScroll, true)
+    return () => {
+      window.removeEventListener('scroll', onScroll, true)
+      window.clearTimeout(timer)
+      delete document.documentElement.dataset.scrolling
+    }
+  }, [])
+
+  useEffect(() => {
     const onKeyDown = (event: KeyboardEvent) => {
       if (event.key === 'F11') {
         event.preventDefault()

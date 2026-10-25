@@ -1,6 +1,7 @@
 import { RollingNumber } from './RollingNumber'
 import { useSettingsStore } from '../stores/settings'
 import { accentFallback, mutedFallback } from '../lib/theme'
+import { fontStackFor } from '../lib/titleFonts'
 import type { CaptureStatus, Level } from '../lib/types'
 
 const STATUS_COPY: Record<CaptureStatus, string> = {
@@ -18,6 +19,7 @@ export function Gauge({
   activeLevel,
   mode,
   status,
+  onStart,
 }: {
   db: number | null
   peak: number | null
@@ -25,13 +27,20 @@ export function Gauge({
   activeLevel: Level | null
   mode: 'forward' | 'reverse'
   status: CaptureStatus
+  onStart?: () => void
 }) {
   const darkMode = useSettingsStore((state) => state.darkMode)
-  const accent = activeLevel?.color ?? accentFallback(darkMode)
+  const idleNumberColor = useSettingsStore((state) => state.idleNumberColor)
+  const idleText = useSettingsStore((state) => state.idleText)
+  const statusColor = useSettingsStore((state) => state.statusColor)
+  const statusFont = useSettingsStore((state) => state.statusFont)
+  const statusSize = useSettingsStore((state) => state.statusSize)
+  const accent = activeLevel?.color ?? (idleNumberColor || accentFallback(darkMode))
   const readoutAnimation = useSettingsStore((state) => state.readoutAnimation)
   const rollingMs = useSettingsStore((state) => state.rollingMs)
   const readoutIntervalMs = useSettingsStore((state) => state.readoutIntervalMs)
-  const silentLabel = mode === 'forward' ? '安静' : '音量正常'
+  const silentLabel = idleText[mode] || (mode === 'forward' ? '安静' : '音量正常')
+  const statusTextColor = statusColor || undefined
   const chipLabel = activeLevel?.name ?? silentLabel
   const chipNote = activeLevel?.note ?? null
   const live = status === 'running' || status === 'suspended' || status === 'starting'
@@ -101,7 +110,16 @@ export function Gauge({
             className="h-[7px] w-[7px] rounded-full transition-colors duration-200"
             style={{ backgroundColor: activeLevel ? accent : mutedFallback(darkMode) }}
           />
-          <span className="text-[12.5px] font-semibold text-ink">{chipLabel}</span>
+          <span
+            className="font-semibold text-ink"
+            style={{
+              fontFamily: fontStackFor(statusFont),
+              fontSize: `${Math.max(10, Math.min(24, statusSize))}px`,
+              color: statusTextColor,
+            }}
+          >
+            {chipLabel}
+          </span>
           {chipNote ? (
             <>
               <span className="text-ink-faint">·</span>
@@ -112,7 +130,19 @@ export function Gauge({
       </div>
 
       <div className="mt-[6px] h-4 text-[11px] tracking-[0.02em] text-ink-faint">
-        {showPeak && live && peak !== null ? <>峰值 {peak.toFixed(1)} dB</> : STATUS_COPY[status]}
+        {showPeak && live && peak !== null ? (
+          <>峰值 {peak.toFixed(1)} dB</>
+        ) : status === 'idle' || status === 'suspended' ? (
+          <button
+            type="button"
+            onClick={onStart}
+            className="cursor-pointer rounded px-1 text-[11px] tracking-[0.02em] text-ink-soft underline decoration-dotted underline-offset-2 transition-colors hover:text-ink"
+          >
+            {STATUS_COPY[status]}
+          </button>
+        ) : (
+          STATUS_COPY[status]
+        )}
       </div>
     </section>
   )
