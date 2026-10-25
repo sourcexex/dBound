@@ -12,7 +12,7 @@ import { isTauri } from './lib/tauri'
 import { useLevelStore } from './stores/level'
 import { useSettingsStore } from './stores/settings'
 
-const APP_VERSION = '1.0.1 Beta2'
+const APP_VERSION = __APP_VERSION__
 
 export default function App() {
   const [view, setView] = useState<'main' | 'settings' | 'logs'>('main')

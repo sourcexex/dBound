@@ -1,6 +1,6 @@
 import { Row, SectionCard } from '../ui/SectionCard'
 
-const APP_VERSION = '1.0.1 Beta2'
+const APP_VERSION = `v${__APP_VERSION__}`
 
 export function AboutPanel() {
   return (

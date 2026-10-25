@@ -1,22 +1,38 @@
 # dBound 开发进度
 
-> 规格见 [PRD.md](PRD.md)（v0.3）。本文件记录每个里程碑的完成情况与验证证据。
+> 规格见 [PRD.md](PRD.md)（v0.3 设计基线 + 顶部实现状态核对）。本文件记录每个里程碑的完成情况与验证证据，**只追加、不改写历史**；当前实现以代码与根 README 为准。
 
-## 当前状态：P0–P6 全部完成 ✅
+## 当前状态摘要（2026-10-25）
+
+- **版本**：以 `src-tauri/tauri.conf.json` 为唯一事实源；渠道标记另行管理。版本号统一方案见 [OPTIMIZATION.md](OPTIMIZATION.md) V-01/V-02（待落地）。
+- **最新产物**：`release/` 目录下的 NSIS 安装包与 portable 版本，附 `SHA256SUMS.txt`（产物不入库，以发布记录为准）。
+- **文档**：索引见 [README.md](README.md)；优化项与整改批次见 [OPTIMIZATION.md](OPTIMIZATION.md)。
+- **已知问题**：见 OPTIMIZATION §0.2 风险 Top 10。
+- **说明**：以下里程碑段落按时间记录，早期描述可能与当前实现不同（例如设置页已从五段扩为七段、emoji 素材经历 20 → 1595 → 40 三阶段）；当前状态以本摘要与根 README 为准。
+
+## 版本一览
+
+| 版本（展示名） | 主要内容 |
+| --- | --- |
+| v0.1.0 | 基础测量、双模式、1–8 级提醒、全屏、迷你窗、托盘、校准、日志 |
+| v1.0.1 Beta2 | 模式改名、全屏标题/状态文字与级别同色、数字动效、表情奖励、双主题 + 暗黑、证据录音、摄像头快照、按模式留证、安装包与首次激活、启动提速、自绘滚动条 |
+
+> 版本号写法以 `tauri.conf.json` 为准；「Beta2」是渠道标记，不属于 semver 主体（见 OPTIMIZATION V-02）。
+
+## 里程碑状态：P0–P6 全部完成 ✅
 
 | 里程碑 | 状态 | 说明 |
 | --- | --- | --- |
 | S 技术验证 | ✅ | WebView2 里 `getUserMedia` 实测可用 |
 | P0 采集 + 主界面 | ✅ | 实时读数、波形、暂停、错误态 |
 | P1 报警引擎 | ✅ | dwell / hysteresis / exitDwell 三层防抖 + 切换动效 |
-| P2 设置与校准 | ✅ | 五段设置页、级别编辑器、两种校准、设备切换 |
+| P2 设置与校准 | ✅ | 设置页（当前七段）、级别编辑器、两种校准、设备切换 |
 | P3 迷你胶囊 + 托盘 | ✅ | 置顶胶囊、跨窗口推流、托盘常驻、关闭到托盘 |
 | P4 日志中心 | ✅ | 事件 + 每秒采样、JSONL、应用内查看、CSV 导出 |
 | P5 打包与终检 | ✅ | release 构建、NSIS 安装包、README、稳定性自测 |
 | P6 全屏模式 | ✅ | 独立全屏窗口、巨大读数、F11 进入 / ESC 退出、自动隐藏信息栏 |
 
-**交付物**：`src-tauri/target/release/bundle/nsis/dBound_0.1.0_x64-setup.exe`
-（1.26 MiB，per-user 安装，免管理员；SHA256 `64BD2329…C707FD`）
+**交付物**：`release/` 下的 NSIS 安装包与 portable 版本（per-user 安装、免管理员；产物不入库，校验和见 `SHA256SUMS.txt`）。
 
 ## 各阶段完成内容
 
@@ -274,3 +290,14 @@ $env:VITE_DBOUND_SIM='72'; $env:VITE_DBOUND_SIM_MODE='forward'; pnpm tauri build
 - 主界面与全屏的数字光晕改为「内层亮光 + 外层柔光」两层径向渐变，
   横向/纵向范围分别扩大到约 188%/176%（主窗）和 132%/52%（全屏），
   命中级别时更明显，未命中时保持克制
+
+### 版本号归一为 v0.1.0（semver 单一来源）
+
+- 系统层与展示层统一为 **0.1.0**（合法 semver，不含 `Beta2` 之类渠道标记）：
+  `src-tauri/tauri.conf.json`（唯一来源）、`package.json`、`src-tauri/Cargo.toml`、`resources/版本信息.txt`
+- 新增 `scripts/version.mjs`：`check` 校验四处一致且为 `x.y.z`，`set <x.y.z>` 一处修改全部同步；
+  `pnpm build` 前置 `ver:check`，版本漂移时构建直接失败
+- 前端不再硬编码版本：Vite `define` 注入 `__APP_VERSION__`（读 tauri.conf），
+  关于页 / 激活页 / 启动日志统一显示 `v0.1.0`
+- 清理 `docs/GITHUB.md`（与 README 重复且内容过期，docs/README 早已标注合并删除）
+- 注意：从 1.0.1 覆盖安装 0.1.0 会触发 NSIS 降级保护，需先卸载旧版本再安装

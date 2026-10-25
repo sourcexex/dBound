@@ -2,7 +2,7 @@
 
 **桌面音量哨兵** —— 用麦克风实时估测环境响度，太吵或（朗读时）太小声，一眼就能看见。
 
-Windows 10 1809+ / Windows 11 · Tauri 2 + React 19 + TypeScript · 当前版本 **1.0.1 Beta2**
+Windows 10 1809+ / Windows 11 · Tauri 2 + React 19 + TypeScript · 当前版本 **v0.1.0**
 
 ![主界面](docs/images/main-quiet.png)
 
@@ -79,7 +79,7 @@ pnpm tauri build --debug --no-bundle
 
 ## 安装（Windows 安装包）
 
-发布包：`release/dBound_1.0.1_x64-setup.exe`（内置完整 Fluent Emoji 素材，体积约 16MB）
+发布包见 GitHub Releases 最新版本（内置完整 Fluent Emoji 素材，体积约 16MB）。
 
 1. 运行安装包，按向导选择**自定义安装目录**（默认 `%LOCALAPPDATA%\dBound`），安装过程中不需要激活码。
 2. **首次启动**会要求输入激活码（`142857`），验证后本机永久记住，之后启动直接进入软件。
@@ -96,7 +96,7 @@ pnpm tauri build --debug --no-bundle
    ```
 
 4. 激活标记保存在本机注册表。把安装目录直接拷贝到别的电脑后，首次打开会要求重新输入激活码。
-5. 静默安装（批量部署）：`dBound_1.0.1_x64-setup.exe /S /D=C:\dBound`
+5. 静默安装（批量部署）：`dBound_<版本>_x64-setup.exe /S /D=C:\dBound`
    （`/D` 必须是最后一个参数；首次启动仍需激活）。
 
 | 证据录制与现场快照 | 快照触发提示 |
@@ -107,7 +107,7 @@ pnpm tauri build --debug --no-bundle
 
 ![激活](docs/images/activation.png)
 
-> 关于页：设置 → 关于，可查看版本（1.0.1 Beta2）与作者信息（设计 / 创意 / 开发 | 作者：Source X）。
+> 关于页：设置 → 关于，可查看当前版本与作者信息（设计 / 创意 / 开发 | 作者：Source X）。
 
 ## 使用
 
@@ -135,7 +135,7 @@ src-tauri/
   src/lib.rs                托盘、迷你窗、窗口事件
   src/logs.rs               JSONL 日志写入、按天滚动、清理、导出
 scripts/                    图标生成、构建与自动化验收脚本
-docs/                       PRD、进度、截图
+docs/                      文档索引（docs/README.md）、需求、进度、优化项与截图
 ```
 
 ## 数据与隐私
@@ -169,6 +169,14 @@ tauri-plugin-window-state / dialog
 ## 第三方素材
 
 - [Microsoft Fluent Emoji](https://github.com/microsoft/fluentui-emoji)（MIT License，3D 图片素材）
+
+## 文档
+
+- [docs/README.md](docs/README.md)：文档地图、截图库与维护约定
+- [docs/PRD.md](docs/PRD.md)：需求规格（含实现状态核对）
+- [docs/PROGRESS.md](docs/PROGRESS.md)：开发进度、里程碑证据与版本一览
+- [docs/OPTIMIZATION.md](docs/OPTIMIZATION.md)：2026-10 优化项审计（P0/P1/P2 与实施批次）
+- [AGENTS.md](AGENTS.md)：协作、代码约定与文档规范（改代码或写文档前先读）
 
 ## 作者
 

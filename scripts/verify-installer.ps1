@@ -1,9 +1,16 @@
 ﻿# Installer layout check: silent install needs no activation code.
 param(
-  [string]$Installer = 'D:\Project\Tauri\dBound\release\dBound_1.0.1_x64-setup.exe',
+    [string]$Installer = '',
   [string]$OutDir = 'D:\Project\Tauri\dBound\output\screenshots'
 )
 $ErrorActionPreference = 'Stop'
+
+$root = Split-Path $PSScriptRoot -Parent
+if (-not $Installer) {
+  $Installer = (Get-ChildItem (Join-Path $root 'release') -Filter 'dBound_*_x64-setup.exe' |
+    Sort-Object LastWriteTime -Descending | Select-Object -First 1).FullName
+}
+if (-not $Installer -or -not (Test-Path $Installer)) { throw 'installer not found in release/' }
 Add-Type -AssemblyName System.Drawing
 if (-not (Test-Path $OutDir)) { New-Item -ItemType Directory -Path $OutDir -Force | Out-Null }
 

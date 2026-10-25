@@ -45,7 +45,7 @@ export function ActivationPage({ onActivated }: { onActivated: () => void }) {
           </span>
           <div>
             <div className="text-[13px] font-semibold text-ink">dBound 激活</div>
-            <div className="text-[10px] text-ink-faint">版本 1.0.1 Beta2</div>
+            <div className="text-[10px] text-ink-faint">版本 v{__APP_VERSION__}</div>
           </div>
         </div>
 

@@ -1,9 +1,16 @@
-# Sample GPU engine utilisation for the dBound WebView2 processes.
+﻿# Sample GPU engine utilisation for the dBound WebView2 processes.
 param(
-  [string]$Exe = 'D:\Project\Tauri\dBound\release\dBound-1.0.1-portable.exe',
+    [string]$Exe = '',
   [int]$Seconds = 8
 )
 $ErrorActionPreference = 'Stop'
+
+$root = Split-Path $PSScriptRoot -Parent
+if (-not $Exe) {
+  $Exe = (Get-ChildItem (Join-Path $root 'release') -Filter 'dBound-*-portable.exe' |
+    Sort-Object LastWriteTime -Descending | Select-Object -First 1).FullName
+}
+if (-not $Exe -or -not (Test-Path $Exe)) { throw 'portable exe not found in release/' }
 reg add 'HKCU\Software\dBound' /v License /t REG_SZ /d 1 /f | Out-Null
 Add-Type @"
 using System;
