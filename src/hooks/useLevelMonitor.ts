@@ -42,6 +42,8 @@ export function useLevelMonitor() {
       name: active?.name ?? null,
       mode: settings.mode,
       modeLabel: settings.modeLabels[settings.mode],
+      title: settings.fullscreenTitle,
+      subtitle: settings.fullscreenSubtitle,
       running: level.status === 'running',
       paused: level.status === 'idle' || level.status === 'error',
     })

@@ -5,16 +5,24 @@ import type { Level, Mode } from './types'
 export const SETTINGS_VERSION = 2
 export const MAX_LEVELS = 8
 export const MODE_LABEL_MAX = 8
+export const FULLSCREEN_TITLE_MAX = 20
+export const FULLSCREEN_SUBTITLE_MAX = 36
 
 export const DEFAULT_MODE_LABELS: Record<Mode, string> = {
   forward: '正向',
   reverse: '反向',
 }
 
+export const DEFAULT_FULLSCREEN_TITLE = 'dBound'
+export const DEFAULT_FULLSCREEN_SUBTITLE = '实时响度估测'
+
 export interface PersistedSettings {
   mode: Mode
   /** User-facing name for each mode, e.g. 自习课模式 / 早读模式. */
   modeLabels: Record<Mode, string>
+  /** Title / subtitle shown in the top-left corner of fullscreen mode. */
+  fullscreenTitle: string
+  fullscreenSubtitle: string
   offset: number
   readingSmooth: boolean
   showPeak: boolean
@@ -26,6 +34,8 @@ export function defaultSettings(): PersistedSettings {
   return {
     mode: 'forward',
     modeLabels: { ...DEFAULT_MODE_LABELS },
+    fullscreenTitle: DEFAULT_FULLSCREEN_TITLE,
+    fullscreenSubtitle: DEFAULT_FULLSCREEN_SUBTITLE,
     offset: DEFAULT_OFFSET,
     readingSmooth: true,
     showPeak: true,
@@ -85,6 +95,12 @@ function sanitizeModeLabels(value: unknown): Record<Mode, string> {
   }
 }
 
+function sanitizeText(value: unknown, fallback: string, max: number, allowEmpty: boolean): string {
+  if (typeof value !== 'string') return fallback
+  const trimmed = value.trim().slice(0, max)
+  return allowEmpty ? trimmed : trimmed.length > 0 ? trimmed : fallback
+}
+
 /** Keep only well-formed settings; fall back to defaults for anything broken. */
 export function sanitizeSettings(value: unknown): PersistedSettings {
   const fallback = defaultSettings()
@@ -103,6 +119,18 @@ export function sanitizeSettings(value: unknown): PersistedSettings {
   return {
     mode,
     modeLabels: sanitizeModeLabels(value.modeLabels),
+    fullscreenTitle: sanitizeText(
+      value.fullscreenTitle,
+      DEFAULT_FULLSCREEN_TITLE,
+      FULLSCREEN_TITLE_MAX,
+      false,
+    ),
+    fullscreenSubtitle: sanitizeText(
+      value.fullscreenSubtitle,
+      DEFAULT_FULLSCREEN_SUBTITLE,
+      FULLSCREEN_SUBTITLE_MAX,
+      true,
+    ),
     offset: Number.isFinite(offset) ? Math.min(125, Math.max(65, Math.round(offset * 2) / 2)) : DEFAULT_OFFSET,
     readingSmooth: value.readingSmooth !== false,
     showPeak: value.showPeak !== false,

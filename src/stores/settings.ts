@@ -14,6 +14,9 @@ export interface SettingsState {
   mode: Mode
   /** User-facing name for each mode (e.g. 自习课模式 / 早读模式). */
   modeLabels: Record<Mode, string>
+  /** Title / subtitle shown in the top-left corner of fullscreen mode. */
+  fullscreenTitle: string
+  fullscreenSubtitle: string
   offset: number
   /** Reverse mode only: smooth over ~3 s so reading aloud does not flicker. */
   readingSmooth: boolean
@@ -24,6 +27,8 @@ export interface SettingsState {
 
   setMode: (mode: Mode) => void
   setModeLabel: (mode: Mode, label: string) => void
+  setFullscreenTitle: (title: string) => void
+  setFullscreenSubtitle: (subtitle: string) => void
   setOffset: (offset: number) => void
   setReadingSmooth: (value: boolean) => void
   setShowPeak: (value: boolean) => void
@@ -64,6 +69,8 @@ export const useSettingsStore = create<SettingsState>()(
     (set) => ({
       mode: initial.mode,
       modeLabels: initial.modeLabels,
+      fullscreenTitle: initial.fullscreenTitle,
+      fullscreenSubtitle: initial.fullscreenSubtitle,
       offset: initial.offset,
       readingSmooth: initial.readingSmooth,
       showPeak: initial.showPeak,
@@ -73,6 +80,8 @@ export const useSettingsStore = create<SettingsState>()(
       setMode: (mode) => set({ mode }),
       setModeLabel: (mode, label) =>
         set((state) => ({ modeLabels: { ...state.modeLabels, [mode]: label } })),
+      setFullscreenTitle: (fullscreenTitle) => set({ fullscreenTitle }),
+      setFullscreenSubtitle: (fullscreenSubtitle) => set({ fullscreenSubtitle }),
       setOffset: (offset) => set({ offset }),
       setReadingSmooth: (readingSmooth) => set({ readingSmooth }),
       setShowPeak: (showPeak) => set({ showPeak }),
@@ -120,6 +129,8 @@ export const useSettingsStore = create<SettingsState>()(
         set({
           mode: fresh.mode,
           modeLabels: fresh.modeLabels,
+          fullscreenTitle: fresh.fullscreenTitle,
+          fullscreenSubtitle: fresh.fullscreenSubtitle,
           offset: fresh.offset,
           readingSmooth: fresh.readingSmooth,
           showPeak: fresh.showPeak,
@@ -135,6 +146,8 @@ export const useSettingsStore = create<SettingsState>()(
       partialize: (state) => ({
         mode: state.mode,
         modeLabels: state.modeLabels,
+        fullscreenTitle: state.fullscreenTitle,
+        fullscreenSubtitle: state.fullscreenSubtitle,
         offset: state.offset,
         readingSmooth: state.readingSmooth,
         showPeak: state.showPeak,

@@ -9,6 +9,8 @@ const INITIAL: MiniState = {
   name: null,
   mode: 'forward',
   modeLabel: '正向',
+  title: 'dBound',
+  subtitle: '',
   running: false,
   paused: false,
 }

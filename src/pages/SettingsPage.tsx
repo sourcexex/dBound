@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { ArrowLeft } from 'lucide-react'
 import { CalibrationPanel } from '../components/settings/CalibrationPanel'
 import { DevicesPanel } from '../components/settings/DevicesPanel'
+import { FullscreenPanel } from '../components/settings/FullscreenPanel'
 import { LevelsPanel } from '../components/settings/LevelsPanel'
 import { ModePanel } from '../components/settings/ModePanel'
 import { SystemPanel } from '../components/settings/SystemPanel'
@@ -10,6 +11,7 @@ const TABS = [
   { id: 'mode', label: '模式' },
   { id: 'levels', label: '级别' },
   { id: 'calibration', label: '校准' },
+  { id: 'fullscreen', label: '全屏' },
   { id: 'devices', label: '设备' },
   { id: 'system', label: '系统' },
 ] as const
@@ -40,7 +42,7 @@ export function SettingsPage({
         <h1 className="ml-1 text-[13px] font-semibold text-ink">设置</h1>
       </header>
 
-      <nav className="shrink-0 px-4">
+      <nav className="shrink-0 px-3">
         <div className="flex items-center gap-0.5 rounded-full bg-paper-2 p-[3px]">
           {TABS.map((item) => {
             const active = item.id === tab
@@ -49,8 +51,10 @@ export function SettingsPage({
                 key={item.id}
                 type="button"
                 onClick={() => setTab(item.id)}
-                className={`flex-1 rounded-full py-[6px] text-[11.5px] transition-colors duration-200 ${
-                  active ? 'bg-white font-semibold text-ink shadow-[0_1px_2px_rgba(0,0,0,0.06)]' : 'font-medium text-ink-soft hover:text-ink'
+                className={`flex-1 rounded-full py-[6px] text-[11px] transition-colors duration-200 ${
+                  active
+                    ? 'bg-white font-semibold text-ink shadow-[0_1px_2px_rgba(0,0,0,0.06)]'
+                    : 'font-medium text-ink-soft hover:text-ink'
                 }`}
               >
                 {item.label}
@@ -64,6 +68,7 @@ export function SettingsPage({
         {tab === 'mode' ? <ModePanel /> : null}
         {tab === 'levels' ? <LevelsPanel /> : null}
         {tab === 'calibration' ? <CalibrationPanel /> : null}
+        {tab === 'fullscreen' ? <FullscreenPanel /> : null}
         {tab === 'devices' ? <DevicesPanel onRestart={onRestartDevice} /> : null}
         {tab === 'system' ? <SystemPanel /> : null}
       </div>

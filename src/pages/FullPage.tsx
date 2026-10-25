@@ -10,6 +10,8 @@ const INITIAL: MiniState = {
   name: null,
   mode: 'forward',
   modeLabel: '正向',
+  title: 'dBound',
+  subtitle: '实时响度估测',
   running: false,
   paused: false,
 }
@@ -101,14 +103,20 @@ export function FullPage() {
         className="absolute inset-x-0 top-0 z-10 flex items-center justify-between px-9 py-7 transition-opacity duration-500"
         style={{ opacity: chromeVisible ? 1 : 0 }}
       >
-        <div className="flex items-center gap-2.5">
-          <span className="relative grid h-5 w-5 place-items-center rounded-[7px] bg-ink">
+        <div className="flex min-w-0 items-start gap-2.5">
+          <span className="relative mt-[3px] grid h-5 w-5 shrink-0 place-items-center rounded-[7px] bg-ink">
             <span className="h-[7px] w-[7px] rounded-full bg-[#F2C94C]" />
           </span>
-          <span className="text-[14px] font-semibold tracking-[0.01em] text-ink">dBound</span>
-          <span className="ml-2 rounded-full bg-black/[0.05] px-2 py-[2px] text-[10.5px] font-medium text-ink-soft">
-            全屏模式
-          </span>
+          <div className="min-w-0">
+            <h1 className="truncate text-[19px] leading-tight font-semibold tracking-[0.01em] text-ink">
+              {state.title || 'dBound'}
+            </h1>
+            {state.subtitle ? (
+              <p className="mt-1 truncate text-[12px] font-medium tracking-[0.02em] text-ink-soft">
+                {state.subtitle}
+              </p>
+            ) : null}
+          </div>
         </div>
 
         <div className="flex items-center gap-4">

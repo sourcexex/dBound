@@ -12,6 +12,9 @@ export interface MiniState {
   mode: Mode
   /** Custom display name of the current mode (e.g. 早读模式). */
   modeLabel: string
+  /** Fullscreen title / subtitle configured in settings. */
+  title: string
+  subtitle: string
   running: boolean
   paused: boolean
 }

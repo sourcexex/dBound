@@ -1,6 +1,8 @@
 import { describe, expect, it } from 'vitest'
 import {
+  DEFAULT_FULLSCREEN_TITLE,
   DEFAULT_MODE_LABELS,
+  FULLSCREEN_SUBTITLE_MAX,
   SETTINGS_VERSION,
   defaultSettings,
   migrateSettings,
@@ -104,5 +106,29 @@ describe('settings schema', () => {
     const broken = sanitizeSettings({ modeLabels: { forward: '   ', reverse: '1234567890123' } })
     expect(broken.modeLabels.forward).toBe(DEFAULT_MODE_LABELS.forward)
     expect(broken.modeLabels.reverse).toHaveLength(8)
+  })
+
+  it('sanitizes the fullscreen title and subtitle', () => {
+    const custom = sanitizeSettings({
+      modeLabels: { forward: '正向', reverse: '反向' },
+      fullscreenTitle: '520班分贝仪',
+      fullscreenSubtitle: '让朗读声响起来',
+    })
+    expect(custom.fullscreenTitle).toBe('520班分贝仪')
+    expect(custom.fullscreenSubtitle).toBe('让朗读声响起来')
+
+    const broken = sanitizeSettings({
+      modeLabels: { forward: '正向', reverse: '反向' },
+      fullscreenTitle: '   ',
+      fullscreenSubtitle: 'x'.repeat(80),
+    })
+    expect(broken.fullscreenTitle).toBe(DEFAULT_FULLSCREEN_TITLE)
+    expect(broken.fullscreenSubtitle).toHaveLength(FULLSCREEN_SUBTITLE_MAX)
+
+    const emptySubtitle = sanitizeSettings({
+      modeLabels: { forward: '正向', reverse: '反向' },
+      fullscreenSubtitle: '',
+    })
+    expect(emptySubtitle.fullscreenSubtitle).toBe('')
   })
 })
