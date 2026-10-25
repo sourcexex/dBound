@@ -23,7 +23,7 @@ function ControlButton({
       }}
       onPointerDown={(event) => event.stopPropagation()}
       className={`grid h-7 w-7 place-items-center rounded-md text-ink-soft transition-colors duration-150 ${
-        danger ? 'hover:bg-[#DC2626] hover:text-white' : 'hover:bg-black/[0.06] hover:text-ink'
+        danger ? 'hover:bg-[#DC2626] hover:text-white' : 'hover:bg-ink/[0.06] hover:text-ink'
       }`}
     >
       {children}

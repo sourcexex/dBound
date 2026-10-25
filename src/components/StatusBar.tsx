@@ -29,7 +29,7 @@ export function StatusBar({
         onClick={onToggle}
         aria-label={active ? '暂停测量' : '开始测量'}
         title={active ? '暂停测量' : '开始测量'}
-        className="grid h-10 w-10 shrink-0 place-items-center rounded-full border border-line bg-white text-ink shadow-[0_1px_2px_rgba(0,0,0,0.04)] transition-all duration-150 hover:border-ink/25 hover:shadow-[0_2px_6px_rgba(0,0,0,0.07)] active:scale-95"
+        className="grid h-10 w-10 shrink-0 place-items-center rounded-full border border-line bg-surface text-ink shadow-[0_1px_2px_rgba(0,0,0,0.04)] transition-all duration-150 hover:border-ink/25 hover:shadow-[0_2px_6px_rgba(0,0,0,0.07)] active:scale-95"
       >
         {active ? <Pause size={15} strokeWidth={2.2} /> : <Play size={15} strokeWidth={2.2} />}
       </button>

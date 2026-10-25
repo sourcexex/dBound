@@ -60,7 +60,7 @@ export function DevicesPanel({ onRestart }: { onRestart: (deviceId: string) => v
             type="button"
             onClick={() => void refresh()}
             aria-label="刷新设备"
-            className="grid h-6 w-6 place-items-center rounded-md text-ink-faint transition-colors hover:bg-black/[0.05] hover:text-ink"
+            className="grid h-6 w-6 place-items-center rounded-md text-ink-faint transition-colors hover:bg-ink/[0.05] hover:text-ink"
           >
             <RefreshCw size={12.5} strokeWidth={2} className={loading ? 'animate-spin' : ''} />
           </button>
@@ -75,7 +75,7 @@ export function DevicesPanel({ onRestart }: { onRestart: (deviceId: string) => v
                 type="button"
                 onClick={() => select(option.deviceId)}
                 className={`flex w-full items-center gap-2.5 rounded-lg border px-2.5 py-2 text-left transition-colors ${
-                  selected ? 'border-ink/25 bg-white' : 'border-transparent hover:bg-black/[0.03]'
+                  selected ? 'border-ink/25 bg-surface' : 'border-transparent hover:bg-ink/[0.03]'
                 }`}
               >
                 <Mic size={13} strokeWidth={2} className="shrink-0 text-ink-soft" />
@@ -85,7 +85,7 @@ export function DevicesPanel({ onRestart }: { onRestart: (deviceId: string) => v
                     selected ? 'border-ink bg-ink' : 'border-[#C9C8C1]'
                   }`}
                 >
-                  {selected ? <span className="h-1 w-1 rounded-full bg-white" /> : null}
+                  {selected ? <span className="h-1 w-1 rounded-full bg-paper" /> : null}
                 </span>
               </button>
             )

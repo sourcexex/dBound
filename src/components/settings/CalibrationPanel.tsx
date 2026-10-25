@@ -97,7 +97,7 @@ export function CalibrationPanel() {
               setOffset(DEFAULT_OFFSET)
               setMessage('已恢复默认偏移。')
             }}
-            className="flex items-center gap-1 rounded-md px-2 py-1 text-[11px] text-ink-faint transition-colors hover:bg-black/[0.05] hover:text-ink"
+            className="flex items-center gap-1 rounded-md px-2 py-1 text-[11px] text-ink-faint transition-colors hover:bg-ink/[0.05] hover:text-ink"
           >
             <RotateCcw size={11.5} strokeWidth={2} />
             恢复默认
@@ -111,7 +111,7 @@ export function CalibrationPanel() {
             type="button"
             disabled={progress !== null}
             onClick={() => startCalibration(QUIET_TARGET)}
-            className="flex w-full items-center gap-2.5 rounded-xl border border-line bg-white px-3 py-2.5 text-left transition-colors enabled:hover:border-ink/25 disabled:opacity-60"
+            className="flex w-full items-center gap-2.5 rounded-xl border border-line bg-surface px-3 py-2.5 text-left transition-colors enabled:hover:border-ink/25 disabled:opacity-60"
           >
             <span className="grid h-8 w-8 place-items-center rounded-lg bg-paper-2 text-ink-soft">
               <Volume1 size={15} strokeWidth={2} />
@@ -126,7 +126,7 @@ export function CalibrationPanel() {
             type="button"
             disabled={progress !== null}
             onClick={() => startCalibration(READING_TARGET)}
-            className="flex w-full items-center gap-2.5 rounded-xl border border-line bg-white px-3 py-2.5 text-left transition-colors enabled:hover:border-ink/25 disabled:opacity-60"
+            className="flex w-full items-center gap-2.5 rounded-xl border border-line bg-surface px-3 py-2.5 text-left transition-colors enabled:hover:border-ink/25 disabled:opacity-60"
           >
             <span className="grid h-8 w-8 place-items-center rounded-lg bg-paper-2 text-ink-soft">
               <Mic size={15} strokeWidth={2} />

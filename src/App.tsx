@@ -7,6 +7,7 @@ import { LogsPage } from './pages/LogsPage'
 import { MainPage } from './pages/MainPage'
 import { SettingsPage } from './pages/SettingsPage'
 import { useLevelStore } from './stores/level'
+import { useSettingsStore } from './stores/settings'
 
 const APP_VERSION = '0.1.0'
 
@@ -14,6 +15,8 @@ export default function App() {
   const [view, setView] = useState<'main' | 'settings' | 'logs'>('main')
   const { toggle, start, restartDevice } = useLevelMonitor()
   const unseenAlerts = useLevelStore((state) => state.unseenAlerts)
+  const theme = useSettingsStore((state) => state.theme)
+  const darkMode = useSettingsStore((state) => state.darkMode)
   const started = useRef(false)
 
   useEffect(() => {
@@ -73,8 +76,12 @@ export default function App() {
     )
 
   return (
-    <div className="relative h-full w-full overflow-hidden rounded-[15px] border border-black/[0.07]">
-      <AuroraBackground />
+    <div
+      data-appearance={darkMode ? 'dark' : 'light'}
+      data-theme={theme}
+      className="relative h-full w-full overflow-hidden rounded-[15px] border border-ink/[0.08]"
+    >
+      <AuroraBackground theme={theme} dark={darkMode} />
       <div className="relative z-10 h-full">{content}</div>
     </div>
   )

@@ -140,6 +140,28 @@ describe('settings schema', () => {
     expect(emptySubtitle.fullscreenSubtitle).toBe('')
   })
 
+  it('sanitizes the theme and dark mode', () => {
+    const defaults = defaultSettings()
+    expect(defaults.theme).toBe('aurora')
+    expect(defaults.darkMode).toBe(false)
+
+    const custom = sanitizeSettings({
+      modeLabels: { forward: '正向', reverse: '反向' },
+      theme: 'ocean',
+      darkMode: true,
+    })
+    expect(custom.theme).toBe('ocean')
+    expect(custom.darkMode).toBe(true)
+
+    const broken = sanitizeSettings({
+      modeLabels: { forward: '正向', reverse: '反向' },
+      theme: 'neon',
+      darkMode: 'yes',
+    })
+    expect(broken.theme).toBe('aurora')
+    expect(broken.darkMode).toBe(false)
+  })
+
   it('sanitizes the title font, size and colour', () => {
     const custom = sanitizeSettings({
       modeLabels: { forward: '正向', reverse: '反向' },

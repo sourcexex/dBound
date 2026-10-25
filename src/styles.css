@@ -3,6 +3,7 @@
 @theme {
   --color-paper: #fafaf8;
   --color-paper-2: #f1f0eb;
+  --color-surface: #ffffff;
   --color-ink: #17171a;
   --color-ink-soft: #6b6b72;
   --color-ink-faint: #a1a1a8;
@@ -12,6 +13,22 @@
     system-ui, sans-serif;
   --font-num: "Segoe UI Variable Display", "Segoe UI", "Microsoft YaHei UI", system-ui,
     sans-serif;
+}
+
+/* Dark appearance: overriding the token values flips every utility that uses them. */
+[data-appearance='dark'] {
+  color-scheme: dark;
+  --color-paper: #0c0d10;
+  --color-paper-2: #1b1d23;
+  --color-surface: #15181e;
+  --color-ink: #f2f3f1;
+  --color-ink-soft: #a4a6ad;
+  --color-ink-faint: #6d7078;
+  --color-line: #262932;
+}
+
+:root {
+  color-scheme: light;
 }
 
 /* Element resets live in @layer base so Tailwind utilities can still override them. */
@@ -178,7 +195,7 @@
 .dbound-range::-webkit-slider-runnable-track {
   height: 4px;
   border-radius: 999px;
-  background: #e6e5de;
+  background: var(--color-line);
 }
 
 .dbound-range::-webkit-slider-thumb {
@@ -187,8 +204,8 @@
   height: 15px;
   margin-top: -5.5px;
   border-radius: 50%;
-  background: #fff;
-  border: 1px solid rgb(0 0 0 / 0.16);
+  background: var(--color-surface);
+  border: 1px solid var(--color-line);
   box-shadow: 0 1px 3px rgb(0 0 0 / 0.18);
 }
 

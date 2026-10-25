@@ -12,7 +12,7 @@ export function SectionCard({
   action?: ReactNode
 }) {
   return (
-    <section className="rounded-xl border border-black/[0.06] bg-white/80 p-3.5">
+    <section className="rounded-xl border border-black/[0.06] bg-surface/80 p-3.5">
       <div className="mb-2.5 flex items-center justify-between">
         <div>
           <h3 className="text-[12.5px] font-semibold text-ink">{title}</h3>

@@ -11,9 +11,13 @@ import {
   type PersistedSettings,
 } from '../lib/settingsSchema'
 import type { Level, Mode } from '../lib/types'
+import type { ThemeId } from '../lib/theme'
 
 export interface SettingsState {
   mode: Mode
+  /** Colour theme + light/dark appearance. */
+  theme: ThemeId
+  darkMode: boolean
   /** User-facing name for each mode (e.g. 自习课模式 / 早读模式). */
   modeLabels: Record<Mode, string>
   /** Title / subtitle shown in the top-left corner of fullscreen mode. */
@@ -42,6 +46,8 @@ export interface SettingsState {
   levels: Record<Mode, Level[]>
 
   setMode: (mode: Mode) => void
+  setTheme: (theme: ThemeId) => void
+  setDarkMode: (darkMode: boolean) => void
   setModeLabel: (mode: Mode, label: string) => void
   setFullscreenTitle: (title: string) => void
   setFullscreenSubtitle: (subtitle: string) => void
@@ -95,6 +101,8 @@ export const useSettingsStore = create<SettingsState>()(
   persist<SettingsState, [], [], PersistedSettings>(
     (set) => ({
       mode: initial.mode,
+      theme: initial.theme,
+      darkMode: initial.darkMode,
       modeLabels: initial.modeLabels,
       fullscreenTitle: initial.fullscreenTitle,
       fullscreenSubtitle: initial.fullscreenSubtitle,
@@ -116,6 +124,8 @@ export const useSettingsStore = create<SettingsState>()(
       levels: initial.levels,
 
       setMode: (mode) => set({ mode }),
+      setTheme: (theme) => set({ theme }),
+      setDarkMode: (darkMode) => set({ darkMode }),
       setModeLabel: (mode, label) =>
         set((state) => ({ modeLabels: { ...state.modeLabels, [mode]: label } })),
       setFullscreenTitle: (fullscreenTitle) => set({ fullscreenTitle }),
@@ -178,6 +188,8 @@ export const useSettingsStore = create<SettingsState>()(
         const fresh = defaultSettings()
         set({
           mode: fresh.mode,
+          theme: fresh.theme,
+          darkMode: fresh.darkMode,
           modeLabels: fresh.modeLabels,
           fullscreenTitle: fresh.fullscreenTitle,
           fullscreenSubtitle: fresh.fullscreenSubtitle,
@@ -206,6 +218,8 @@ export const useSettingsStore = create<SettingsState>()(
       migrate: (persisted, version) => migrateSettings(persisted, version),
       partialize: (state) => ({
         mode: state.mode,
+        theme: state.theme,
+        darkMode: state.darkMode,
         modeLabels: state.modeLabels,
         fullscreenTitle: state.fullscreenTitle,
         fullscreenSubtitle: state.fullscreenSubtitle,

@@ -19,7 +19,7 @@ export function ModeSwitch({
       <div className="relative flex w-[248px] items-center rounded-full bg-paper-2 p-[3px]">
         <span
           aria-hidden
-          className="absolute top-[3px] bottom-[3px] left-[3px] w-[calc(50%-3px)] rounded-full bg-white shadow-[0_1px_2px_rgba(0,0,0,0.06),0_1px_6px_rgba(0,0,0,0.04)] transition-transform duration-200 ease-out"
+          className="absolute top-[3px] bottom-[3px] left-[3px] w-[calc(50%-3px)] rounded-full bg-surface shadow-[0_1px_2px_rgba(0,0,0,0.06),0_1px_6px_rgba(0,0,0,0.04)] transition-transform duration-200 ease-out"
           style={{ transform: mode === 'reverse' ? 'translateX(100%)' : 'translateX(0)' }}
         />
         {options.map((option) => {

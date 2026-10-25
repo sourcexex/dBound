@@ -1,5 +1,6 @@
 import { isTauri } from './tauri'
 import type { EmojiRule } from './settingsSchema'
+import type { ThemeId } from './theme'
 import type { Mode } from './types'
 
 export const MINI_STATE_EVENT = 'dbound:mini-state'
@@ -11,6 +12,8 @@ export interface MiniState {
   color: string
   name: string | null
   mode: Mode
+  theme: ThemeId
+  darkMode: boolean
   /** Custom display name of the current mode (e.g. 早读模式). */
   modeLabel: string
   /** Fullscreen title / subtitle configured in settings. */

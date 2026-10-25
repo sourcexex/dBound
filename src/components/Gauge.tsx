@@ -1,5 +1,6 @@
 import { RollingNumber } from './RollingNumber'
 import { useSettingsStore } from '../stores/settings'
+import { accentFallback, mutedFallback } from '../lib/theme'
 import type { CaptureStatus, Level } from '../lib/types'
 
 const STATUS_COPY: Record<CaptureStatus, string> = {
@@ -25,7 +26,8 @@ export function Gauge({
   mode: 'forward' | 'reverse'
   status: CaptureStatus
 }) {
-  const accent = activeLevel?.color ?? '#17171A'
+  const darkMode = useSettingsStore((state) => state.darkMode)
+  const accent = activeLevel?.color ?? accentFallback(darkMode)
   const readoutAnimation = useSettingsStore((state) => state.readoutAnimation)
   const rollingMs = useSettingsStore((state) => state.rollingMs)
   const readoutIntervalMs = useSettingsStore((state) => state.readoutIntervalMs)
@@ -52,7 +54,7 @@ export function Gauge({
         }`}
       >
         {db === null ? (
-          <span className="num text-[54px] leading-none font-semibold tracking-[0.08em] text-[#CFCEC7]">
+          <span className="num text-[54px] leading-none font-semibold tracking-[0.08em] text-ink-faint">
             ––
           </span>
         ) : (
@@ -91,13 +93,13 @@ export function Gauge({
       <div className="mt-[18px] flex h-8 items-center">
         <div
           key={chipLabel + chipNote}
-          className={`dbound-rise flex items-center gap-2 rounded-full border border-black/[0.06] bg-white/75 px-3.5 py-1.5 backdrop-blur-sm transition-opacity duration-300 ${
+          className={`dbound-rise flex items-center gap-2 rounded-full border border-black/[0.06] bg-surface/75 px-3.5 py-1.5 backdrop-blur-sm transition-opacity duration-300 ${
             dimmed ? 'opacity-50' : 'opacity-100'
           }`}
         >
           <span
             className="h-[7px] w-[7px] rounded-full transition-colors duration-200"
-            style={{ backgroundColor: activeLevel ? accent : '#C7C6BE' }}
+            style={{ backgroundColor: activeLevel ? accent : mutedFallback(darkMode) }}
           />
           <span className="text-[12.5px] font-semibold text-ink">{chipLabel}</span>
           {chipNote ? (

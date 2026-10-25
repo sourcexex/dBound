@@ -202,7 +202,7 @@ export function LogsPage({ onBack }: { onBack: () => void }) {
           type="button"
           onClick={onBack}
           aria-label="返回"
-          className="flex items-center gap-1 rounded-md px-2 py-1.5 text-[12px] text-ink-soft transition-colors hover:bg-black/[0.05] hover:text-ink"
+          className="flex items-center gap-1 rounded-md px-2 py-1.5 text-[12px] text-ink-soft transition-colors hover:bg-ink/[0.05] hover:text-ink"
         >
           <ArrowLeft size={14} strokeWidth={2.2} />
           返回
@@ -214,7 +214,7 @@ export function LogsPage({ onBack }: { onBack: () => void }) {
           disabled={busy}
           aria-label="导出 CSV"
           title="导出 CSV"
-          className="grid h-7 w-7 place-items-center rounded-md text-ink-soft transition-colors hover:bg-black/[0.06] hover:text-ink disabled:opacity-40"
+          className="grid h-7 w-7 place-items-center rounded-md text-ink-soft transition-colors hover:bg-ink/[0.06] hover:text-ink disabled:opacity-40"
         >
           <Download size={14} strokeWidth={2} />
         </button>
@@ -226,7 +226,7 @@ export function LogsPage({ onBack }: { onBack: () => void }) {
           className={`grid h-7 w-7 place-items-center rounded-md transition-colors ${
             confirmClear
               ? 'bg-[#FEE2E2] text-[#B91C1C]'
-              : 'text-ink-soft hover:bg-black/[0.06] hover:text-ink'
+              : 'text-ink-soft hover:bg-ink/[0.06] hover:text-ink'
           }`}
         >
           <Trash2 size={13.5} strokeWidth={2} />
@@ -236,7 +236,7 @@ export function LogsPage({ onBack }: { onBack: () => void }) {
           onClick={() => void load(day)}
           aria-label="刷新"
           title="刷新"
-          className="grid h-7 w-7 place-items-center rounded-md text-ink-soft transition-colors hover:bg-black/[0.06] hover:text-ink"
+          className="grid h-7 w-7 place-items-center rounded-md text-ink-soft transition-colors hover:bg-ink/[0.06] hover:text-ink"
         >
           <RefreshCw size={13.5} strokeWidth={2} />
         </button>
@@ -247,7 +247,7 @@ export function LogsPage({ onBack }: { onBack: () => void }) {
           <select
             value={day}
             onChange={(event) => setDay(event.target.value)}
-            className="num rounded-lg border border-line bg-white px-2 py-1 text-[11.5px] text-ink outline-none"
+            className="num rounded-lg border border-line bg-surface px-2 py-1 text-[11.5px] text-ink outline-none"
           >
             {[day, ...days.filter((item) => item !== day)].map((item) => (
               <option key={item} value={item}>
@@ -259,7 +259,7 @@ export function LogsPage({ onBack }: { onBack: () => void }) {
             value={query}
             onChange={(event) => setQuery(event.target.value)}
             placeholder="搜索提示文字或级别…"
-            className="min-w-0 flex-1 rounded-lg border border-line bg-white px-2.5 py-1 text-[11.5px] text-ink outline-none transition-colors placeholder:text-ink-faint focus:border-ink/30"
+            className="min-w-0 flex-1 rounded-lg border border-line bg-surface px-2.5 py-1 text-[11.5px] text-ink outline-none transition-colors placeholder:text-ink-faint focus:border-ink/30"
           />
         </div>
 
@@ -284,7 +284,7 @@ export function LogsPage({ onBack }: { onBack: () => void }) {
         </div>
 
         {stats ? (
-          <div className="mt-2.5 rounded-xl border border-black/[0.06] bg-white/80 p-2.5">
+          <div className="mt-2.5 rounded-xl border border-black/[0.06] bg-surface/80 p-2.5">
             <div className="flex items-baseline justify-between text-[10.5px] text-ink-soft">
               <span>当日采样 {samples.length} 条</span>
               <span className="num">

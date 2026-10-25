@@ -5,6 +5,7 @@ import { RollingNumber } from '../components/RollingNumber'
 import { MINI_STATE_EVENT, type MiniState } from '../lib/miniBridge'
 import { EMOJI_MAX } from '../lib/settingsSchema'
 import { isTauri } from '../lib/tauri'
+import { accentFallback, dimmedNumber, mutedFallback } from '../lib/theme'
 import { fontStackFor } from '../lib/titleFonts'
 
 const EMOJI_POOL = [
@@ -61,6 +62,8 @@ const INITIAL: MiniState = {
   color: '#17171A',
   name: null,
   mode: 'forward',
+  theme: 'aurora',
+  darkMode: false,
   modeLabel: '正向',
   title: 'dBound',
   subtitle: '实时响度估测',
@@ -134,7 +137,11 @@ export function FullPage() {
   }, [])
 
   const measuring = state.running && !state.paused
-  const accent = state.name ? state.color : '#17171A'
+  const accent = state.name ? state.color : accentFallback(state.darkMode)
+  const titleColor =
+    state.darkMode && state.titleColor.toLowerCase() === '#17171a' ? '#F2F3F1' : state.titleColor
+  const subtitleColor =
+    state.darkMode && state.subtitleColor.toLowerCase() === '#6b6b72' ? '#A4A6AD' : state.subtitleColor
   const value = state.db === null ? null : state.db.toFixed(1)
 
   const [emojis, setEmojis] = useState<EmojiItem[]>([])
@@ -198,9 +205,11 @@ export function FullPage() {
     <div
       onMouseMove={revealChrome}
       onClick={revealChrome}
+      data-appearance={state.darkMode ? 'dark' : 'light'}
+      data-theme={state.theme}
       className="relative h-screen w-screen overflow-hidden"
     >
-      <AuroraBackground variant="fullscreen" />
+      <AuroraBackground variant="fullscreen" theme={state.theme} dark={state.darkMode} />
       {/* soft colour wash driven by the active level */}
       <div
         aria-hidden
@@ -222,7 +231,7 @@ export function FullPage() {
               style={{
                 fontFamily: fontStackFor(state.titleFont),
                 fontSize: `${state.titleSize}px`,
-                color: state.titleColor,
+                color: titleColor,
               }}
             >
               {state.title || 'dBound'}
@@ -233,7 +242,7 @@ export function FullPage() {
                 style={{
                   fontFamily: fontStackFor(state.titleFont),
                   fontSize: `${state.subtitleSize}px`,
-                  color: state.subtitleColor,
+                  color: subtitleColor,
                 }}
               >
                 {state.subtitle}
@@ -254,7 +263,7 @@ export function FullPage() {
               exit()
             }}
             aria-label="退出全屏"
-            className="grid h-8 w-8 place-items-center rounded-full text-ink-soft transition-colors hover:bg-black/[0.06] hover:text-ink"
+            className="grid h-8 w-8 place-items-center rounded-full text-ink-soft transition-colors hover:bg-ink/[0.06] hover:text-ink"
           >
             <X size={16} strokeWidth={2} />
           </button>
@@ -303,14 +312,14 @@ export function FullPage() {
               aria-hidden
               className="pointer-events-none absolute top-1/2 left-1/2 h-[38%] w-[104%] -translate-x-1/2 -translate-y-1/2 rounded-full blur-[95px] transition-opacity duration-700"
               style={{
-                backgroundColor: measuring ? accent : '#17171A',
+                backgroundColor: measuring ? accent : accentFallback(state.darkMode),
                 opacity: state.name ? 0.26 : 0.13,
               }}
             />
           ) : null}
           {value === null ? (
             <span
-              className="num font-semibold tracking-[0.06em] text-[#CBCAC3]"
+              className="num font-semibold tracking-[0.06em] text-ink-faint"
               style={{ fontSize: 'min(16vh, 12vw)' }}
             >
               ––
@@ -332,7 +341,7 @@ export function FullPage() {
                 durationMs={state.rollingMs}
                 refreshMs={state.readoutIntervalMs}
                 className="num font-semibold tracking-[-0.03em] transition-colors duration-300"
-                style={{ color: measuring ? accent : '#A9A8A1' }}
+                style={{ color: measuring ? accent : dimmedNumber(state.darkMode) }}
               />
             </span>
           )}
@@ -348,7 +357,7 @@ export function FullPage() {
         <div className="mt-[3.2vh] flex items-center gap-2.5">
           <span
             className="h-[9px] w-[9px] rounded-full transition-colors duration-300"
-            style={{ backgroundColor: state.name ? accent : '#C7C6BE' }}
+            style={{ backgroundColor: state.name ? accent : mutedFallback(state.darkMode) }}
           />
           <span
             className="font-semibold text-ink"
@@ -380,7 +389,7 @@ export function FullPage() {
         <span className="num">
           {state.peak !== null ? `峰值 ${state.peak.toFixed(1)} dB` : '等待数据'}
         </span>
-        <span className="h-3 w-px bg-black/10" />
+        <span className="h-3 w-px bg-ink/10" />
         <span>估测值，仅供感知参考</span>
       </footer>
     </div>

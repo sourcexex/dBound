@@ -1,5 +1,6 @@
 import { DEFAULT_OFFSET } from './dsp'
 import { LEVEL_PALETTE, defaultLevels } from './presets'
+import { DEFAULT_DARK_MODE, DEFAULT_THEME, isThemeId, type ThemeId } from './theme'
 import {
   DEFAULT_SUBTITLE_COLOR,
   DEFAULT_SUBTITLE_SIZE,
@@ -74,6 +75,9 @@ export const DEFAULT_STATUS_SIZE = 15
 
 export interface PersistedSettings {
   mode: Mode
+  /** Colour theme and light/dark appearance. */
+  theme: ThemeId
+  darkMode: boolean
   /** User-facing name for each mode, e.g. 自习课模式 / 早读模式. */
   modeLabels: Record<Mode, string>
   /** Title / subtitle shown in the top-left corner of fullscreen mode. */
@@ -100,6 +104,8 @@ export interface PersistedSettings {
 export function defaultSettings(): PersistedSettings {
   return {
     mode: 'forward',
+    theme: DEFAULT_THEME,
+    darkMode: DEFAULT_DARK_MODE,
     modeLabels: { ...DEFAULT_MODE_LABELS },
     fullscreenTitle: DEFAULT_FULLSCREEN_TITLE,
     fullscreenSubtitle: DEFAULT_FULLSCREEN_SUBTITLE,
@@ -228,6 +234,8 @@ export function sanitizeSettings(value: unknown): PersistedSettings {
 
   return {
     mode,
+    theme: isThemeId(value.theme) ? value.theme : DEFAULT_THEME,
+    darkMode: value.darkMode === true,
     modeLabels: sanitizeModeLabels(value.modeLabels),
     fullscreenTitle: sanitizeText(
       value.fullscreenTitle,

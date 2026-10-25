@@ -41,6 +41,8 @@ export function useLevelMonitor() {
       color: active?.color ?? '#17171A',
       name: active?.name ?? null,
       mode: settings.mode,
+      theme: settings.theme,
+      darkMode: settings.darkMode,
       modeLabel: settings.modeLabels[settings.mode],
       title: settings.fullscreenTitle,
       subtitle: settings.fullscreenSubtitle,

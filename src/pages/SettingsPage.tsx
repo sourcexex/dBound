@@ -34,7 +34,7 @@ export function SettingsPage({
           type="button"
           onClick={onBack}
           aria-label="返回"
-          className="flex items-center gap-1 rounded-md px-2 py-1.5 text-[12px] text-ink-soft transition-colors hover:bg-black/[0.05] hover:text-ink"
+          className="flex items-center gap-1 rounded-md px-2 py-1.5 text-[12px] text-ink-soft transition-colors hover:bg-ink/[0.05] hover:text-ink"
         >
           <ArrowLeft size={14} strokeWidth={2.2} />
           返回
@@ -53,7 +53,7 @@ export function SettingsPage({
                 onClick={() => setTab(item.id)}
                 className={`flex-1 rounded-full py-[6px] text-[11px] transition-colors duration-200 ${
                   active
-                    ? 'bg-white font-semibold text-ink shadow-[0_1px_2px_rgba(0,0,0,0.06)]'
+                    ? 'bg-surface font-semibold text-ink shadow-[0_1px_2px_rgba(0,0,0,0.06)]'
                     : 'font-medium text-ink-soft hover:text-ink'
                 }`}
               >

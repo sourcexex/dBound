@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { MINI_COMMAND_EVENT, MINI_STATE_EVENT, type MiniState } from '../lib/miniBridge'
+import { accentFallback, dimmedNumber, mutedFallback } from '../lib/theme'
 import { isTauri } from '../lib/tauri'
 
 const INITIAL: MiniState = {
@@ -8,6 +9,8 @@ const INITIAL: MiniState = {
   color: '#17171A',
   name: null,
   mode: 'forward',
+  theme: 'aurora',
+  darkMode: false,
   modeLabel: '正向',
   title: 'dBound',
   subtitle: '',
@@ -62,12 +65,14 @@ export function MiniPage() {
 
   const measuring = state.running && !state.paused
   const live = measuring && state.db !== null
-  const accent = state.name ? state.color : '#17171A'
+  const accent = state.name ? state.color : accentFallback(state.darkMode)
   const value = state.db === null ? null : state.db.toFixed(1)
 
   return (
     <div
       data-tauri-drag-region
+      data-appearance={state.darkMode ? 'dark' : 'light'}
+      data-theme={state.theme}
       onClick={openMain}
       title="点击回到主窗口"
       className="relative flex h-full w-full items-center overflow-hidden rounded-[14px] border border-black/[0.09] bg-paper px-3.5 shadow-[0_6px_18px_rgba(0,0,0,0.14)]"
@@ -82,7 +87,7 @@ export function MiniPage() {
 
       <span
         className="mr-2.5 h-[8px] w-[8px] shrink-0 rounded-full transition-colors duration-200"
-        style={{ backgroundColor: measuring ? (state.name ? accent : '#B9B8B0') : '#D3D2CB' }}
+        style={{ backgroundColor: measuring ? (state.name ? accent : mutedFallback(state.darkMode)) : 'var(--color-line)' }}
       />
 
       {value !== null ? (
@@ -90,7 +95,7 @@ export function MiniPage() {
           <span className="text-[11px] text-ink-faint">≈</span>
           <span
             className="num text-[26px] leading-none font-semibold tracking-[-0.02em] transition-colors duration-200"
-            style={{ color: measuring ? (state.name ? accent : '#17171A') : '#9C9B94' }}
+            style={{ color: measuring ? accent : dimmedNumber(state.darkMode) }}
           >
             {value}
           </span>

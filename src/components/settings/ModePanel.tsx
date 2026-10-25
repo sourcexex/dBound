@@ -24,7 +24,7 @@ const MODE_COPY = {
 } as const
 
 const INPUT_CLASS =
-  'w-full rounded-lg border border-line bg-white px-2.5 py-1.5 text-[12px] text-ink outline-none transition-colors focus:border-ink/30'
+  'w-full rounded-lg border border-line bg-surface px-2.5 py-1.5 text-[12px] text-ink outline-none transition-colors focus:border-ink/30'
 
 export function ModePanel() {
   const mode = useSettingsStore((state) => state.mode)
@@ -72,7 +72,7 @@ export function ModePanel() {
               setModeLabel('forward', DEFAULT_MODE_LABELS.forward)
               setModeLabel('reverse', DEFAULT_MODE_LABELS.reverse)
             }}
-            className="shrink-0 rounded-md px-2 py-1 text-[11px] text-ink-faint transition-colors hover:bg-black/[0.05] hover:text-ink"
+            className="shrink-0 rounded-md px-2 py-1 text-[11px] text-ink-faint transition-colors hover:bg-ink/[0.05] hover:text-ink"
           >
             恢复默认
           </button>
@@ -91,8 +91,8 @@ export function ModePanel() {
                 onClick={() => setMode(key)}
                 className={`w-full rounded-xl border px-3 py-2.5 text-left transition-colors ${
                   selected
-                    ? 'border-ink/25 bg-white shadow-[0_1px_3px_rgba(0,0,0,0.05)]'
-                    : 'border-line bg-white/50 hover:border-ink/15'
+                    ? 'border-ink/25 bg-surface shadow-[0_1px_3px_rgba(0,0,0,0.05)]'
+                    : 'border-line bg-surface/50 hover:border-ink/15'
                 }`}
               >
                 <div className="flex items-center justify-between">
@@ -102,7 +102,7 @@ export function ModePanel() {
                       selected ? 'border-ink bg-ink' : 'border-[#C9C8C1]'
                     }`}
                   >
-                    {selected ? <span className="h-1.5 w-1.5 rounded-full bg-white" /> : null}
+                    {selected ? <span className="h-1.5 w-1.5 rounded-full bg-paper" /> : null}
                   </span>
                 </div>
                 <div className="mt-0.5 text-[10.5px] font-medium text-ink-soft">{copy.subtitle}</div>

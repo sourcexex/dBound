@@ -33,7 +33,7 @@ import { Toggle } from '../ui/Toggle'
 import { ValueSlider } from '../ui/ValueSlider'
 
 const INPUT_CLASS =
-  'w-full rounded-lg border border-line bg-white px-2.5 py-1.5 text-[12px] text-ink outline-none transition-colors placeholder:text-ink-faint focus:border-ink/30'
+  'w-full rounded-lg border border-line bg-surface px-2.5 py-1.5 text-[12px] text-ink outline-none transition-colors placeholder:text-ink-faint focus:border-ink/30'
 
 const LABEL_CLASS = 'mb-1 block text-[10.5px] text-ink-soft'
 
@@ -243,7 +243,7 @@ export function FullscreenPanel() {
               setSubtitleSize(DEFAULT_SUBTITLE_SIZE)
               setSubtitleColor(DEFAULT_SUBTITLE_COLOR)
             }}
-            className="shrink-0 rounded-md px-2 py-1 text-[11px] text-ink-faint transition-colors hover:bg-black/[0.05] hover:text-ink"
+            className="shrink-0 rounded-md px-2 py-1 text-[11px] text-ink-faint transition-colors hover:bg-ink/[0.05] hover:text-ink"
           >
             恢复默认
           </button>

@@ -5,11 +5,12 @@ import { LEVEL_PALETTE } from '../../lib/presets'
 import type { Level } from '../../lib/types'
 import { useLevelStore } from '../../stores/level'
 import { useSettingsStore } from '../../stores/settings'
+import { accentFallback } from '../../lib/theme'
 import { Toggle } from '../ui/Toggle'
 import { ThresholdScale } from './ThresholdScale'
 
 const inputClass =
-  'w-full rounded-lg border border-line bg-white px-2.5 py-1.5 text-[12px] text-ink outline-none transition-colors focus:border-ink/30'
+  'w-full rounded-lg border border-line bg-surface px-2.5 py-1.5 text-[12px] text-ink outline-none transition-colors focus:border-ink/30'
 
 function ColorSwatches({ value, onChange }: { value: string; onChange: (color: string) => void }) {
   return (
@@ -54,7 +55,7 @@ function LevelRow({
 
   return (
     <div
-      className={`rounded-xl border bg-white/85 transition-colors ${
+      className={`rounded-xl border bg-surface/85 transition-colors ${
         expanded ? 'border-black/[0.1]' : 'border-black/[0.06]'
       }`}
     >
@@ -85,7 +86,7 @@ function LevelRow({
           type="button"
           onClick={onToggleExpand}
           aria-label="展开编辑"
-          className="grid h-6 w-6 place-items-center rounded-md text-ink-faint transition-colors hover:bg-black/[0.05] hover:text-ink"
+          className="grid h-6 w-6 place-items-center rounded-md text-ink-faint transition-colors hover:bg-ink/[0.05] hover:text-ink"
         >
           <ChevronDown
             size={13}
@@ -174,14 +175,15 @@ export function LevelsPanel() {
 
   const sorted = sortLevels(mode, levels)
   const problem = validateLevels(mode, sorted)
-  const accent = activeLevel?.color ?? '#17171A'
+  const darkMode = useSettingsStore((state) => state.darkMode)
+  const accent = activeLevel?.color ?? accentFallback(darkMode)
   const orderedForScale = [...levels].sort((a, b) =>
     mode === 'forward' ? a.threshold - b.threshold : b.threshold - a.threshold,
   )
 
   return (
     <div className="space-y-3">
-      <div className="rounded-xl border border-black/[0.06] bg-white/80 p-3.5">
+      <div className="rounded-xl border border-black/[0.06] bg-surface/80 p-3.5">
         <div className="mb-2 flex items-center justify-between">
           <div>
             <h3 className="text-[12.5px] font-semibold text-ink">
@@ -236,7 +238,7 @@ export function LevelsPanel() {
             resetLevels(mode)
             setExpanded(null)
           }}
-          className="flex items-center gap-1.5 rounded-xl border border-line bg-white px-3 py-2 text-[11.5px] text-ink-soft transition-colors hover:text-ink"
+          className="flex items-center gap-1.5 rounded-xl border border-line bg-surface px-3 py-2 text-[11.5px] text-ink-soft transition-colors hover:text-ink"
         >
           <RotateCcw size={12} strokeWidth={2} />
           默认

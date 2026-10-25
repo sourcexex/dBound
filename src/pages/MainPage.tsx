@@ -8,6 +8,7 @@ import { Waveform } from '../components/Waveform'
 import type { CaptureErrorCode } from '../lib/types'
 import { useLevelStore } from '../stores/level'
 import { useSettingsStore } from '../stores/settings'
+import { accentFallback } from '../lib/theme'
 
 const ERROR_COPY: Record<CaptureErrorCode, { title: string; hint: string }> = {
   denied: {
@@ -64,7 +65,8 @@ export function MainPage({
   const history = useLevelStore((state) => state.history)
   const activeLevel = useLevelStore((state) => state.activeLevel)
 
-  const accent = activeLevel?.color ?? '#17171A'
+  const darkMode = useSettingsStore((state) => state.darkMode)
+  const accent = activeLevel?.color ?? accentFallback(darkMode)
 
   const errorCopy = error ? ERROR_COPY[error.code] : null
 
@@ -147,7 +149,7 @@ export function MainPage({
               <button
                 type="button"
                 onClick={onStart}
-                className="mt-1 flex items-center gap-1.5 rounded-full border border-line bg-white px-4 py-1.5 text-[12px] font-medium text-ink transition-colors hover:border-ink/20"
+                className="mt-1 flex items-center gap-1.5 rounded-full border border-line bg-surface px-4 py-1.5 text-[12px] font-medium text-ink transition-colors hover:border-ink/20"
               >
                 <RotateCw size={12.5} strokeWidth={2.2} />
                 重试
