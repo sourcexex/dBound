@@ -176,6 +176,16 @@
   }
 }
 
+/* Hide the native scrollbar; the overlay thumb in ScrollArea replaces it. */
+.scrollbar-none {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.scrollbar-none::-webkit-scrollbar {
+  display: none;
+}
+
 /* Pause the slow drift while a list is being scrolled (keeps dragging smooth). */
 html[data-scrolling='true'] .dbound-aurora-blob {
   animation-play-state: paused;

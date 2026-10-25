@@ -35,6 +35,8 @@ export function Gauge({
   const statusColor = useSettingsStore((state) => state.statusColor)
   const statusFont = useSettingsStore((state) => state.statusFont)
   const statusSize = useSettingsStore((state) => state.statusSize)
+  const levelNameSize = useSettingsStore((state) => state.levelNameSize)
+  const levelNoteSize = useSettingsStore((state) => state.levelNoteSize)
   const accent = activeLevel?.color ?? (idleNumberColor || accentFallback(darkMode))
   const readoutAnimation = useSettingsStore((state) => state.readoutAnimation)
   const rollingMs = useSettingsStore((state) => state.rollingMs)
@@ -114,7 +116,7 @@ export function Gauge({
             className="font-semibold text-ink"
             style={{
               fontFamily: fontStackFor(statusFont),
-              fontSize: `${Math.max(10, Math.min(24, statusSize))}px`,
+              fontSize: `${activeLevel ? levelNameSize : Math.max(10, Math.min(24, statusSize))}px`,
               color: statusTextColor,
             }}
           >
@@ -123,7 +125,15 @@ export function Gauge({
           {chipNote ? (
             <>
               <span className="text-ink-faint">·</span>
-              <span className="text-[12.5px] text-ink-soft">{chipNote}</span>
+              <span
+                className="text-ink-soft"
+                style={{
+                  fontFamily: fontStackFor(statusFont),
+                  fontSize: `${levelNoteSize}px`,
+                }}
+              >
+                {chipNote}
+              </span>
             </>
           ) : null}
         </div>

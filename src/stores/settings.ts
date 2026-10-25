@@ -24,6 +24,8 @@ export interface SettingsState {
   idleNumberColor: string
   statusColor: string
   idleText: Record<Mode, string>
+  levelNameSize: number
+  levelNoteSize: number
   /** Title / subtitle shown in the top-left corner of fullscreen mode. */
   fullscreenTitle: string
   fullscreenSubtitle: string
@@ -65,6 +67,8 @@ export interface SettingsState {
   setIdleNumberColor: (color: string) => void
   setStatusColor: (color: string) => void
   setIdleText: (mode: Mode, text: string) => void
+  setLevelNameSize: (size: number) => void
+  setLevelNoteSize: (size: number) => void
   setEvidenceMode: (mode: Mode, enabled: boolean) => void
   setFullscreenTitle: (title: string) => void
   setFullscreenSubtitle: (subtitle: string) => void
@@ -131,6 +135,8 @@ export const useSettingsStore = create<SettingsState>()(
       idleNumberColor: initial.idleNumberColor,
       statusColor: initial.statusColor,
       idleText: initial.idleText,
+      levelNameSize: initial.levelNameSize,
+      levelNoteSize: initial.levelNoteSize,
       fullscreenTitle: initial.fullscreenTitle,
       fullscreenSubtitle: initial.fullscreenSubtitle,
       fullscreenTitleFont: initial.fullscreenTitleFont,
@@ -165,6 +171,8 @@ export const useSettingsStore = create<SettingsState>()(
       setStatusColor: (statusColor) => set({ statusColor }),
       setIdleText: (mode, text) =>
         set((state) => ({ idleText: { ...state.idleText, [mode]: text } })),
+      setLevelNameSize: (levelNameSize) => set({ levelNameSize }),
+      setLevelNoteSize: (levelNoteSize) => set({ levelNoteSize }),
       setEvidenceMode: (mode, enabled) =>
         set((state) => ({ evidenceModes: { ...state.evidenceModes, [mode]: enabled } })),
       setModeLabel: (mode, label) =>
@@ -242,6 +250,8 @@ export const useSettingsStore = create<SettingsState>()(
           idleNumberColor: fresh.idleNumberColor,
           statusColor: fresh.statusColor,
           idleText: fresh.idleText,
+          levelNameSize: fresh.levelNameSize,
+          levelNoteSize: fresh.levelNoteSize,
           fullscreenTitle: fresh.fullscreenTitle,
           fullscreenSubtitle: fresh.fullscreenSubtitle,
           fullscreenTitleFont: fresh.fullscreenTitleFont,
@@ -283,6 +293,8 @@ export const useSettingsStore = create<SettingsState>()(
         idleNumberColor: state.idleNumberColor,
         statusColor: state.statusColor,
         idleText: state.idleText,
+        levelNameSize: state.levelNameSize,
+        levelNoteSize: state.levelNoteSize,
         fullscreenTitle: state.fullscreenTitle,
         fullscreenSubtitle: state.fullscreenSubtitle,
         fullscreenTitleFont: state.fullscreenTitleFont,

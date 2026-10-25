@@ -2,12 +2,19 @@ import { useState } from 'react'
 import { ChevronDown, Plus, RotateCcw, Trash2 } from 'lucide-react'
 import { sortLevels, validateLevels } from '../../lib/dsp'
 import { LEVEL_PALETTE } from '../../lib/presets'
+import {
+  LEVEL_NAME_SIZE_MAX,
+  LEVEL_NAME_SIZE_MIN,
+  LEVEL_NOTE_SIZE_MAX,
+  LEVEL_NOTE_SIZE_MIN,
+} from '../../lib/settingsSchema'
 import type { Level } from '../../lib/types'
 import { useLevelStore } from '../../stores/level'
 import { useSettingsStore } from '../../stores/settings'
 import { accentFallback } from '../../lib/theme'
 import { Toggle } from '../ui/Toggle'
 import { ThresholdScale } from './ThresholdScale'
+import { ValueSlider } from '../ui/ValueSlider'
 
 const inputClass =
   'w-full rounded-lg border border-line bg-surface px-2.5 py-1.5 text-[12px] text-ink outline-none transition-colors focus:border-ink/30'
@@ -167,6 +174,10 @@ export function LevelsPanel() {
   const addLevel = useSettingsStore((state) => state.addLevel)
   const removeLevel = useSettingsStore((state) => state.removeLevel)
   const resetLevels = useSettingsStore((state) => state.resetLevels)
+  const levelNameSize = useSettingsStore((state) => state.levelNameSize)
+  const levelNoteSize = useSettingsStore((state) => state.levelNoteSize)
+  const setLevelNameSize = useSettingsStore((state) => state.setLevelNameSize)
+  const setLevelNoteSize = useSettingsStore((state) => state.setLevelNoteSize)
 
   const db = useLevelStore((state) => state.db)
   const activeLevel = useLevelStore((state) => state.activeLevel)
@@ -199,6 +210,33 @@ export function LevelsPanel() {
           </span>
         </div>
         <ThresholdScale mode={mode} levels={orderedForScale} db={db} accent={accent} />
+      </div>
+
+      <div className="rounded-xl border border-black/[0.06] bg-surface/80 p-3.5">
+        <h3 className="text-[12.5px] font-semibold text-ink">级别文字大小</h3>
+        <p className="mt-0.5 text-[10.5px] leading-relaxed text-ink-faint">
+          命中级别时，主界面胶囊与全屏状态行里的「级别名称 / 提示文字」字号
+        </p>
+        <div className="mt-2 space-y-3">
+          <ValueSlider
+            label="名称字号"
+            value={levelNameSize}
+            min={LEVEL_NAME_SIZE_MIN}
+            max={LEVEL_NAME_SIZE_MAX}
+            step={1}
+            unit="px"
+            onChange={setLevelNameSize}
+          />
+          <ValueSlider
+            label="提示文字字号"
+            value={levelNoteSize}
+            min={LEVEL_NOTE_SIZE_MIN}
+            max={LEVEL_NOTE_SIZE_MAX}
+            step={1}
+            unit="px"
+            onChange={setLevelNoteSize}
+          />
+        </div>
       </div>
 
       {problem ? (

@@ -2,6 +2,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { ArrowLeft, Download, RefreshCw, Trash2 } from 'lucide-react'
 import { localDay, type LogEntry, type LogKind } from '../lib/logger'
 import { isTauri } from '../lib/tauri'
+import { ScrollArea } from '../components/ui/ScrollArea'
 
 const FILTERS: Array<{ id: 'all' | LogKind; label: string }> = [
   { id: 'all', label: '全部' },
@@ -300,7 +301,7 @@ export function LogsPage({ onBack }: { onBack: () => void }) {
         ) : null}
       </div>
 
-      <div className="mt-2 min-h-0 flex-1 overflow-y-auto overscroll-contain px-4 pb-3">
+      <ScrollArea className="mt-2 min-h-0 flex-1"><div className="px-4 pb-3">
         {visible.length === 0 ? (
           <div className="grid h-full place-items-center text-center">
             <p className="text-[11.5px] leading-relaxed text-ink-faint">
@@ -341,6 +342,7 @@ export function LogsPage({ onBack }: { onBack: () => void }) {
           </div>
         )}
       </div>
+      </ScrollArea>
 
       <footer className="shrink-0 border-t border-line/80 px-4 py-2">
         {message ? (

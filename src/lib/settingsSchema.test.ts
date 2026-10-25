@@ -338,6 +338,28 @@ describe('settings schema', () => {
     expect(broken.evidenceModes.reverse).toBe(true)
   })
 
+  it('sanitizes level name and note sizes', () => {
+    const defaults = defaultSettings()
+    expect(defaults.levelNameSize).toBe(13)
+    expect(defaults.levelNoteSize).toBe(12)
+
+    const custom = sanitizeSettings({
+      modeLabels: { forward: '正向', reverse: '反向' },
+      levelNameSize: 20,
+      levelNoteSize: 16,
+    })
+    expect(custom.levelNameSize).toBe(20)
+    expect(custom.levelNoteSize).toBe(16)
+
+    const clamped = sanitizeSettings({
+      modeLabels: { forward: '正向', reverse: '反向' },
+      levelNameSize: 99,
+      levelNoteSize: 1,
+    })
+    expect(clamped.levelNameSize).toBe(28)
+    expect(clamped.levelNoteSize).toBe(9)
+  })
+
   it('sanitizes the emoji reward rules', () => {
     const defaults = defaultSettings().emoji
     expect(defaults.reverse).toEqual({ enabled: true, threshold: 70, holdSeconds: 5, initial: 3 })

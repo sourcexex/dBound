@@ -77,6 +77,9 @@ const INITIAL: MiniState = {
   statusSize: 15,
   statusColor: '',
   idleText: '音量正常',
+  idleNumberColor: '',
+  levelNameSize: 13,
+  levelNoteSize: 12,
   readoutAnimation: true,
   rollingMs: 600,
   readoutIntervalMs: 1000,
@@ -141,7 +144,9 @@ export function FullPage() {
   }, [])
 
   const measuring = state.running && !state.paused
-  const accent = state.name ? state.color : accentFallback(state.darkMode)
+  const accent = state.name
+    ? state.color
+    : state.idleNumberColor || accentFallback(state.darkMode)
   const titleColor =
     state.darkMode && state.titleColor.toLowerCase() === '#17171a' ? '#F2F3F1' : state.titleColor
   const subtitleColor =
@@ -367,7 +372,7 @@ export function FullPage() {
             className="font-semibold text-ink"
             style={{
               fontFamily: fontStackFor(state.statusFont),
-              fontSize: `${state.statusSize}px`,
+              fontSize: `${state.name ? state.levelNameSize : state.statusSize}px`,
               color: state.statusColor || undefined,
             }}
           >
@@ -378,7 +383,7 @@ export function FullPage() {
               className="text-ink-soft"
               style={{
                 fontFamily: fontStackFor(state.statusFont),
-                fontSize: `${Math.max(11, Math.round(state.statusSize * 0.9))}px`,
+                fontSize: `${state.levelNoteSize}px`,
               }}
             >
               · {state.mode === 'forward' ? '声音偏大' : '声音偏小'}

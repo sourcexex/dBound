@@ -23,6 +23,9 @@ const INITIAL: MiniState = {
   statusSize: 15,
   statusColor: '',
   idleText: '音量正常',
+  idleNumberColor: '',
+  levelNameSize: 13,
+  levelNoteSize: 12,
   readoutAnimation: true,
   rollingMs: 600,
   readoutIntervalMs: 1000,
@@ -68,7 +71,9 @@ export function MiniPage() {
 
   const measuring = state.running && !state.paused
   const live = measuring && state.db !== null
-  const accent = state.name ? state.color : accentFallback(state.darkMode)
+  const accent = state.name
+    ? state.color
+    : state.idleNumberColor || accentFallback(state.darkMode)
   const value = state.db === null ? null : state.db.toFixed(1)
 
   return (

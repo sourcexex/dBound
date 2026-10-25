@@ -33,6 +33,14 @@ export const DEFAULT_IDLE_TEXT: Record<Mode, string> = {
   reverse: '音量正常',
 }
 
+/** Level name / note typography in the chip and fullscreen status line. */
+export const LEVEL_NAME_SIZE_MIN = 10
+export const LEVEL_NAME_SIZE_MAX = 28
+export const DEFAULT_LEVEL_NAME_SIZE = 13
+export const LEVEL_NOTE_SIZE_MIN = 9
+export const LEVEL_NOTE_SIZE_MAX = 24
+export const DEFAULT_LEVEL_NOTE_SIZE = 12
+
 export const DEFAULT_FULLSCREEN_TITLE = 'dBound'
 export const DEFAULT_FULLSCREEN_SUBTITLE = '实时响度估测'
 
@@ -112,6 +120,8 @@ export interface PersistedSettings {
   /** Typography/copy of the status line (main window chip + fullscreen). */
   statusColor: string
   idleText: Record<Mode, string>
+  levelNameSize: number
+  levelNoteSize: number
   /** Title / subtitle shown in the top-left corner of fullscreen mode. */
   fullscreenTitle: string
   fullscreenSubtitle: string
@@ -153,6 +163,8 @@ export function defaultSettings(): PersistedSettings {
     idleNumberColor: '',
     statusColor: '',
     idleText: { ...DEFAULT_IDLE_TEXT },
+    levelNameSize: DEFAULT_LEVEL_NAME_SIZE,
+    levelNoteSize: DEFAULT_LEVEL_NOTE_SIZE,
     fullscreenTitle: DEFAULT_FULLSCREEN_TITLE,
     fullscreenSubtitle: DEFAULT_FULLSCREEN_SUBTITLE,
     fullscreenTitleFont: DEFAULT_TITLE_FONT,
@@ -309,6 +321,18 @@ export function sanitizeSettings(value: unknown): PersistedSettings {
     idleNumberColor: sanitizeColorOrEmpty(value.idleNumberColor),
     statusColor: sanitizeColorOrEmpty(value.statusColor),
     idleText: sanitizeIdleText(value.idleText),
+    levelNameSize: sanitizeNumber(
+      value.levelNameSize,
+      DEFAULT_LEVEL_NAME_SIZE,
+      LEVEL_NAME_SIZE_MIN,
+      LEVEL_NAME_SIZE_MAX,
+    ),
+    levelNoteSize: sanitizeNumber(
+      value.levelNoteSize,
+      DEFAULT_LEVEL_NOTE_SIZE,
+      LEVEL_NOTE_SIZE_MIN,
+      LEVEL_NOTE_SIZE_MAX,
+    ),
     fullscreenTitle: sanitizeText(
       value.fullscreenTitle,
       DEFAULT_FULLSCREEN_TITLE,

@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+import { useState } from 'react'
 import { ArrowLeft } from 'lucide-react'
 import { CalibrationPanel } from '../components/settings/CalibrationPanel'
 import { DevicesPanel } from '../components/settings/DevicesPanel'
@@ -7,6 +7,7 @@ import { LevelsPanel } from '../components/settings/LevelsPanel'
 import { ModePanel } from '../components/settings/ModePanel'
 import { SystemPanel } from '../components/settings/SystemPanel'
 import { AboutPanel } from '../components/settings/AboutPanel'
+import { ScrollArea } from '../components/ui/ScrollArea'
 
 const TABS = [
   { id: 'mode', label: '模式' },
@@ -28,12 +29,6 @@ export function SettingsPage({
   onRestartDevice: (deviceId: string) => void
 }) {
   const [tab, setTab] = useState<TabId>('mode')
-  const scrollRef = useRef<HTMLDivElement | null>(null)
-
-  // Each tab starts at the top instead of inheriting the previous scroll offset.
-  useEffect(() => {
-    scrollRef.current?.scrollTo({ top: 0 })
-  }, [tab])
 
   return (
     <div className="flex h-full flex-col overflow-hidden">
@@ -74,15 +69,17 @@ export function SettingsPage({
         </div>
       </nav>
 
-      <div ref={scrollRef} className="min-h-0 flex-1 overflow-y-auto overscroll-contain px-4 py-3">
-        {tab === 'mode' ? <ModePanel /> : null}
-        {tab === 'levels' ? <LevelsPanel /> : null}
-        {tab === 'calibration' ? <CalibrationPanel /> : null}
-        {tab === 'fullscreen' ? <FullscreenPanel /> : null}
-        {tab === 'devices' ? <DevicesPanel onRestart={onRestartDevice} /> : null}
-        {tab === 'system' ? <SystemPanel /> : null}
-        {tab === 'about' ? <AboutPanel /> : null}
-      </div>
+      <ScrollArea key={tab} className="min-h-0 flex-1">
+        <div className="px-4 py-3">
+          {tab === 'mode' ? <ModePanel /> : null}
+          {tab === 'levels' ? <LevelsPanel /> : null}
+          {tab === 'calibration' ? <CalibrationPanel /> : null}
+          {tab === 'fullscreen' ? <FullscreenPanel /> : null}
+          {tab === 'devices' ? <DevicesPanel onRestart={onRestartDevice} /> : null}
+          {tab === 'system' ? <SystemPanel /> : null}
+          {tab === 'about' ? <AboutPanel /> : null}
+        </div>
+      </ScrollArea>
     </div>
   )
 }
