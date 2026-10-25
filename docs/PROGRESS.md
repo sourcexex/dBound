@@ -260,3 +260,11 @@ $env:VITE_DBOUND_SIM='72'; $env:VITE_DBOUND_SIM_MODE='forward'; pnpm tauri build
   通过 `<EmojiText>` 把界面文字里的 emoji 渲染成内置图片，Win10/Win11 一致；
   输入框内编辑时仍使用系统 emoji 字体（原生 input 限制），保存后显示为 Fluent 图片
 - 验收：`scripts/verify-first-run.ps1`（安装 → 首次激活 → 重启免激活 → 删除标记后重新要求激活）
+
+### 奖励表情精选（40 个 Fluent 3D）
+
+- 从本地 `fluentui-emoji-main` 仓库按 glyph 元数据精确匹配，挑选 40 个适合课堂鼓励的表情：
+  笑脸（😀😃😄😁😆😊😇🙂😉😍🤩😎🤗😂🥳）、手势（🤝👍👏🙌💪✌️👌）、
+  庆祝（🎉🎊🎈🎁🏆🥇👑🚀⭐🌟✨）、自然与动物（🌈☀️🌻🌸🍀🐱🐶）
+- 奖励池改用这 40 个高分辨率 3D PNG（`src/assets/emoji/`，约 1.3MB）；
+  文字 emoji 的完整 Fluent 图片集保持不变，level 名称里的任意 emoji 仍与 Win10/Win11 一致
