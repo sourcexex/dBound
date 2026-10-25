@@ -18,6 +18,8 @@ export interface LevelState {
   history: number[]
   /** Level currently shown by the alert engine (already debounced). */
   activeLevel: Level | null
+  /** Transient toast message (e.g. evidence saved). */
+  toast: string | null
   /** Recent enter/exit transitions, newest last. */
   events: AlertEvent[]
   /** Alerts seen since the log page was opened last. */
@@ -30,6 +32,7 @@ export interface LevelState {
   pushHistory: (db: number) => void
   clearHistory: () => void
   setActiveLevel: (level: Level | null) => void
+  setToast: (message: string | null) => void
   pushAlertEvent: (event: AlertEvent) => void
   clearUnseenAlerts: () => void
   reset: () => void
@@ -45,6 +48,7 @@ export const useLevelStore = create<LevelState>()((set) => ({
   constraintFallback: false,
   history: [],
   activeLevel: null,
+  toast: null,
   events: [],
   unseenAlerts: 0,
 
@@ -76,6 +80,7 @@ export const useLevelStore = create<LevelState>()((set) => ({
   clearHistory: () => set({ history: [] }),
 
   setActiveLevel: (activeLevel) => set({ activeLevel }),
+  setToast: (toast) => set({ toast }),
 
   pushAlertEvent: (event) =>
     set((state) => {
@@ -98,5 +103,6 @@ export const useLevelStore = create<LevelState>()((set) => ({
       error: null,
       history: [],
       activeLevel: null,
+      toast: null,
     }),
 }))

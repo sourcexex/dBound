@@ -27,6 +27,7 @@ const INITIAL: MiniState = {
   emojiRule: null,
   running: false,
   paused: false,
+  toast: null,
 }
 
 export function MiniPage() {

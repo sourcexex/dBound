@@ -1,3 +1,4 @@
+mod evidence;
 mod logs;
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
@@ -19,6 +20,8 @@ pub fn run() {
             show_mini,
             show_main_window,
             show_fullscreen,
+            evidence::evidence_default_dir,
+            evidence::save_evidence,
             logs::log_append,
             logs::log_days,
             logs::log_read,

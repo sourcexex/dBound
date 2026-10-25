@@ -67,6 +67,15 @@ export const DEFAULT_EMOJI_SETTINGS: EmojiSettings = {
   reverse: { enabled: true, threshold: 70, holdSeconds: 5, initial: 3 },
 }
 
+/** Evidence recording (time machine). */
+export const DEFAULT_RECORDING_ENABLED = true
+export const DEFAULT_PREROLL_SECONDS = 5
+export const DEFAULT_POSTROLL_SECONDS = 10
+export const PREROLL_MIN = 1
+export const PREROLL_MAX = 10
+export const POSTROLL_MIN = 5
+export const POSTROLL_MAX = 30
+
 /** Fullscreen status line ("音量正常" / level name) typography. */
 export const DEFAULT_STATUS_FONT = 'system'
 export const STATUS_SIZE_MIN = 10
@@ -90,6 +99,11 @@ export interface PersistedSettings {
   fullscreenSubtitleColor: string
   statusFont: string
   statusSize: number
+  /** Evidence recording: only triggered by an alert while buffering in RAM. */
+  recordingEnabled: boolean
+  recordingDir: string
+  prerollSeconds: number
+  postrollSeconds: number
   readoutAnimation: boolean
   rollingMs: number
   readoutIntervalMs: number
@@ -116,6 +130,10 @@ export function defaultSettings(): PersistedSettings {
     fullscreenSubtitleColor: DEFAULT_SUBTITLE_COLOR,
     statusFont: DEFAULT_STATUS_FONT,
     statusSize: DEFAULT_STATUS_SIZE,
+    recordingEnabled: DEFAULT_RECORDING_ENABLED,
+    recordingDir: '',
+    prerollSeconds: DEFAULT_PREROLL_SECONDS,
+    postrollSeconds: DEFAULT_POSTROLL_SECONDS,
     readoutAnimation: DEFAULT_READOUT_ANIMATION,
     rollingMs: DEFAULT_ROLLING_MS,
     readoutIntervalMs: DEFAULT_READOUT_INTERVAL_MS,
@@ -276,6 +294,10 @@ export function sanitizeSettings(value: unknown): PersistedSettings {
         : DEFAULT_SUBTITLE_COLOR,
     statusFont: isKnownTitleFont(value.statusFont) ? value.statusFont : DEFAULT_STATUS_FONT,
     statusSize: sanitizeNumber(value.statusSize, DEFAULT_STATUS_SIZE, STATUS_SIZE_MIN, STATUS_SIZE_MAX),
+    recordingEnabled: value.recordingEnabled !== false,
+    recordingDir: typeof value.recordingDir === 'string' ? value.recordingDir.trim() : '',
+    prerollSeconds: sanitizeNumber(value.prerollSeconds, DEFAULT_PREROLL_SECONDS, PREROLL_MIN, PREROLL_MAX),
+    postrollSeconds: sanitizeNumber(value.postrollSeconds, DEFAULT_POSTROLL_SECONDS, POSTROLL_MIN, POSTROLL_MAX),
     readoutAnimation: value.readoutAnimation !== false,
     rollingMs: sanitizeNumber(value.rollingMs, DEFAULT_ROLLING_MS, ROLLING_MS_MIN, ROLLING_MS_MAX),
     readoutIntervalMs: sanitizeNumber(

@@ -245,6 +245,34 @@ describe('settings schema', () => {
     expect(broken.statusSize).toBe(STATUS_SIZE_MAX)
   })
 
+  it('sanitizes the evidence recording settings', () => {
+    const defaults = defaultSettings()
+    expect(defaults.recordingEnabled).toBe(true)
+    expect(defaults.recordingDir).toBe('')
+    expect(defaults.prerollSeconds).toBe(5)
+    expect(defaults.postrollSeconds).toBe(10)
+
+    const custom = sanitizeSettings({
+      modeLabels: { forward: '正向', reverse: '反向' },
+      recordingEnabled: false,
+      recordingDir: '  D:\\dBound-证据  ',
+      prerollSeconds: 2,
+      postrollSeconds: 20,
+    })
+    expect(custom.recordingEnabled).toBe(false)
+    expect(custom.recordingDir).toBe('D:\\dBound-证据')
+    expect(custom.prerollSeconds).toBe(2)
+    expect(custom.postrollSeconds).toBe(20)
+
+    const clamped = sanitizeSettings({
+      modeLabels: { forward: '正向', reverse: '反向' },
+      prerollSeconds: 0,
+      postrollSeconds: 99,
+    })
+    expect(clamped.prerollSeconds).toBe(1)
+    expect(clamped.postrollSeconds).toBe(30)
+  })
+
   it('sanitizes the emoji reward rules', () => {
     const defaults = defaultSettings().emoji
     expect(defaults.reverse).toEqual({ enabled: true, threshold: 70, holdSeconds: 5, initial: 3 })

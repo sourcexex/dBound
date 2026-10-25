@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { AuroraBackground } from './components/AuroraBackground'
+import { Toast } from './components/Toast'
 import { useLevelMonitor } from './hooks/useLevelMonitor'
 import { flushLogs, initLogFlushHooks, logSystem } from './lib/logger'
 import { showFullscreen, showMiniWindow } from './lib/miniBridge'
@@ -83,6 +84,7 @@ export default function App() {
     >
       <AuroraBackground theme={theme} dark={darkMode} />
       <div className="relative z-10 h-full">{content}</div>
+      <Toast />
     </div>
   )
 }

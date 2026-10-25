@@ -33,6 +33,8 @@ export interface MiniState {
   emojiRule: EmojiRule | null
   running: boolean
   paused: boolean
+  /** Transient confirmation shown in the fullscreen window too. */
+  toast: string | null
 }
 
 type EmitFn = (event: string, payload?: unknown) => Promise<void>

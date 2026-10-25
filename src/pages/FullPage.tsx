@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import { X } from 'lucide-react'
 import { AuroraBackground } from '../components/AuroraBackground'
 import { RollingNumber } from '../components/RollingNumber'
+import { Toast } from '../components/Toast'
 import { MINI_STATE_EVENT, type MiniState } from '../lib/miniBridge'
 import { EMOJI_MAX } from '../lib/settingsSchema'
 import { isTauri } from '../lib/tauri'
@@ -80,6 +81,7 @@ const INITIAL: MiniState = {
   emojiRule: null,
   running: false,
   paused: false,
+  toast: null,
 }
 
 const CHROME_HIDE_MS = 3200
@@ -269,6 +271,8 @@ export function FullPage() {
           </button>
         </div>
       </header>
+
+      {state.toast ? <Toast bottom="56px" /> : null}
 
       {/* emoji reward row */}
       <div

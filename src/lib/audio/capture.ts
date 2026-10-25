@@ -84,6 +84,14 @@ export class AudioEngine {
     return this.running
   }
 
+  get mediaStream(): MediaStream | null {
+    return this.stream
+  }
+
+  get audioContext(): AudioContext | null {
+    return this.context
+  }
+
   get contextState(): AudioContextState | 'none' {
     return this.context?.state ?? 'none'
   }

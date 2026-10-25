@@ -31,6 +31,11 @@ export interface SettingsState {
   /** Fullscreen status line typography. */
   statusFont: string
   statusSize: number
+  /** Evidence recording time machine. */
+  recordingEnabled: boolean
+  recordingDir: string
+  prerollSeconds: number
+  postrollSeconds: number
   /** Readout animation: rolling digits on/off, roll duration, refresh interval. */
   readoutAnimation: boolean
   rollingMs: number
@@ -58,6 +63,10 @@ export interface SettingsState {
   setFullscreenSubtitleColor: (color: string) => void
   setStatusFont: (font: string) => void
   setStatusSize: (size: number) => void
+  setRecordingEnabled: (enabled: boolean) => void
+  setRecordingDir: (dir: string) => void
+  setPrerollSeconds: (seconds: number) => void
+  setPostrollSeconds: (seconds: number) => void
   setReadoutAnimation: (enabled: boolean) => void
   setRollingMs: (value: number) => void
   setReadoutIntervalMs: (value: number) => void
@@ -113,6 +122,10 @@ export const useSettingsStore = create<SettingsState>()(
       fullscreenSubtitleColor: initial.fullscreenSubtitleColor,
       statusFont: initial.statusFont,
       statusSize: initial.statusSize,
+      recordingEnabled: initial.recordingEnabled,
+      recordingDir: initial.recordingDir,
+      prerollSeconds: initial.prerollSeconds,
+      postrollSeconds: initial.postrollSeconds,
       readoutAnimation: initial.readoutAnimation,
       rollingMs: initial.rollingMs,
       readoutIntervalMs: initial.readoutIntervalMs,
@@ -137,6 +150,10 @@ export const useSettingsStore = create<SettingsState>()(
       setFullscreenSubtitleColor: (fullscreenSubtitleColor) => set({ fullscreenSubtitleColor }),
       setStatusFont: (statusFont) => set({ statusFont }),
       setStatusSize: (statusSize) => set({ statusSize }),
+      setRecordingEnabled: (recordingEnabled) => set({ recordingEnabled }),
+      setRecordingDir: (recordingDir) => set({ recordingDir }),
+      setPrerollSeconds: (prerollSeconds) => set({ prerollSeconds }),
+      setPostrollSeconds: (postrollSeconds) => set({ postrollSeconds }),
       setReadoutAnimation: (readoutAnimation) => set({ readoutAnimation }),
       setRollingMs: (rollingMs) => set({ rollingMs }),
       setReadoutIntervalMs: (readoutIntervalMs) => set({ readoutIntervalMs }),
@@ -200,6 +217,10 @@ export const useSettingsStore = create<SettingsState>()(
           fullscreenSubtitleColor: fresh.fullscreenSubtitleColor,
           statusFont: fresh.statusFont,
           statusSize: fresh.statusSize,
+          recordingEnabled: fresh.recordingEnabled,
+          recordingDir: fresh.recordingDir,
+          prerollSeconds: fresh.prerollSeconds,
+          postrollSeconds: fresh.postrollSeconds,
           readoutAnimation: fresh.readoutAnimation,
           rollingMs: fresh.rollingMs,
           readoutIntervalMs: fresh.readoutIntervalMs,
@@ -230,6 +251,10 @@ export const useSettingsStore = create<SettingsState>()(
         fullscreenSubtitleColor: state.fullscreenSubtitleColor,
         statusFont: state.statusFont,
         statusSize: state.statusSize,
+        recordingEnabled: state.recordingEnabled,
+        recordingDir: state.recordingDir,
+        prerollSeconds: state.prerollSeconds,
+        postrollSeconds: state.postrollSeconds,
         readoutAnimation: state.readoutAnimation,
         rollingMs: state.rollingMs,
         readoutIntervalMs: state.readoutIntervalMs,

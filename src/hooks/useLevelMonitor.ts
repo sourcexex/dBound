@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef } from 'react'
 import { AlertEngine } from '../lib/alertEngine'
 import { AudioEngine } from '../lib/audio/capture'
+import { TimeMachine } from '../lib/audio/timeMachine'
 import { frameAverage, rmsToDb, tauForMode, timeWeight } from '../lib/dsp'
 import { emitMiniState, listenMiniCommands } from '../lib/miniBridge'
 import { logAlert, logDevice, logSample, logSystem } from '../lib/logger'
@@ -30,6 +31,7 @@ export function useLevelMonitor() {
   const lastHistoryRef = useRef(0)
   const lastMiniEmitRef = useRef(0)
   const lastSampleLogRef = useRef(0)
+  const recorderRef = useRef<TimeMachine | null>(null)
 
   const publishMiniState = useCallback(() => {
     const settings = useSettingsStore.getState()
@@ -57,6 +59,7 @@ export function useLevelMonitor() {
       rollingMs: settings.rollingMs,
       readoutIntervalMs: settings.readoutIntervalMs,
       emojiRule: settings.emoji[settings.mode],
+      toast: level.toast,
       running: level.status === 'running',
       paused: level.status === 'idle' || level.status === 'error',
     })
@@ -65,6 +68,53 @@ export function useLevelMonitor() {
   const getAlert = useCallback((): AlertEngine => {
     if (!alertRef.current) alertRef.current = new AlertEngine()
     return alertRef.current
+  }, [])
+
+  const stopRecorder = useCallback((): void => {
+    recorderRef.current?.dispose()
+    recorderRef.current = null
+  }, [])
+
+  const saveEvidenceFor = useCallback(async (levelName: string): Promise<void> => {
+    const settings = useSettingsStore.getState()
+    if (!settings.recordingEnabled) return
+
+    const audio = audioRef.current
+    const stream = audio?.mediaStream
+    const context = audio?.audioContext
+    if (!stream || !context || context.state !== 'running') return
+    if (recorderRef.current?.isCapturing) return
+
+    try {
+      if (!recorderRef.current) {
+        recorderRef.current = new TimeMachine(context, stream, settings.prerollSeconds)
+      }
+      recorderRef.current.setPrerollSeconds(settings.prerollSeconds)
+      const result = await recorderRef.current.captureWindow(
+        settings.prerollSeconds,
+        settings.postrollSeconds,
+      )
+
+      const stamp = new Date()
+        .toLocaleString('sv-SE')
+        .replace(/[: ]/g, '-')
+        .replace(/,/g, '')
+      const filename = `事件录音-${stamp}-${levelName}.wav`
+      const bytes = Array.from(new Uint8Array(result.wav))
+      const { invoke } = await import('@tauri-apps/api/core')
+      const path = await invoke<string>('save_evidence', {
+        dir: settings.recordingDir || null,
+        filename,
+        data: bytes,
+      })
+
+      logSystem(
+        `已保存事件录音（${result.durationSeconds.toFixed(1)} 秒，触发「${levelName}」）：${path}`,
+      )
+      useLevelStore.getState().setToast(`已保存事件录音 · ${result.durationSeconds.toFixed(1)} 秒`)
+    } catch (error) {
+      logDevice(`证据录音失败：${error instanceof Error ? error.message : String(error)}`)
+    }
   }, [])
 
   const applyDb = useCallback(
@@ -95,6 +145,7 @@ export function useLevelMonitor() {
       for (const event of update.events) {
         store.pushAlertEvent(event)
         logAlert(event.type, event.level.name, event.db)
+        if (event.type === 'enter') void saveEvidenceFor(event.level.name)
       }
 
       if (now - lastHistoryRef.current >= HISTORY_INTERVAL_MS) {
@@ -132,6 +183,15 @@ export function useLevelMonitor() {
             store.setDeviceLabel(audioRef.current.trackLabel || '默认麦克风')
             store.setConstraintFallback(audioRef.current.constraintFallback)
             logSystem(`开始测量 · ${audioRef.current.trackLabel || '默认麦克风'}`)
+
+            // Start buffering immediately so the 5 s pre-roll is already in RAM
+            // by the time the first alert fires.
+            const settings = useSettingsStore.getState()
+            const stream = audioRef.current.mediaStream
+            const context = audioRef.current.audioContext
+            if (settings.recordingEnabled && stream && context && !recorderRef.current) {
+              recorderRef.current = new TimeMachine(context, stream, settings.prerollSeconds)
+            }
           }
           if (status === 'error') {
             logDevice(`采集失败：${error?.code ?? 'unknown'} ${error?.message ?? ''}`.trim())
@@ -146,13 +206,14 @@ export function useLevelMonitor() {
             peakRef.current = []
             getAlert().reset()
             store.setActiveLevel(null)
+            stopRecorder()
           }
           publishMiniState()
         },
       )
     }
     return audioRef.current
-  }, [applyDb, getAlert, publishMiniState])
+  }, [applyDb, getAlert, publishMiniState, stopRecorder])
 
   const start = useCallback(async (): Promise<void> => {
     if (SIMULATION) return
@@ -166,12 +227,13 @@ export function useLevelMonitor() {
   }, [getAudio])
 
   const stop = useCallback((): void => {
+    stopRecorder()
     audioRef.current?.stop()
     getAlert().reset()
     useLevelStore.getState().clearHistory()
     useLevelStore.getState().setActiveLevel(null)
     publishMiniState()
-  }, [getAlert, publishMiniState])
+  }, [getAlert, publishMiniState, stopRecorder])
 
   const toggle = useCallback(async (): Promise<void> => {
     if (SIMULATION) return
@@ -199,6 +261,7 @@ export function useLevelMonitor() {
   // Reset the alert state whenever the mode changes.
   useEffect(() => {
     const unsubscribe = useSettingsStore.subscribe((state, previous) => {
+      if (previous.recordingEnabled && !state.recordingEnabled) stopRecorder()
       if (state.mode !== previous.mode) {
         getAlert().reset()
         useLevelStore.getState().setActiveLevel(null)
@@ -207,7 +270,7 @@ export function useLevelMonitor() {
       }
     })
     return unsubscribe
-  }, [getAlert, publishMiniState])
+  }, [getAlert, publishMiniState, stopRecorder])
 
   // The mini window asks for a fresh snapshot right after it opens.
   useEffect(() => {
