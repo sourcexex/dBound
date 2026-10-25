@@ -6,12 +6,20 @@ import {
   PREROLL_MAX,
   PREROLL_MIN,
 } from '../../lib/settingsSchema'
+import { CameraMonitor, listCameras, type CameraDevice } from '../../lib/camera'
+import { evidenceStamp, saveEvidenceBytes } from '../../lib/evidence'
+import { logSystem } from '../../lib/logger'
+import { SNAPSHOT_SIZES, type SnapshotSize } from '../../lib/settingsSchema'
 import { isTauri } from '../../lib/tauri'
 import { THEME_OPTIONS } from '../../lib/theme'
 import { useSettingsStore } from '../../stores/settings'
 import { Toggle } from '../ui/Toggle'
 import { Row, SectionCard } from '../ui/SectionCard'
 import { ValueSlider } from '../ui/ValueSlider'
+import { useLevelStore } from '../../stores/level'
+
+const INPUT_CLASS =
+  'w-full rounded-lg border border-line bg-surface px-2.5 py-1.5 text-[11px] text-ink outline-none transition-colors focus:border-ink/30'
 
 export function SystemPanel() {
   const resetAll = useSettingsStore((state) => state.resetAll)
@@ -27,6 +35,15 @@ export function SystemPanel() {
   const setRecordingDir = useSettingsStore((state) => state.setRecordingDir)
   const setPrerollSeconds = useSettingsStore((state) => state.setPrerollSeconds)
   const setPostrollSeconds = useSettingsStore((state) => state.setPostrollSeconds)
+  const snapshotEnabled = useSettingsStore((state) => state.snapshotEnabled)
+  const cameraId = useSettingsStore((state) => state.cameraId)
+  const snapshotSize = useSettingsStore((state) => state.snapshotSize)
+  const setSnapshotEnabled = useSettingsStore((state) => state.setSnapshotEnabled)
+  const setCameraId = useSettingsStore((state) => state.setCameraId)
+  const setSnapshotSize = useSettingsStore((state) => state.setSnapshotSize)
+  const [cameras, setCameras] = useState<CameraDevice[]>([])
+  const [testing, setTesting] = useState(false)
+  const [cameraError, setCameraError] = useState('')
   const [confirming, setConfirming] = useState(false)
   const [defaultDir, setDefaultDir] = useState('')
   const [picking, setPicking] = useState(false)
@@ -39,6 +56,41 @@ export function SystemPanel() {
       setDefaultDir(dir)
     })()
   }, [])
+
+  useEffect(() => {
+    let disposed = false
+    void listCameras().then((list) => {
+      if (!disposed) setCameras(list)
+    })
+    return () => {
+      disposed = true
+    }
+  }, [snapshotEnabled])
+
+  const testPhoto = async () => {
+    if (testing) return
+    setTesting(true)
+    setCameraError('')
+    const camera = new CameraMonitor()
+    try {
+      await camera.start({ deviceId: cameraId, size: snapshotSize })
+      const bytes = await camera.capture()
+      const path = await saveEvidenceBytes(
+        recordingDir,
+        `测试照片-${evidenceStamp()}.jpg`,
+        bytes,
+      )
+      logSystem(`已保存测试照片（${Math.round(bytes.length / 1024)} KB）：${path}`)
+      useLevelStore.getState().setToast(`已保存测试照片 · ${Math.round(bytes.length / 1024)} KB`)
+      setCameras(await listCameras())
+    } catch (error) {
+      const message = error instanceof Error ? error.message : String(error)
+      setCameraError(`摄像头不可用：${message}`)
+    } finally {
+      camera.stop()
+      setTesting(false)
+    }
+  }
 
   const pickDirectory = async () => {
     if (picking || !isTauri()) return
@@ -161,6 +213,70 @@ export function SystemPanel() {
             只有警报触发时才写盘：前 {prerollSeconds} 秒 + 后 {postrollSeconds} 秒，单声道 16 kHz
             WAV，仅保存在本机。每条保存记录都会写进日志。
           </p>
+
+          <div className="mt-3.5 border-t border-line/70 pt-3">
+            <Row label="现场快照" hint="触发瞬间用摄像头拍一张 JPG，与录音放在同一目录">
+              <Toggle checked={snapshotEnabled} label="现场快照" onChange={setSnapshotEnabled} />
+            </Row>
+
+            <div className={`mt-2 ${snapshotEnabled ? '' : 'opacity-45'}`}>
+              <div className="grid grid-cols-2 gap-2">
+                <label className="block">
+                  <span className="mb-1 block text-[10.5px] text-ink-soft">摄像头</span>
+                  <select
+                    className={INPUT_CLASS}
+                    value={cameraId}
+                    disabled={!snapshotEnabled}
+                    onChange={(event) => setCameraId(event.target.value)}
+                  >
+                    <option value="default">默认摄像头</option>
+                    {cameras.map((camera) => (
+                      <option key={camera.deviceId} value={camera.deviceId}>
+                        {camera.label}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+                <label className="block">
+                  <span className="mb-1 block text-[10.5px] text-ink-soft">分辨率</span>
+                  <select
+                    className={INPUT_CLASS}
+                    value={snapshotSize}
+                    disabled={!snapshotEnabled}
+                    onChange={(event) => setSnapshotSize(event.target.value as SnapshotSize)}
+                  >
+                    {Object.entries(SNAPSHOT_SIZES).map(([key, size]) => (
+                      <option key={key} value={key}>
+                        {size.width} × {size.height}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+              </div>
+
+              <div className="mt-2 flex items-center gap-2">
+                <button
+                  type="button"
+                  disabled={!snapshotEnabled || testing}
+                  onClick={() => void testPhoto()}
+                  className="shrink-0 rounded-lg border border-line bg-surface px-2 py-1.5 text-[10.5px] font-medium text-ink-soft transition-colors hover:text-ink disabled:opacity-50"
+                >
+                  {testing ? '拍照中…' : '测试拍照'}
+                </button>
+                <span className="text-[9.5px] leading-relaxed text-ink-faint">
+                  测试照片也会保存到上面的目录；实际分辨率以摄像头能力为准
+                </span>
+              </div>
+              {cameraError ? (
+                <p className="mt-1.5 text-[10px] text-[#DC2626]">{cameraError}</p>
+              ) : null}
+
+              <p className="mt-2 text-[10px] leading-relaxed text-ink-faint">
+                摄像头只在「测量中 + 快照开启」时工作，其余时间完全关闭；没有常驻预览、不上传。
+                照片只在警报触发时保存，名单与录音一致。
+              </p>
+            </div>
+          </div>
         </div>
       </SectionCard>
 

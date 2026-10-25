@@ -67,6 +67,17 @@ export const DEFAULT_EMOJI_SETTINGS: EmojiSettings = {
   reverse: { enabled: true, threshold: 70, holdSeconds: 5, initial: 3 },
 }
 
+/** Camera snapshot taken at the trigger moment. */
+export const DEFAULT_SNAPSHOT_ENABLED = false
+export const DEFAULT_CAMERA_ID = 'default'
+export const SNAPSHOT_SIZES = {
+  '720p': { width: 1280, height: 720 },
+  '1080p': { width: 1920, height: 1080 },
+  '1440p': { width: 2560, height: 1440 },
+} as const
+export type SnapshotSize = keyof typeof SNAPSHOT_SIZES
+export const DEFAULT_SNAPSHOT_SIZE: SnapshotSize = '1080p'
+
 /** Evidence recording (time machine). */
 export const DEFAULT_RECORDING_ENABLED = true
 export const DEFAULT_PREROLL_SECONDS = 5
@@ -104,6 +115,10 @@ export interface PersistedSettings {
   recordingDir: string
   prerollSeconds: number
   postrollSeconds: number
+  /** Evidence snapshot from the camera. */
+  snapshotEnabled: boolean
+  cameraId: string
+  snapshotSize: SnapshotSize
   readoutAnimation: boolean
   rollingMs: number
   readoutIntervalMs: number
@@ -134,6 +149,9 @@ export function defaultSettings(): PersistedSettings {
     recordingDir: '',
     prerollSeconds: DEFAULT_PREROLL_SECONDS,
     postrollSeconds: DEFAULT_POSTROLL_SECONDS,
+    snapshotEnabled: DEFAULT_SNAPSHOT_ENABLED,
+    cameraId: DEFAULT_CAMERA_ID,
+    snapshotSize: DEFAULT_SNAPSHOT_SIZE,
     readoutAnimation: DEFAULT_READOUT_ANIMATION,
     rollingMs: DEFAULT_ROLLING_MS,
     readoutIntervalMs: DEFAULT_READOUT_INTERVAL_MS,
@@ -298,6 +316,12 @@ export function sanitizeSettings(value: unknown): PersistedSettings {
     recordingDir: typeof value.recordingDir === 'string' ? value.recordingDir.trim() : '',
     prerollSeconds: sanitizeNumber(value.prerollSeconds, DEFAULT_PREROLL_SECONDS, PREROLL_MIN, PREROLL_MAX),
     postrollSeconds: sanitizeNumber(value.postrollSeconds, DEFAULT_POSTROLL_SECONDS, POSTROLL_MIN, POSTROLL_MAX),
+    snapshotEnabled: value.snapshotEnabled === true,
+    cameraId: typeof value.cameraId === 'string' ? value.cameraId.trim() : DEFAULT_CAMERA_ID,
+    snapshotSize:
+      typeof value.snapshotSize === 'string' && value.snapshotSize in SNAPSHOT_SIZES
+        ? (value.snapshotSize as SnapshotSize)
+        : DEFAULT_SNAPSHOT_SIZE,
     readoutAnimation: value.readoutAnimation !== false,
     rollingMs: sanitizeNumber(value.rollingMs, DEFAULT_ROLLING_MS, ROLLING_MS_MIN, ROLLING_MS_MAX),
     readoutIntervalMs: sanitizeNumber(

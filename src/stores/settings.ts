@@ -9,6 +9,7 @@ import {
   type EmojiRule,
   type EmojiSettings,
   type PersistedSettings,
+  type SnapshotSize,
 } from '../lib/settingsSchema'
 import type { Level, Mode } from '../lib/types'
 import type { ThemeId } from '../lib/theme'
@@ -36,6 +37,9 @@ export interface SettingsState {
   recordingDir: string
   prerollSeconds: number
   postrollSeconds: number
+  snapshotEnabled: boolean
+  cameraId: string
+  snapshotSize: SnapshotSize
   /** Readout animation: rolling digits on/off, roll duration, refresh interval. */
   readoutAnimation: boolean
   rollingMs: number
@@ -67,6 +71,9 @@ export interface SettingsState {
   setRecordingDir: (dir: string) => void
   setPrerollSeconds: (seconds: number) => void
   setPostrollSeconds: (seconds: number) => void
+  setSnapshotEnabled: (enabled: boolean) => void
+  setCameraId: (cameraId: string) => void
+  setSnapshotSize: (size: SnapshotSize) => void
   setReadoutAnimation: (enabled: boolean) => void
   setRollingMs: (value: number) => void
   setReadoutIntervalMs: (value: number) => void
@@ -126,6 +133,9 @@ export const useSettingsStore = create<SettingsState>()(
       recordingDir: initial.recordingDir,
       prerollSeconds: initial.prerollSeconds,
       postrollSeconds: initial.postrollSeconds,
+      snapshotEnabled: initial.snapshotEnabled,
+      cameraId: initial.cameraId,
+      snapshotSize: initial.snapshotSize,
       readoutAnimation: initial.readoutAnimation,
       rollingMs: initial.rollingMs,
       readoutIntervalMs: initial.readoutIntervalMs,
@@ -154,6 +164,9 @@ export const useSettingsStore = create<SettingsState>()(
       setRecordingDir: (recordingDir) => set({ recordingDir }),
       setPrerollSeconds: (prerollSeconds) => set({ prerollSeconds }),
       setPostrollSeconds: (postrollSeconds) => set({ postrollSeconds }),
+      setSnapshotEnabled: (snapshotEnabled) => set({ snapshotEnabled }),
+      setCameraId: (cameraId) => set({ cameraId }),
+      setSnapshotSize: (snapshotSize) => set({ snapshotSize }),
       setReadoutAnimation: (readoutAnimation) => set({ readoutAnimation }),
       setRollingMs: (rollingMs) => set({ rollingMs }),
       setReadoutIntervalMs: (readoutIntervalMs) => set({ readoutIntervalMs }),
@@ -221,6 +234,9 @@ export const useSettingsStore = create<SettingsState>()(
           recordingDir: fresh.recordingDir,
           prerollSeconds: fresh.prerollSeconds,
           postrollSeconds: fresh.postrollSeconds,
+          snapshotEnabled: fresh.snapshotEnabled,
+          cameraId: fresh.cameraId,
+          snapshotSize: fresh.snapshotSize,
           readoutAnimation: fresh.readoutAnimation,
           rollingMs: fresh.rollingMs,
           readoutIntervalMs: fresh.readoutIntervalMs,
@@ -255,6 +271,9 @@ export const useSettingsStore = create<SettingsState>()(
         recordingDir: state.recordingDir,
         prerollSeconds: state.prerollSeconds,
         postrollSeconds: state.postrollSeconds,
+        snapshotEnabled: state.snapshotEnabled,
+        cameraId: state.cameraId,
+        snapshotSize: state.snapshotSize,
         readoutAnimation: state.readoutAnimation,
         rollingMs: state.rollingMs,
         readoutIntervalMs: state.readoutIntervalMs,

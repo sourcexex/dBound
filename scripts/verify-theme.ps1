@@ -2,7 +2,9 @@
 param(
   [string]$Exe = 'D:\Project\Tauri\dBound\src-tauri\target\debug\dbound.exe',
   [string]$OutDir = 'D:\Project\Tauri\dBound\output\screenshots',
-  [switch]$OnlySettings
+  [switch]$OnlySettings,
+  [int]$Scroll = 0,
+  [string]$Shot = 'theme-settings.png'
 )
 
 $ErrorActionPreference = 'Stop'
@@ -95,9 +97,15 @@ function Click-Css([double]$cssX, [double]$cssY) {
 # Open settings -> 系统 tab (6th).
 Click-Css 342 24
 Start-Sleep -Milliseconds 600
-Click-Css 375 62
+Click-Css 323 62
 Start-Sleep -Milliseconds 700
-Save-Rect $origin.X $origin.Y $w $h 'theme-settings.png'
+if ($Scroll -gt 0) {
+  [void][TCheck]::SetCursorPos([int]($origin.X + 210 * $scale), [int]($origin.Y + 420 * $scale))
+  Start-Sleep -Milliseconds 200
+  [TCheck]::mouse_event(0x0800, 0, 0, -$Scroll, [UIntPtr]::Zero)
+  Start-Sleep -Milliseconds 600
+}
+Save-Rect $origin.X $origin.Y $w $h $Shot
 
 if (-not $OnlySettings) {
   # Switch to 青碧 theme (second card), then capture the main window.

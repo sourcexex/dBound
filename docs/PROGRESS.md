@@ -165,3 +165,14 @@ $env:VITE_DBOUND_SIM='72'; $env:VITE_DBOUND_SIM_MODE='forward'; pnpm tauri build
 - 验收脚本：`scripts/verify-installer.ps1`（静默安装/错误序列号/自定义目录/启停卸载）、
   `scripts/verify-about-activation.ps1`（关于页 / 激活页 / 激活成功）、
   `scripts/verify-installer-ui.ps1`（安装向导截图）
+
+### 现场快照（摄像头）
+
+- 新增可选「现场快照」：警报触发瞬间用摄像头拍一张 JPG，命名 `现场照片-时间-级别.jpg`，
+  与同一次事件的 WAV 时间戳一致，保存在同一个目录
+- 摄像头生命周期：只在「测量中 + 快照开启」时打开（离屏 video + 隐藏 canvas 持续保留最新帧），
+  停止测量、关闭快照、切换摄像头或分辨率都会立即关闭/重启
+- 设置项：开关、摄像头选择、分辨率（1280×720 / 1920×1080 / 2560×1440，按设备能力取最优）、
+  「测试拍照」按钮（保存一张测试照片并刷新设备列表）
+- 隐私：无任何常驻预览画面，不上传；摄像头不可用时记录日志并在界面提示
+- 验收：`scripts/verify-snapshot.ps1`（自动开启快照 → 触发警报 → 校验 JPG + WAV 同名同时间戳）

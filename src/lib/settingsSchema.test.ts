@@ -273,6 +273,30 @@ describe('settings schema', () => {
     expect(clamped.postrollSeconds).toBe(30)
   })
 
+  it('sanitizes camera snapshot settings', () => {
+    const defaults = defaultSettings()
+    expect(defaults.snapshotEnabled).toBe(false)
+    expect(defaults.cameraId).toBe('default')
+    expect(defaults.snapshotSize).toBe('1080p')
+
+    const custom = sanitizeSettings({
+      modeLabels: { forward: '正向', reverse: '反向' },
+      snapshotEnabled: true,
+      cameraId: '  cam-1  ',
+      snapshotSize: '720p',
+    })
+    expect(custom.snapshotEnabled).toBe(true)
+    expect(custom.cameraId).toBe('cam-1')
+    expect(custom.snapshotSize).toBe('720p')
+
+    const broken = sanitizeSettings({
+      modeLabels: { forward: '正向', reverse: '反向' },
+      snapshotSize: '4k',
+    })
+    expect(broken.snapshotEnabled).toBe(false)
+    expect(broken.snapshotSize).toBe('1080p')
+  })
+
   it('sanitizes the emoji reward rules', () => {
     const defaults = defaultSettings().emoji
     expect(defaults.reverse).toEqual({ enabled: true, threshold: 70, holdSeconds: 5, initial: 3 })

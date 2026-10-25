@@ -2,6 +2,8 @@ import { useCallback, useEffect, useRef } from 'react'
 import { AlertEngine } from '../lib/alertEngine'
 import { AudioEngine } from '../lib/audio/capture'
 import { TimeMachine } from '../lib/audio/timeMachine'
+import { CameraMonitor } from '../lib/camera'
+import { evidenceStamp, saveEvidenceBytes } from '../lib/evidence'
 import { frameAverage, rmsToDb, tauForMode, timeWeight } from '../lib/dsp'
 import { emitMiniState, listenMiniCommands } from '../lib/miniBridge'
 import { logAlert, logDevice, logSample, logSystem } from '../lib/logger'
@@ -32,6 +34,7 @@ export function useLevelMonitor() {
   const lastMiniEmitRef = useRef(0)
   const lastSampleLogRef = useRef(0)
   const recorderRef = useRef<TimeMachine | null>(null)
+  const cameraRef = useRef<CameraMonitor | null>(null)
 
   const publishMiniState = useCallback(() => {
     const settings = useSettingsStore.getState()
@@ -75,17 +78,56 @@ export function useLevelMonitor() {
     recorderRef.current = null
   }, [])
 
-  const saveEvidenceFor = useCallback(async (levelName: string): Promise<void> => {
+  const stopCamera = useCallback((): void => {
+    cameraRef.current?.stop()
+    cameraRef.current = null
+  }, [])
+
+  const ensureCamera = useCallback(async (): Promise<void> => {
     const settings = useSettingsStore.getState()
-    if (!settings.recordingEnabled) return
+    if (!settings.snapshotEnabled) return
+    if (useLevelStore.getState().status !== 'running') return
+    if (cameraRef.current?.isRunning) return
 
-    const audio = audioRef.current
-    const stream = audio?.mediaStream
-    const context = audio?.audioContext
-    if (!stream || !context || context.state !== 'running') return
-    if (recorderRef.current?.isCapturing) return
-
+    const camera = cameraRef.current ?? new CameraMonitor()
+    cameraRef.current = camera
     try {
+      await camera.start({ deviceId: settings.cameraId, size: settings.snapshotSize })
+      logDevice(
+        `现场快照摄像头已开启 · ${settings.cameraId === 'default' ? '默认摄像头' : settings.cameraId}`,
+      )
+    } catch (error) {
+      logDevice(`摄像头不可用：${error instanceof Error ? error.message : String(error)}`)
+      useLevelStore.getState().setToast('摄像头不可用，未保存现场照片')
+      camera.stop()
+      cameraRef.current = null
+    }
+  }, [])
+
+  const saveSnapshot = useCallback(
+    async (levelName: string, stamp: string, dir: string): Promise<void> => {
+      const camera = cameraRef.current
+      if (!camera?.isRunning) return
+      const bytes = await camera.capture()
+      const filename = `现场照片-${stamp}-${levelName}.jpg`
+      const path = await saveEvidenceBytes(dir, filename, bytes)
+      logSystem(
+        `已保存现场照片（${Math.round(bytes.length / 1024)} KB，触发「${levelName}」）：${path}`,
+      )
+      useLevelStore.getState().setToast('已保存现场照片')
+    },
+    [],
+  )
+
+  const saveRecording = useCallback(
+    async (levelName: string, stamp: string, dir: string): Promise<void> => {
+      const settings = useSettingsStore.getState()
+      const audio = audioRef.current
+      const stream = audio?.mediaStream
+      const context = audio?.audioContext
+      if (!stream || !context || context.state !== 'running') return
+      if (recorderRef.current?.isCapturing) return
+
       if (!recorderRef.current) {
         recorderRef.current = new TimeMachine(context, stream, settings.prerollSeconds)
       }
@@ -94,28 +136,41 @@ export function useLevelMonitor() {
         settings.prerollSeconds,
         settings.postrollSeconds,
       )
-
-      const stamp = new Date()
-        .toLocaleString('sv-SE')
-        .replace(/[: ]/g, '-')
-        .replace(/,/g, '')
       const filename = `事件录音-${stamp}-${levelName}.wav`
-      const bytes = Array.from(new Uint8Array(result.wav))
-      const { invoke } = await import('@tauri-apps/api/core')
-      const path = await invoke<string>('save_evidence', {
-        dir: settings.recordingDir || null,
-        filename,
-        data: bytes,
-      })
-
+      const path = await saveEvidenceBytes(dir, filename, new Uint8Array(result.wav))
       logSystem(
         `已保存事件录音（${result.durationSeconds.toFixed(1)} 秒，触发「${levelName}」）：${path}`,
       )
       useLevelStore.getState().setToast(`已保存事件录音 · ${result.durationSeconds.toFixed(1)} 秒`)
-    } catch (error) {
-      logDevice(`证据录音失败：${error instanceof Error ? error.message : String(error)}`)
-    }
-  }, [])
+    },
+    [],
+  )
+
+  const captureEvidenceFor = useCallback(
+    async (levelName: string): Promise<void> => {
+      const settings = useSettingsStore.getState()
+      if (!settings.recordingEnabled && !settings.snapshotEnabled) return
+
+      const stamp = evidenceStamp()
+      const dir = settings.recordingDir
+      const jobs: Array<Promise<void>> = []
+      if (settings.snapshotEnabled) jobs.push(saveSnapshot(levelName, stamp, dir))
+      if (settings.recordingEnabled) jobs.push(saveRecording(levelName, stamp, dir))
+
+      const results = await Promise.allSettled(jobs)
+      for (const result of results) {
+        if (result.status === 'rejected') {
+          const reason = result.reason
+          const message = reason instanceof Error ? reason.message : String(reason)
+          // Stopping the measurement aborts an in-flight capture on purpose.
+          if (message !== 'recorder stopped' && message !== 'recorder disposed') {
+            logDevice(`证据保存失败：${message}`)
+          }
+        }
+      }
+    },
+    [saveRecording, saveSnapshot],
+  )
 
   const applyDb = useCallback(
     (rawDb: number, now: number) => {
@@ -145,7 +200,7 @@ export function useLevelMonitor() {
       for (const event of update.events) {
         store.pushAlertEvent(event)
         logAlert(event.type, event.level.name, event.db)
-        if (event.type === 'enter') void saveEvidenceFor(event.level.name)
+        if (event.type === 'enter') void captureEvidenceFor(event.level.name)
       }
 
       if (now - lastHistoryRef.current >= HISTORY_INTERVAL_MS) {
@@ -192,6 +247,7 @@ export function useLevelMonitor() {
             if (settings.recordingEnabled && stream && context && !recorderRef.current) {
               recorderRef.current = new TimeMachine(context, stream, settings.prerollSeconds)
             }
+            if (settings.snapshotEnabled) void ensureCamera()
           }
           if (status === 'error') {
             logDevice(`采集失败：${error?.code ?? 'unknown'} ${error?.message ?? ''}`.trim())
@@ -207,13 +263,14 @@ export function useLevelMonitor() {
             getAlert().reset()
             store.setActiveLevel(null)
             stopRecorder()
+            stopCamera()
           }
           publishMiniState()
         },
       )
     }
     return audioRef.current
-  }, [applyDb, getAlert, publishMiniState, stopRecorder])
+  }, [applyDb, ensureCamera, getAlert, publishMiniState, stopCamera, stopRecorder])
 
   const start = useCallback(async (): Promise<void> => {
     if (SIMULATION) return
@@ -228,12 +285,13 @@ export function useLevelMonitor() {
 
   const stop = useCallback((): void => {
     stopRecorder()
+    stopCamera()
     audioRef.current?.stop()
     getAlert().reset()
     useLevelStore.getState().clearHistory()
     useLevelStore.getState().setActiveLevel(null)
     publishMiniState()
-  }, [getAlert, publishMiniState, stopRecorder])
+  }, [getAlert, publishMiniState, stopCamera, stopRecorder])
 
   const toggle = useCallback(async (): Promise<void> => {
     if (SIMULATION) return
@@ -262,6 +320,15 @@ export function useLevelMonitor() {
   useEffect(() => {
     const unsubscribe = useSettingsStore.subscribe((state, previous) => {
       if (previous.recordingEnabled && !state.recordingEnabled) stopRecorder()
+      if (!previous.snapshotEnabled && state.snapshotEnabled) void ensureCamera()
+      if (previous.snapshotEnabled && !state.snapshotEnabled) stopCamera()
+      if (
+        state.snapshotEnabled &&
+        (previous.cameraId !== state.cameraId || previous.snapshotSize !== state.snapshotSize)
+      ) {
+        stopCamera()
+        void ensureCamera()
+      }
       if (state.mode !== previous.mode) {
         getAlert().reset()
         useLevelStore.getState().setActiveLevel(null)
@@ -270,7 +337,7 @@ export function useLevelMonitor() {
       }
     })
     return unsubscribe
-  }, [getAlert, publishMiniState, stopRecorder])
+  }, [ensureCamera, getAlert, publishMiniState, stopCamera, stopRecorder])
 
   // The mini window asks for a fresh snapshot right after it opens.
   useEffect(() => {
