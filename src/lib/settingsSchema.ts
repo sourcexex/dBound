@@ -4,9 +4,17 @@ import type { Level, Mode } from './types'
 
 export const SETTINGS_VERSION = 2
 export const MAX_LEVELS = 8
+export const MODE_LABEL_MAX = 8
+
+export const DEFAULT_MODE_LABELS: Record<Mode, string> = {
+  forward: '正向',
+  reverse: '反向',
+}
 
 export interface PersistedSettings {
   mode: Mode
+  /** User-facing name for each mode, e.g. 自习课模式 / 早读模式. */
+  modeLabels: Record<Mode, string>
   offset: number
   readingSmooth: boolean
   showPeak: boolean
@@ -17,6 +25,7 @@ export interface PersistedSettings {
 export function defaultSettings(): PersistedSettings {
   return {
     mode: 'forward',
+    modeLabels: { ...DEFAULT_MODE_LABELS },
     offset: DEFAULT_OFFSET,
     readingSmooth: true,
     showPeak: true,
@@ -63,10 +72,26 @@ function sanitizeLevels(value: unknown, mode: Mode): Level[] {
   return levels.length > 0 ? levels : defaultLevels(mode)
 }
 
+function sanitizeModeLabels(value: unknown): Record<Mode, string> {
+  const raw = isRecord(value) ? value : {}
+  const pick = (candidate: unknown, fallback: string): string => {
+    if (typeof candidate !== 'string') return fallback
+    const trimmed = candidate.trim().slice(0, MODE_LABEL_MAX)
+    return trimmed.length > 0 ? trimmed : fallback
+  }
+  return {
+    forward: pick(raw.forward, DEFAULT_MODE_LABELS.forward),
+    reverse: pick(raw.reverse, DEFAULT_MODE_LABELS.reverse),
+  }
+}
+
 /** Keep only well-formed settings; fall back to defaults for anything broken. */
 export function sanitizeSettings(value: unknown): PersistedSettings {
   const fallback = defaultSettings()
   if (!isRecord(value)) return fallback
+  // `modeLabels` exists in every dBound payload. Its absence means the data comes
+  // from a foreign/older layout (e.g. a previous prototype), so start clean.
+  if (!isRecord(value.modeLabels)) return fallback
 
   const mode: Mode = value.mode === 'reverse' ? 'reverse' : 'forward'
   const offset = Number(value.offset)
@@ -77,6 +102,7 @@ export function sanitizeSettings(value: unknown): PersistedSettings {
 
   return {
     mode,
+    modeLabels: sanitizeModeLabels(value.modeLabels),
     offset: Number.isFinite(offset) ? Math.min(125, Math.max(65, Math.round(offset * 2) / 2)) : DEFAULT_OFFSET,
     readingSmooth: value.readingSmooth !== false,
     showPeak: value.showPeak !== false,

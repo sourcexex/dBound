@@ -1,23 +1,28 @@
+import { DEFAULT_MODE_LABELS, MODE_LABEL_MAX } from '../../lib/settingsSchema'
+import type { Mode } from '../../lib/types'
 import { useSettingsStore } from '../../stores/settings'
 import { Row, SectionCard } from '../ui/SectionCard'
 import { Toggle } from '../ui/Toggle'
 
 const MODE_COPY = {
   forward: {
-    title: '正向模式',
     subtitle: '太吵时报警',
     detail: '读数高于某级阈值并持续 2 秒，触发该级提醒；峰值越高，命中的级别越严重。',
   },
   reverse: {
-    title: '反向模式',
     subtitle: '太小声时报警',
     detail: '读数低于某级阈值并持续 2 秒，触发该级提醒；阈值越低，命中的级别越严重。',
   },
 } as const
 
+const INPUT_CLASS =
+  'w-full rounded-lg border border-line bg-white px-2.5 py-1.5 text-[12px] text-ink outline-none transition-colors focus:border-ink/30'
+
 export function ModePanel() {
   const mode = useSettingsStore((state) => state.mode)
+  const modeLabels = useSettingsStore((state) => state.modeLabels)
   const setMode = useSettingsStore((state) => state.setMode)
+  const setModeLabel = useSettingsStore((state) => state.setModeLabel)
   const readingSmooth = useSettingsStore((state) => state.readingSmooth)
   const setReadingSmooth = useSettingsStore((state) => state.setReadingSmooth)
   const showPeak = useSettingsStore((state) => state.showPeak)
@@ -25,6 +30,41 @@ export function ModePanel() {
 
   return (
     <div className="space-y-3">
+      <SectionCard title="模式名称" hint="显示在主界面切换器、全屏与日志里，最多 8 个字">
+        <div className="grid grid-cols-2 gap-2">
+          {(['forward', 'reverse'] as Mode[]).map((key) => (
+            <label key={key} className="block">
+              <span className="mb-1 block text-[10.5px] text-ink-soft">
+                {key === 'forward' ? '正向（越吵越严重）' : '反向（越安静越严重）'}
+              </span>
+              <input
+                className={INPUT_CLASS}
+                value={modeLabels[key]}
+                maxLength={MODE_LABEL_MAX}
+                placeholder={DEFAULT_MODE_LABELS[key]}
+                onChange={(event) => setModeLabel(key, event.target.value)}
+                onBlur={() => {
+                  if (!modeLabels[key].trim()) setModeLabel(key, DEFAULT_MODE_LABELS[key])
+                }}
+              />
+            </label>
+          ))}
+        </div>
+        <div className="mt-2 flex items-center justify-between">
+          <p className="text-[10px] text-ink-faint">例如：正向改成「自习课模式」，反向改成「早读模式」</p>
+          <button
+            type="button"
+            onClick={() => {
+              setModeLabel('forward', DEFAULT_MODE_LABELS.forward)
+              setModeLabel('reverse', DEFAULT_MODE_LABELS.reverse)
+            }}
+            className="shrink-0 rounded-md px-2 py-1 text-[11px] text-ink-faint transition-colors hover:bg-black/[0.05] hover:text-ink"
+          >
+            恢复默认
+          </button>
+        </div>
+      </SectionCard>
+
       <SectionCard title="工作模式">
         <div className="space-y-2">
           {(Object.keys(MODE_COPY) as Array<keyof typeof MODE_COPY>).map((key) => {
@@ -42,7 +82,7 @@ export function ModePanel() {
                 }`}
               >
                 <div className="flex items-center justify-between">
-                  <span className="text-[12.5px] font-semibold text-ink">{copy.title}</span>
+                  <span className="text-[12.5px] font-semibold text-ink">{modeLabels[key]}</span>
                   <span
                     className={`grid h-4 w-4 place-items-center rounded-full border ${
                       selected ? 'border-ink bg-ink' : 'border-[#C9C8C1]'

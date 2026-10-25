@@ -12,6 +12,8 @@ import type { Level, Mode } from '../lib/types'
 
 export interface SettingsState {
   mode: Mode
+  /** User-facing name for each mode (e.g. 自习课模式 / 早读模式). */
+  modeLabels: Record<Mode, string>
   offset: number
   /** Reverse mode only: smooth over ~3 s so reading aloud does not flicker. */
   readingSmooth: boolean
@@ -21,6 +23,7 @@ export interface SettingsState {
   levels: Record<Mode, Level[]>
 
   setMode: (mode: Mode) => void
+  setModeLabel: (mode: Mode, label: string) => void
   setOffset: (offset: number) => void
   setReadingSmooth: (value: boolean) => void
   setShowPeak: (value: boolean) => void
@@ -60,6 +63,7 @@ export const useSettingsStore = create<SettingsState>()(
   persist<SettingsState, [], [], PersistedSettings>(
     (set) => ({
       mode: initial.mode,
+      modeLabels: initial.modeLabels,
       offset: initial.offset,
       readingSmooth: initial.readingSmooth,
       showPeak: initial.showPeak,
@@ -67,6 +71,8 @@ export const useSettingsStore = create<SettingsState>()(
       levels: initial.levels,
 
       setMode: (mode) => set({ mode }),
+      setModeLabel: (mode, label) =>
+        set((state) => ({ modeLabels: { ...state.modeLabels, [mode]: label } })),
       setOffset: (offset) => set({ offset }),
       setReadingSmooth: (readingSmooth) => set({ readingSmooth }),
       setShowPeak: (showPeak) => set({ showPeak }),
@@ -113,6 +119,7 @@ export const useSettingsStore = create<SettingsState>()(
         const fresh = defaultSettings()
         set({
           mode: fresh.mode,
+          modeLabels: fresh.modeLabels,
           offset: fresh.offset,
           readingSmooth: fresh.readingSmooth,
           showPeak: fresh.showPeak,
@@ -127,6 +134,7 @@ export const useSettingsStore = create<SettingsState>()(
       migrate: (persisted, version) => migrateSettings(persisted, version),
       partialize: (state) => ({
         mode: state.mode,
+        modeLabels: state.modeLabels,
         offset: state.offset,
         readingSmooth: state.readingSmooth,
         showPeak: state.showPeak,

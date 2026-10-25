@@ -50,6 +50,7 @@ export function MainPage({
   unseenLogs: boolean
 }) {
   const mode = useSettingsStore((state) => state.mode)
+  const modeLabels = useSettingsStore((state) => state.modeLabels)
   const setMode = useSettingsStore((state) => state.setMode)
   const levels = useSettingsStore((state) => state.levels[state.mode])
   const showPeak = useSettingsStore((state) => state.showPeak)
@@ -90,7 +91,7 @@ export function MainPage({
       />
 
       <div className="mt-0.5 px-6">
-        <ModeSwitch mode={mode} onChange={setMode} />
+        <ModeSwitch mode={mode} labels={modeLabels} onChange={setMode} />
       </div>
 
       <div className="relative flex min-h-0 flex-1 flex-col justify-center px-6">

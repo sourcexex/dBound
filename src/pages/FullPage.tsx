@@ -9,6 +9,7 @@ const INITIAL: MiniState = {
   color: '#17171A',
   name: null,
   mode: 'forward',
+  modeLabel: '正向',
   running: false,
   paused: false,
 }
@@ -75,7 +76,7 @@ export function FullPage() {
       ? '已暂停'
       : '未开始测量'
     : state.name
-      ? `${state.name} · ${state.mode === 'forward' ? '正向' : '反向'}`
+      ? `${state.name} · ${state.modeLabel}`
       : state.mode === 'forward'
         ? '安静'
         : '音量正常'

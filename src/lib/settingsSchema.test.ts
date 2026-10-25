@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import {
+  DEFAULT_MODE_LABELS,
   SETTINGS_VERSION,
   defaultSettings,
   migrateSettings,
@@ -26,11 +27,33 @@ describe('settings schema', () => {
     }
     expect(migrateSettings(legacy, 0)).toEqual(defaultSettings())
     expect(migrateSettings(legacy, SETTINGS_VERSION - 1)).toEqual(defaultSettings())
+    // Same version but a foreign payload (no modeLabels) must not be trusted either.
+    expect(sanitizeSettings(legacy)).toEqual(defaultSettings())
+  })
+
+  it('keeps a well-formed payload of the current version', () => {
+    const current = {
+      mode: 'reverse',
+      modeLabels: { forward: '自习课模式', reverse: '早读模式' },
+      offset: 90,
+      readingSmooth: false,
+      showPeak: true,
+      deviceId: 'default',
+      levels: {
+        forward: [{ id: 'f-1', threshold: 70, name: '安静', note: '', color: '#2563EB', enabled: true }],
+        reverse: [{ id: 'r-1', threshold: 55, name: '大声', note: '', color: '#D97706', enabled: true }],
+      },
+    }
+    const migrated = migrateSettings(current, SETTINGS_VERSION)
+    expect(migrated.mode).toBe('reverse')
+    expect(migrated.modeLabels.forward).toBe('自习课模式')
+    expect(migrated.levels.forward[0].threshold).toBe(70)
   })
 
   it('sanitizes a current-version payload instead of failing', () => {
     const sanitized = sanitizeSettings({
       mode: 'sideways',
+      modeLabels: { forward: '自习课模式' },
       offset: 500,
       readingSmooth: false,
       showPeak: 'nope',
@@ -67,7 +90,19 @@ describe('settings schema', () => {
       color: '#2563EB',
       enabled: true,
     }))
-    expect(sanitizeSettings({ levels: { forward: many } }).levels.forward).toHaveLength(8)
-    expect(sanitizeSettings({ levels: { forward: [] } }).levels.forward).toHaveLength(3)
+    expect(sanitizeSettings({ modeLabels: {}, levels: { forward: many } }).levels.forward).toHaveLength(8)
+    expect(sanitizeSettings({ modeLabels: {}, levels: { forward: [] } }).levels.forward).toHaveLength(3)
+  })
+
+  it('keeps custom mode labels within limits and falls back when empty', () => {
+    expect(defaultSettings().modeLabels).toEqual(DEFAULT_MODE_LABELS)
+
+    const custom = sanitizeSettings({ modeLabels: { forward: '自习课模式', reverse: '早读模式' } })
+    expect(custom.modeLabels.forward).toBe('自习课模式')
+    expect(custom.modeLabels.reverse).toBe('早读模式')
+
+    const broken = sanitizeSettings({ modeLabels: { forward: '   ', reverse: '1234567890123' } })
+    expect(broken.modeLabels.forward).toBe(DEFAULT_MODE_LABELS.forward)
+    expect(broken.modeLabels.reverse).toHaveLength(8)
   })
 })

@@ -10,6 +10,8 @@ export interface MiniState {
   color: string
   name: string | null
   mode: Mode
+  /** Custom display name of the current mode (e.g. 早读模式). */
+  modeLabel: string
   running: boolean
   paused: boolean
 }

@@ -8,6 +8,7 @@ const INITIAL: MiniState = {
   color: '#17171A',
   name: null,
   mode: 'forward',
+  modeLabel: '正向',
   running: false,
   paused: false,
 }

@@ -41,6 +41,7 @@ export function useLevelMonitor() {
       color: active?.color ?? '#17171A',
       name: active?.name ?? null,
       mode: settings.mode,
+      modeLabel: settings.modeLabels[settings.mode],
       running: level.status === 'running',
       paused: level.status === 'idle' || level.status === 'error',
     })
@@ -186,7 +187,7 @@ export function useLevelMonitor() {
       if (state.mode !== previous.mode) {
         getAlert().reset()
         useLevelStore.getState().setActiveLevel(null)
-        logSystem(`切换到${state.mode === 'forward' ? '正向' : '反向'}模式`)
+        logSystem(`切换到${state.modeLabels[state.mode]}`)
         publishMiniState()
       }
     })

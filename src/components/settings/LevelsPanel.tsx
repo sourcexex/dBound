@@ -160,6 +160,7 @@ function LevelRow({
 
 export function LevelsPanel() {
   const mode = useSettingsStore((state) => state.mode)
+  const modeLabels = useSettingsStore((state) => state.modeLabels)
   const levels = useSettingsStore((state) => state.levels[state.mode])
   const updateLevel = useSettingsStore((state) => state.updateLevel)
   const addLevel = useSettingsStore((state) => state.addLevel)
@@ -184,7 +185,7 @@ export function LevelsPanel() {
         <div className="mb-2 flex items-center justify-between">
           <div>
             <h3 className="text-[12.5px] font-semibold text-ink">
-              {mode === 'forward' ? '正向 · 越吵越严重' : '反向 · 越安静越严重'}
+              {modeLabels[mode]} · {mode === 'forward' ? '越吵越严重' : '越安静越严重'}
             </h3>
             <p className="mt-0.5 text-[10.5px] text-ink-faint">
               当前读数 {db === null ? '—' : `${db.toFixed(1)} dB`}
