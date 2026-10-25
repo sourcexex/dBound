@@ -2,6 +2,84 @@ mod evidence;
 mod license;
 mod logs;
 
+/// Remove the native Windows window frame/border.
+///
+/// Undecorated Tauri windows still get a thin DWM border (square on Win10,
+/// rounded on Win11). Turning off non-client rendering and the Win11 accent
+/// border/corner preference leaves only the rounded shape drawn by the app.
+#[cfg(target_os = "windows")]
+fn strip_native_frame(hwnd: isize) {
+    use core::ffi::c_void;
+
+    #[link(name = "dwmapi")]
+    unsafe extern "system" {
+        fn DwmSetWindowAttribute(
+            hwnd: isize,
+            attribute: u32,
+            value: *const c_void,
+            size: u32,
+        ) -> i32;
+    }
+
+    const DWMWA_WINDOW_CORNER_PREFERENCE: u32 = 33; // DWMWCP_DONOTROUND
+    const DWMWA_BORDER_COLOR: u32 = 34; // DWMWA_COLOR_NONE
+    const DWMWA_COLOR_NONE: u32 = 0xFFFF_FFFE;
+
+    unsafe {
+        let handle = hwnd;
+        {
+            let do_not_round: i32 = 1;
+            let _ = DwmSetWindowAttribute(
+                handle,
+                DWMWA_WINDOW_CORNER_PREFERENCE,
+                &do_not_round as *const _ as *const c_void,
+                std::mem::size_of::<i32>() as u32,
+            );
+            let no_border: u32 = DWMWA_COLOR_NONE;
+            let _ = DwmSetWindowAttribute(
+                handle,
+                DWMWA_BORDER_COLOR,
+                &no_border as *const _ as *const c_void,
+                std::mem::size_of::<u32>() as u32,
+            );
+        }
+    }
+}
+
+/// Clip the window surface to the same rounded rectangle the UI draws.
+///
+/// Without this, Windows 10 paints the native square window frame behind the
+/// transparent CSS corners, while Windows 11 applies its own DWM rounding.
+#[cfg(target_os = "windows")]
+fn apply_rounded_region(hwnd: isize, width: u32, height: u32, scale: f64, radius_css: f64) {
+    #[link(name = "gdi32")]
+    unsafe extern "system" {
+        fn CreateRoundRectRgn(
+            left: i32,
+            top: i32,
+            right: i32,
+            bottom: i32,
+            width: i32,
+            height: i32,
+        ) -> isize;
+    }
+    #[link(name = "user32")]
+    unsafe extern "system" {
+        fn SetWindowRgn(hwnd: isize, region: isize, redraw: i32) -> i32;
+    }
+
+    let radius = (radius_css * scale).round().max(1.0) as i32;
+    let width = width as i32 + 1;
+    let height = height as i32 + 1;
+    let handle = hwnd;
+    unsafe {
+        let region = CreateRoundRectRgn(0, 0, width, height, radius * 2, radius * 2);
+        if region != 0 {
+            let _ = SetWindowRgn(handle, region, 1);
+        }
+    }
+}
+
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
     // Remember window position/size only – never restore the VISIBLE flag, otherwise
@@ -39,14 +117,52 @@ pub fn run() {
             build_tray(app.handle())?;
             // Secondary windows are configured as hidden; make sure that still holds
             // even if a previous session left them on screen.
-            for label in [MINI_LABEL, FULL_LABEL] {
+            for label in [MAIN_LABEL, MINI_LABEL, FULL_LABEL] {
                 if let Some(window) = app.get_webview_window(label) {
-                    let _ = window.hide();
+                    #[cfg(target_os = "windows")]
+                    if let (Ok(hwnd), Ok(size), Ok(scale)) = (
+                        window.hwnd(),
+                        window.outer_size(),
+                        window.scale_factor(),
+                    ) {
+                        let handle = hwnd.0 as isize;
+                        strip_native_frame(handle);
+                        if label != FULL_LABEL {
+                            let radius = if label == MAIN_LABEL { 15.0 } else { 14.0 };
+                            apply_rounded_region(handle, size.width, size.height, scale, radius);
+                        }
+                    }
+                    if label != MAIN_LABEL {
+                        let _ = window.hide();
+                    }
                 }
             }
             Ok(())
         })
         .on_window_event(|window, event| {
+            #[cfg(target_os = "windows")]
+            if let tauri::WindowEvent::ScaleFactorChanged { .. } = event {
+                let radius = match window.label() {
+                    MAIN_LABEL => Some(15.0),
+                    MINI_LABEL => Some(14.0),
+                    _ => None,
+                };
+                if let Some(radius) = radius {
+                    if let (Ok(hwnd), Ok(size), Ok(scale)) = (
+                        window.hwnd(),
+                        window.outer_size(),
+                        window.scale_factor(),
+                    ) {
+                        apply_rounded_region(
+                            hwnd.0 as isize,
+                            size.width,
+                            size.height,
+                            scale,
+                            radius,
+                        );
+                    }
+                }
+            }
             // Closing the main window parks the app in the tray instead of quitting.
             if let tauri::WindowEvent::CloseRequested { api, .. } = event {
                 if window.label() == "main" {

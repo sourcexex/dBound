@@ -335,3 +335,13 @@ $env:VITE_DBOUND_SIM='72'; $env:VITE_DBOUND_SIM_MODE='forward'; pnpm tauri build
 - 去掉主窗口外壳的 1px `border`（`App.tsx` 的 shell），并关闭主窗口的 DWM 阴影（`shadow: false`），
   消除窗口外围的细微灰/黑描边；圆角与透明背景保持不变
 - 迷你窗与全屏窗口不受影响（迷你窗自身有描边与投影设计）
+
+### 去除 Windows 原生窗口边框
+
+- 问题：Tauri 无边框窗口在 Windows 上仍会带一圈系统边框（Win10 方角、Win11 圆角）
+- Rust 侧新增 `strip_native_frame` / `apply_rounded_region`：
+  - `DWMWA_BORDER_COLOR = DWMWA_COLOR_NONE` 去掉 Win11 的强调色边框
+  - `DWMWA_WINDOW_CORNER_PREFERENCE = DWMWCP_DONOTROUND` 关闭系统圆角，由应用自己画圆角
+  - `SetWindowRgn(CreateRoundRectRgn(...))` 把窗口裁成与 UI 一致的 15px 圆角矩形，
+    Win10 上也得到圆角并裁掉方形原生边框；DPI 变化时重新计算
+- 主窗与迷你窗应用处理，全屏窗口不裁圆角；配合 `shadow: false`，外围不再出现系统描边
