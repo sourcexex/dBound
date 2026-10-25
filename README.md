@@ -2,7 +2,7 @@
 
 **桌面音量哨兵** —— 用麦克风实时估测环境响度，太吵或（朗读时）太小声，一眼就能看见。
 
-Windows 10 1809+ / Windows 11 · Tauri 2 + React 19 + TypeScript
+Windows 10 1809+ / Windows 11 · Tauri 2 + React 19 + TypeScript · 当前版本 **1.0.1 Beta2**
 
 ![主界面](docs/images/main-quiet.png)
 
@@ -66,11 +66,41 @@ $env:VITE_DBOUND_SIM_MODE='forward'  # forward | reverse
 pnpm tauri build --debug --no-bundle
 ```
 
+## 安装（Windows 安装包）
+
+发布包：`release/dBound_1.0.1_x64-setup.exe`
+
+1. 运行安装包，**安装过程中必须输入序列号**（序列号 `142857`）。
+2. 安装向导支持**自定义安装目录**（默认 `%LOCALAPPDATA%\dBound`）。
+3. 安装完成后是完整的软件文件夹，而不是单个 exe：
+
+   ```
+   dBound\
+     dbound.exe
+     uninstall.exe
+     license.dat
+     文档\
+       使用说明.txt
+       版本信息.txt
+       LICENSE.txt
+   ```
+
+4. 安装器会写入激活标记；首次启动软件会再次校验。把安装目录直接拷贝到别的电脑后，
+   软件会要求重新输入序列号激活。
+5. 静默安装（批量部署）：`dBound_1.0.1_x64-setup.exe /S /SERIAL=142857 /D=C:\dBound`
+   （`/D` 必须是最后一个参数；不传或序列号错误时安装会以错误码 2 退出）。
+
+| 安装向导（序列号页） | 首次激活界面 |
+| --- | --- |
+| ![安装序列号](docs/images/installer-serial.png) | ![激活](docs/images/activation.png) |
+
+> 关于页：设置 → 关于，可查看版本（1.0.1 Beta2）与作者信息（设计 / 创意 / 开发 | 作者：Source X）。
+
 ## 使用
 
 1. 首次启动会自动开始测量（系统要求一次点击时，界面会提示「开始测量」）
 2. 顶部切换**正向 / 反向**
-3. 齿轮进设置：模式、级别、校准、设备、系统
+3. 齿轮进设置：模式、级别、校准、全屏、设备、系统、关于
 4. 标题栏 ← 日志 查看事件与采样记录
 5. 标题栏 ⧉ 切到迷你胶囊；关闭主窗则收进托盘
 6. 标题栏 ⛶ 或按 **F11** 进入全屏模式，按 **ESC** 退出
@@ -97,7 +127,8 @@ docs/                       PRD、进度、截图
 
 ## 数据与隐私
 
-- 音频只在内存中计算 RMS，**从不录制、不写盘、不上传**
+- 音频只在本机处理：平时仅在内存中计算 RMS 并循环缓冲；只有警报触发且开启「证据录制」时，
+  才把前 5 秒 + 后 10 秒写成 WAV 保存到你设置的目录；从不上传
 - 设置保存在本机 WebView 的 localStorage
 - 日志只包含分贝数值与事件文本，位于
   `%APPDATA%\com.dbound.desktop\logs\YYYY-MM-DD.jsonl`，保留 7 天 / 20 MB
@@ -122,6 +153,10 @@ Tauri 2 ｜ React 19 ｜ TypeScript ｜ Vite ｜ Tailwind CSS v4 ｜ zustand ｜
 Web Audio API（AnalyserNode + RMS）｜ cpal 未使用，采集完全在前端完成 ｜
 tauri-plugin-window-state / dialog
 
+## 作者
+
+设计 / 创意 / 开发 | 作者：Source X
+
 ## License
 
-MIT
+MIT（源码）；分发的安装包受《dBound 软件许可说明》约束，需授权序列号使用。

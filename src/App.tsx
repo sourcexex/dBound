@@ -7,10 +7,12 @@ import { showFullscreen, showMiniWindow } from './lib/miniBridge'
 import { LogsPage } from './pages/LogsPage'
 import { MainPage } from './pages/MainPage'
 import { SettingsPage } from './pages/SettingsPage'
+import { ActivationPage } from './pages/ActivationPage'
+import { isTauri } from './lib/tauri'
 import { useLevelStore } from './stores/level'
 import { useSettingsStore } from './stores/settings'
 
-const APP_VERSION = '0.1.0'
+const APP_VERSION = '1.0.1 Beta2'
 
 export default function App() {
   const [view, setView] = useState<'main' | 'settings' | 'logs'>('main')
@@ -19,6 +21,23 @@ export default function App() {
   const theme = useSettingsStore((state) => state.theme)
   const darkMode = useSettingsStore((state) => state.darkMode)
   const started = useRef(false)
+  const [license, setLicense] = useState<'checking' | 'ok' | 'locked'>('checking')
+
+  useEffect(() => {
+    let cancelled = false
+    if (!isTauri()) {
+      setLicense('ok')
+      return
+    }
+    void (async () => {
+      const { invoke } = await import('@tauri-apps/api/core')
+      const active = await invoke<boolean>('license_status').catch(() => false)
+      if (!cancelled) setLicense(active ? 'ok' : 'locked')
+    })()
+    return () => {
+      cancelled = true
+    }
+  }, [])
 
   useEffect(() => {
     const dispose = initLogFlushHooks()
@@ -76,15 +95,27 @@ export default function App() {
       />
     )
 
-  return (
+  const shell = (body: React.ReactNode) => (
     <div
       data-appearance={darkMode ? 'dark' : 'light'}
       data-theme={theme}
       className="relative h-full w-full overflow-hidden rounded-[15px] border border-ink/[0.08]"
     >
       <AuroraBackground theme={theme} dark={darkMode} />
-      <div className="relative z-10 h-full">{content}</div>
+      <div className="relative z-10 h-full">{body}</div>
       <Toast />
     </div>
   )
+
+  if (license === 'checking') {
+    return shell(
+      <div className="grid h-full place-items-center text-[11.5px] text-ink-soft">正在检查授权…</div>,
+    )
+  }
+
+  if (license === 'locked') {
+    return shell(<ActivationPage onActivated={() => setLicense('ok')} />)
+  }
+
+  return shell(content)
 }

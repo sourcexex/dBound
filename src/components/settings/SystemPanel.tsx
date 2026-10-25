@@ -13,8 +13,6 @@ import { Toggle } from '../ui/Toggle'
 import { Row, SectionCard } from '../ui/SectionCard'
 import { ValueSlider } from '../ui/ValueSlider'
 
-const APP_VERSION = '0.1.0'
-
 export function SystemPanel() {
   const resetAll = useSettingsStore((state) => state.resetAll)
   const theme = useSettingsStore((state) => state.theme)
@@ -164,16 +162,6 @@ export function SystemPanel() {
             WAV，仅保存在本机。每条保存记录都会写进日志。
           </p>
         </div>
-      </SectionCard>
-
-      <SectionCard title="关于">
-        <Row label="dBound" hint={`版本 ${APP_VERSION} · Windows 10 1809+ / 11`} />
-        <Row label="读数说明" hint="本应用用麦克风响度估测分贝，数值用于比较相对大小，不能用于声学计量或法律用途。" />
-        <Row
-          label="隐私"
-          hint="音频只在本机处理；平时仅在内存中计算并循环缓冲，只有警报触发且开启证据录制时才写入本地文件，从不上传。"
-        />
-        <Row label="数据存储" hint="设置保存在本机 WebView 的 localStorage，卸载应用时一并清除。" />
       </SectionCard>
 
       <SectionCard title="重置">

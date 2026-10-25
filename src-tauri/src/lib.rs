@@ -1,4 +1,5 @@
 mod evidence;
+mod license;
 mod logs;
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
@@ -21,6 +22,8 @@ pub fn run() {
             show_main_window,
             show_fullscreen,
             evidence::evidence_default_dir,
+            license::activate_license,
+            license::license_status,
             evidence::save_evidence,
             logs::log_append,
             logs::log_days,

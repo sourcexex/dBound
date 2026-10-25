@@ -6,6 +6,7 @@ param(
 )
 
 $ErrorActionPreference = 'Stop'
+reg add 'HKCU\Software\dBound' /v License /t REG_SZ /d 1 /f | Out-Null
 Add-Type -AssemblyName System.Drawing
 
 Add-Type @"

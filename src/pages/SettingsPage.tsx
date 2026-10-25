@@ -6,6 +6,7 @@ import { FullscreenPanel } from '../components/settings/FullscreenPanel'
 import { LevelsPanel } from '../components/settings/LevelsPanel'
 import { ModePanel } from '../components/settings/ModePanel'
 import { SystemPanel } from '../components/settings/SystemPanel'
+import { AboutPanel } from '../components/settings/AboutPanel'
 
 const TABS = [
   { id: 'mode', label: '模式' },
@@ -14,6 +15,7 @@ const TABS = [
   { id: 'fullscreen', label: '全屏' },
   { id: 'devices', label: '设备' },
   { id: 'system', label: '系统' },
+  { id: 'about', label: '关于' },
 ] as const
 
 type TabId = (typeof TABS)[number]['id']
@@ -71,6 +73,7 @@ export function SettingsPage({
         {tab === 'fullscreen' ? <FullscreenPanel /> : null}
         {tab === 'devices' ? <DevicesPanel onRestart={onRestartDevice} /> : null}
         {tab === 'system' ? <SystemPanel /> : null}
+        {tab === 'about' ? <AboutPanel /> : null}
       </div>
     </div>
   )

@@ -149,3 +149,19 @@ $env:VITE_DBOUND_SIM='72'; $env:VITE_DBOUND_SIM_MODE='forward'; pnpm tauri build
 - 安装包未在本机实际安装验证（避免改动系统）；其内嵌的 release 可执行文件已实测运行
 - `%APPDATA%\com.dbound.desktop` 下可能存在更早期原型留下的 `dbound.log.*`
   与 `recordings/`，与本版本无关，不影响运行
+
+## 1.0.1 Beta2（发布与授权）
+
+- 版本号统一为 1.0.1（安装器 / 应用 / 包元数据），界面显示 `1.0.1 Beta2`
+- 设置新增「关于」独立页（系统右侧），含版本、授权、隐私、作者：设计 / 创意 / 开发 | 作者：Source X
+- 安装包：自定义 NSIS 模板
+  - 安装向导新增「序列号验证」页，序列号 `142857`，错误则中止
+  - 静默/被动安装必须传 `/SERIAL=142857`，否则以退出码 2 失败
+  - 安装后写入 `HKCU\Software\dBound\License` 与安装目录 `license.dat`
+  - 安装包图标、卸载图标使用应用图标；默认安装目录 `%LOCALAPPDATA%\dBound`，支持自定义路径
+  - 安装目录包含 `dbound.exe`、`uninstall.exe`、`license.dat`、`文档/`（使用说明 / 版本信息 / LICENSE）
+  - 开始菜单 `dBound` 文件夹 + 快捷方式；卸载时清理注册表激活标记
+- 应用启动增加激活校验：缺少注册表标记时显示激活页，输入序列号后写入标记
+- 验收脚本：`scripts/verify-installer.ps1`（静默安装/错误序列号/自定义目录/启停卸载）、
+  `scripts/verify-about-activation.ps1`（关于页 / 激活页 / 激活成功）、
+  `scripts/verify-installer-ui.ps1`（安装向导截图）

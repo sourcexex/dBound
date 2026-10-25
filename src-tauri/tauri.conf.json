@@ -1,7 +1,7 @@
 {
   "$schema": "https://schema.tauri.app/config/2",
   "productName": "dBound",
-  "version": "0.1.0",
+  "version": "1.0.1",
   "identifier": "com.dbound.desktop",
   "build": {
     "beforeDevCommand": "pnpm dev",
@@ -74,7 +74,9 @@
   },
   "bundle": {
     "active": true,
-    "targets": ["nsis"],
+    "targets": [
+      "nsis"
+    ],
     "icon": [
       "icons/32x32.png",
       "icons/128x128.png",
@@ -85,12 +87,28 @@
     "windows": {
       "nsis": {
         "installMode": "currentUser",
-        "languages": ["SimpChinese", "English"]
+        "languages": [
+          "SimpChinese",
+          "English"
+        ],
+        "template": "nsis/installer.nsi",
+        "installerIcon": "icons/icon.ico",
+        "uninstallerIcon": "icons/icon.ico",
+        "startMenuFolder": "dBound"
       },
       "webviewInstallMode": {
         "type": "downloadBootstrapper",
         "silent": true
       }
-    }
+    },
+    "resources": {
+      "../resources/使用说明.txt": "文档/使用说明.txt",
+      "../resources/版本信息.txt": "文档/版本信息.txt",
+      "../resources/LICENSE.txt": "文档/LICENSE.txt"
+    },
+    "publisher": "Source X",
+    "copyright": "Copyright © 2026 Source X. All rights reserved.",
+    "shortDescription": "dBound · 桌面音量哨兵",
+    "longDescription": "dBound 是面向课堂与自习场景的桌面响度提示工具：实时估测麦克风响度、按级别提醒、全屏投屏、证据录制。"
   }
 }
