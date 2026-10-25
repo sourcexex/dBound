@@ -313,3 +313,12 @@ $env:VITE_DBOUND_SIM='72'; $env:VITE_DBOUND_SIM_MODE='forward'; pnpm tauri build
 - 便携版改为 zip：`dBound-<版本>-portable.zip`（exe + resources + 文档），不再提供单 exe 便携版。
 - 验收：静默安装后目录 1639 个文件（`resources/emoji` 1594、`resources/emoji-reward` 40、文档 3）；
   主界面与全屏奖励表情均从外置目录正常加载（截图见 `output/screenshots/ext-resources-main.png`）。
+
+### 品牌图标与全屏默认标题
+
+- 主窗标题栏、全屏左上角、设置页全屏预览统一改用应用图标（`src/assets/app-icon.png`，
+  由 `src-tauri/icons/128x128.png` 提供），替换原来的「黑底 + 琥珀圆点」占位标记
+- 全屏默认标题改为软件名称 `dBound`（原「802班分贝仪」），默认副标题改为空；
+  已有用户设置不会被覆盖，可在「设置 → 全屏 → 恢复默认」或重装后看到新默认
+- 单测同步更新（51 条通过）；截图：`output/screenshots/level-color-main.png`（标题栏）、
+  `output/screenshots/perf-emoji-fullscreen.png`（全屏左上角）

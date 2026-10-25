@@ -1,4 +1,5 @@
 import { EmojiText } from '../components/EmojiText'
+import appIcon from '../assets/app-icon.png'
 import { useEffect, useRef, useState } from 'react'
 import { X } from 'lucide-react'
 import { AuroraBackground } from '../components/AuroraBackground'
@@ -249,9 +250,12 @@ export function FullPage() {
 
       <header className="absolute inset-x-0 top-0 z-10 flex items-center justify-between px-9 py-7">
         <div className="flex min-w-0 items-start gap-2.5">
-          <span className="relative mt-[3px] grid h-5 w-5 shrink-0 place-items-center rounded-[7px] bg-ink">
-            <span className="h-[7px] w-[7px] rounded-full bg-[#F2C94C]" />
-          </span>
+          <img
+            src={appIcon}
+            alt="dBound"
+            draggable={false}
+            className="mt-[3px] h-5 w-5 shrink-0 rounded-[6px] object-contain"
+          />
           <div className="min-w-0">
             <h1
               className="truncate leading-tight font-semibold tracking-[0.01em]"

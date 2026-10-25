@@ -1,4 +1,5 @@
 import { Maximize2, Minus, PictureInPicture2, ScrollText, Settings, X } from 'lucide-react'
+import appIcon from '../assets/app-icon.png'
 import { closeWindow, minimizeWindow } from '../lib/tauri'
 
 function ControlButton({
@@ -50,9 +51,12 @@ export function TitleBar({
       className="flex h-12 shrink-0 items-center justify-between pl-5 pr-2"
     >
       <div data-tauri-drag-region className="flex items-center gap-2">
-        <span className="relative grid h-[18px] w-[18px] place-items-center rounded-[6px] bg-ink">
-          <span className="h-[6px] w-[6px] rounded-full bg-[#F2C94C]" />
-        </span>
+        <img
+          src={appIcon}
+          alt="dBound"
+          draggable={false}
+          className="h-[18px] w-[18px] rounded-[5px] object-contain"
+        />
         <span
           data-tauri-drag-region
           className="text-[13px] font-semibold tracking-[0.01em] text-ink"

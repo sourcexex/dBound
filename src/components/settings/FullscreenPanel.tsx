@@ -29,6 +29,7 @@ import {
   fontStackFor,
 } from '../../lib/titleFonts'
 import { EmojiText } from '../EmojiText'
+import appIcon from '../../assets/app-icon.png'
 import { useSettingsStore } from '../../stores/settings'
 import { SectionCard } from '../ui/SectionCard'
 import { Toggle } from '../ui/Toggle'
@@ -394,9 +395,12 @@ export function FullscreenPanel() {
       <SectionCard title="预览" hint="全屏左上角的实际效果">
         <div className="rounded-xl border border-black/[0.05] bg-paper px-4 py-3.5">
           <div className="flex items-start gap-2.5">
-            <span className="relative mt-[3px] grid h-5 w-5 shrink-0 place-items-center rounded-[7px] bg-ink">
-              <span className="h-[7px] w-[7px] rounded-full bg-[#F2C94C]" />
-            </span>
+            <img
+              src={appIcon}
+              alt="dBound"
+              draggable={false}
+              className="mt-[3px] h-5 w-5 shrink-0 rounded-[6px] object-contain"
+            />
             <div className="min-w-0">
               <div
                 className="truncate leading-tight font-semibold"

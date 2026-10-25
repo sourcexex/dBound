@@ -41,8 +41,8 @@ export const LEVEL_NOTE_SIZE_MIN = 9
 export const LEVEL_NOTE_SIZE_MAX = 24
 export const DEFAULT_LEVEL_NOTE_SIZE = 24
 
-export const DEFAULT_FULLSCREEN_TITLE = '802班分贝仪'
-export const DEFAULT_FULLSCREEN_SUBTITLE = '团结友爱，严肃活泼'
+export const DEFAULT_FULLSCREEN_TITLE = 'dBound'
+export const DEFAULT_FULLSCREEN_SUBTITLE = ''
 
 /** Readout animation: how often the digits refresh and how long they roll. */
 export const DEFAULT_READOUT_ANIMATION = true
