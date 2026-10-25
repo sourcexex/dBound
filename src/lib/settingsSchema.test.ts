@@ -28,9 +28,44 @@ describe('settings schema', () => {
   it('exposes the shipped presets as defaults', () => {
     const settings = defaultSettings()
     expect(settings.mode).toBe('forward')
+    expect(settings.theme).toBe('ocean')
     expect(settings.offset).toBe(DEFAULT_OFFSET)
-    expect(settings.levels.forward).toHaveLength(3)
-    expect(settings.levels.reverse.map((level) => level.threshold)).toEqual([60, 50, 40])
+    expect(settings.offset).toBe(90)
+    expect(settings.modeLabels).toEqual({ forward: '自习课模式', reverse: '早读模式' })
+    expect(settings.fullscreenTitle).toBe('802班分贝仪')
+    expect(settings.fullscreenSubtitle).toBe('团结友爱，严肃活泼')
+    expect(settings.fullscreenTitleFont).toBe('simhei')
+    expect(settings.fullscreenTitleSize).toBe(35)
+    expect(settings.fullscreenSubtitleSize).toBe(29)
+    expect(settings.statusFont).toBe('simhei')
+    expect(settings.statusSize).toBe(32)
+    expect(settings.statusColor).toBe('#16A34A')
+    expect(settings.idleNumberColor).toBe('#1ac756')
+    expect(settings.idleText).toEqual({
+      forward: '🥳🥳非常好！继续保持',
+      reverse: '🥳🥳非常好！继续保持',
+    })
+    expect(settings.levelNameSize).toBe(24)
+    expect(settings.levelNoteSize).toBe(24)
+    expect(settings.rollingMs).toBe(900)
+    expect(settings.readoutIntervalMs).toBe(1200)
+    expect(settings.recordingEnabled).toBe(false)
+    expect(settings.evidenceModes).toEqual({ forward: true, reverse: false })
+    expect(settings.snapshotEnabled).toBe(true)
+    expect(settings.levels.forward).toHaveLength(1)
+    expect(settings.levels.forward[0]).toMatchObject({
+      threshold: 43.5,
+      name: '注意😤😤😤',
+      note: '我看到你了哦',
+      color: '#EA580C',
+    })
+    expect(settings.levels.reverse).toHaveLength(1)
+    expect(settings.levels.reverse[0]).toMatchObject({
+      threshold: 65,
+      name: '加油啊！🤯🥳',
+      note: '早读不开口，气势少一半！',
+      color: '#EA580C',
+    })
   })
 
   it('drops persisted state from an unknown/older layout', () => {
@@ -94,7 +129,7 @@ describe('settings schema', () => {
     expect(level.note).toHaveLength(30)
     expect(level.color).toMatch(/^#[0-9a-f]{6}$/i)
     // reverse had no usable data → defaults
-    expect(sanitized.levels.reverse).toHaveLength(3)
+    expect(sanitized.levels.reverse).toHaveLength(1)
   })
 
   it('caps the number of levels and guarantees at least one', () => {
@@ -107,7 +142,7 @@ describe('settings schema', () => {
       enabled: true,
     }))
     expect(sanitizeSettings({ modeLabels: {}, levels: { forward: many } }).levels.forward).toHaveLength(8)
-    expect(sanitizeSettings({ modeLabels: {}, levels: { forward: [] } }).levels.forward).toHaveLength(3)
+    expect(sanitizeSettings({ modeLabels: {}, levels: { forward: [] } }).levels.forward).toHaveLength(1)
   })
 
   it('keeps custom mode labels within limits and falls back when empty', () => {
@@ -148,7 +183,7 @@ describe('settings schema', () => {
 
   it('sanitizes the theme and dark mode', () => {
     const defaults = defaultSettings()
-    expect(defaults.theme).toBe('aurora')
+    expect(defaults.theme).toBe('ocean')
     expect(defaults.darkMode).toBe(false)
 
     const custom = sanitizeSettings({
@@ -164,7 +199,7 @@ describe('settings schema', () => {
       theme: 'neon',
       darkMode: 'yes',
     })
-    expect(broken.theme).toBe('aurora')
+    expect(broken.theme).toBe('ocean')
     expect(broken.darkMode).toBe(false)
   })
 
@@ -211,18 +246,18 @@ describe('settings schema', () => {
   it('sanitizes the readout animation settings', () => {
     const defaults = defaultSettings()
     expect(defaults.readoutAnimation).toBe(true)
-    expect(defaults.rollingMs).toBe(600)
-    expect(defaults.readoutIntervalMs).toBe(1000)
+    expect(defaults.rollingMs).toBe(900)
+    expect(defaults.readoutIntervalMs).toBe(1200)
 
     const custom = sanitizeSettings({
       modeLabels: { forward: '正向', reverse: '反向' },
       readoutAnimation: false,
-      rollingMs: 900,
-      readoutIntervalMs: 1200,
+      rollingMs: 700,
+      readoutIntervalMs: 1000,
     })
     expect(custom.readoutAnimation).toBe(false)
-    expect(custom.rollingMs).toBe(900)
-    expect(custom.readoutIntervalMs).toBe(1200)
+    expect(custom.rollingMs).toBe(700)
+    expect(custom.readoutIntervalMs).toBe(1000)
 
     const clamped = sanitizeSettings({
       modeLabels: { forward: '正向', reverse: '反向' },
@@ -253,7 +288,7 @@ describe('settings schema', () => {
 
   it('sanitizes the evidence recording settings', () => {
     const defaults = defaultSettings()
-    expect(defaults.recordingEnabled).toBe(true)
+    expect(defaults.recordingEnabled).toBe(false)
     expect(defaults.recordingDir).toBe('')
     expect(defaults.prerollSeconds).toBe(5)
     expect(defaults.postrollSeconds).toBe(10)
@@ -281,7 +316,7 @@ describe('settings schema', () => {
 
   it('sanitizes camera snapshot settings', () => {
     const defaults = defaultSettings()
-    expect(defaults.snapshotEnabled).toBe(false)
+    expect(defaults.snapshotEnabled).toBe(true)
     expect(defaults.cameraId).toBe('default')
     expect(defaults.snapshotSize).toBe('1080p')
 
@@ -299,16 +334,19 @@ describe('settings schema', () => {
       modeLabels: { forward: '正向', reverse: '反向' },
       snapshotSize: '4k',
     })
-    expect(broken.snapshotEnabled).toBe(false)
+    expect(broken.snapshotEnabled).toBe(true)
     expect(broken.snapshotSize).toBe('1080p')
   })
 
   it('sanitizes idle colours, idle copy and per-mode evidence', () => {
     const defaults = defaultSettings()
-    expect(defaults.idleNumberColor).toBe('')
-    expect(defaults.statusColor).toBe('')
-    expect(defaults.idleText).toEqual({ forward: '安静', reverse: '音量正常' })
-    expect(defaults.evidenceModes).toEqual({ forward: true, reverse: true })
+    expect(defaults.idleNumberColor).toBe('#1ac756')
+    expect(defaults.statusColor).toBe('#16A34A')
+    expect(defaults.idleText).toEqual({
+      forward: '🥳🥳非常好！继续保持',
+      reverse: '🥳🥳非常好！继续保持',
+    })
+    expect(defaults.evidenceModes).toEqual({ forward: true, reverse: false })
 
     const custom = sanitizeSettings({
       modeLabels: { forward: '正向', reverse: '反向' },
@@ -332,16 +370,16 @@ describe('settings schema', () => {
     })
     expect(broken.idleNumberColor).toBe('')
     expect(broken.statusColor).toBe('')
-    expect(broken.idleText.forward).toBe('安静')
+    expect(broken.idleText.forward).toBe('🥳🥳非常好！继续保持')
     expect(broken.idleText.reverse.length).toBe(IDLE_TEXT_MAX)
     expect(broken.evidenceModes.forward).toBe(false)
-    expect(broken.evidenceModes.reverse).toBe(true)
+    expect(broken.evidenceModes.reverse).toBe(false)
   })
 
   it('sanitizes level name and note sizes', () => {
     const defaults = defaultSettings()
-    expect(defaults.levelNameSize).toBe(13)
-    expect(defaults.levelNoteSize).toBe(12)
+    expect(defaults.levelNameSize).toBe(24)
+    expect(defaults.levelNoteSize).toBe(24)
 
     const custom = sanitizeSettings({
       modeLabels: { forward: '正向', reverse: '反向' },
@@ -362,8 +400,8 @@ describe('settings schema', () => {
 
   it('sanitizes the emoji reward rules', () => {
     const defaults = defaultSettings().emoji
-    expect(defaults.reverse).toEqual({ enabled: true, threshold: 70, holdSeconds: 5, initial: 3 })
-    expect(defaults.forward).toEqual({ enabled: true, threshold: 45, holdSeconds: 5, initial: 3 })
+    expect(defaults.reverse).toEqual({ enabled: true, threshold: 70, holdSeconds: 30, initial: 3 })
+    expect(defaults.forward).toEqual({ enabled: true, threshold: 50, holdSeconds: 30, initial: 3 })
 
     const custom = sanitizeSettings({
       modeLabels: { forward: '正向', reverse: '反向' },

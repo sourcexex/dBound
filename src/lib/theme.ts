@@ -1,6 +1,6 @@
 export type ThemeId = 'aurora' | 'ocean'
 
-export const DEFAULT_THEME: ThemeId = 'aurora'
+export const DEFAULT_THEME: ThemeId = 'ocean'
 export const DEFAULT_DARK_MODE = false
 
 export function isThemeId(value: unknown): value is ThemeId {

@@ -22,34 +22,34 @@ export const FULLSCREEN_TITLE_MAX = 20
 export const FULLSCREEN_SUBTITLE_MAX = 36
 
 export const DEFAULT_MODE_LABELS: Record<Mode, string> = {
-  forward: '正向',
-  reverse: '反向',
+  forward: '自习课模式',
+  reverse: '早读模式',
 }
 
 /** Copy shown when no level is hit. */
 export const IDLE_TEXT_MAX = 12
 export const DEFAULT_IDLE_TEXT: Record<Mode, string> = {
-  forward: '安静',
-  reverse: '音量正常',
+  forward: '🥳🥳非常好！继续保持',
+  reverse: '🥳🥳非常好！继续保持',
 }
 
 /** Level name / note typography in the chip and fullscreen status line. */
 export const LEVEL_NAME_SIZE_MIN = 10
 export const LEVEL_NAME_SIZE_MAX = 28
-export const DEFAULT_LEVEL_NAME_SIZE = 13
+export const DEFAULT_LEVEL_NAME_SIZE = 24
 export const LEVEL_NOTE_SIZE_MIN = 9
 export const LEVEL_NOTE_SIZE_MAX = 24
-export const DEFAULT_LEVEL_NOTE_SIZE = 12
+export const DEFAULT_LEVEL_NOTE_SIZE = 24
 
-export const DEFAULT_FULLSCREEN_TITLE = 'dBound'
-export const DEFAULT_FULLSCREEN_SUBTITLE = '实时响度估测'
+export const DEFAULT_FULLSCREEN_TITLE = '802班分贝仪'
+export const DEFAULT_FULLSCREEN_SUBTITLE = '团结友爱，严肃活泼'
 
 /** Readout animation: how often the digits refresh and how long they roll. */
 export const DEFAULT_READOUT_ANIMATION = true
-export const DEFAULT_ROLLING_MS = 600
+export const DEFAULT_ROLLING_MS = 900
 export const ROLLING_MS_MIN = 200
 export const ROLLING_MS_MAX = 900
-export const DEFAULT_READOUT_INTERVAL_MS = 1000
+export const DEFAULT_READOUT_INTERVAL_MS = 1200
 export const READOUT_INTERVAL_MIN = 200
 export const READOUT_INTERVAL_MAX = 1200
 
@@ -78,12 +78,12 @@ export const EMOJI_INITIAL_MIN = 0
 export const EMOJI_INITIAL_MAX = 40
 
 export const DEFAULT_EMOJI_SETTINGS: EmojiSettings = {
-  forward: { enabled: true, threshold: 45, holdSeconds: 5, initial: 3 },
-  reverse: { enabled: true, threshold: 70, holdSeconds: 5, initial: 3 },
+  forward: { enabled: true, threshold: 50, holdSeconds: 30, initial: 3 },
+  reverse: { enabled: true, threshold: 70, holdSeconds: 30, initial: 3 },
 }
 
 /** Camera snapshot taken at the trigger moment. */
-export const DEFAULT_SNAPSHOT_ENABLED = false
+export const DEFAULT_SNAPSHOT_ENABLED = true
 export const DEFAULT_CAMERA_ID = 'default'
 export const SNAPSHOT_SIZES = {
   '720p': { width: 1280, height: 720 },
@@ -94,7 +94,7 @@ export type SnapshotSize = keyof typeof SNAPSHOT_SIZES
 export const DEFAULT_SNAPSHOT_SIZE: SnapshotSize = '1080p'
 
 /** Evidence recording (time machine). */
-export const DEFAULT_RECORDING_ENABLED = true
+export const DEFAULT_RECORDING_ENABLED = false
 export const DEFAULT_PREROLL_SECONDS = 5
 export const DEFAULT_POSTROLL_SECONDS = 10
 export const PREROLL_MIN = 1
@@ -103,10 +103,16 @@ export const POSTROLL_MIN = 5
 export const POSTROLL_MAX = 30
 
 /** Fullscreen status line ("音量正常" / level name) typography. */
-export const DEFAULT_STATUS_FONT = 'system'
+export const DEFAULT_STATUS_FONT = 'simhei'
 export const STATUS_SIZE_MIN = 10
 export const STATUS_SIZE_MAX = 32
-export const DEFAULT_STATUS_SIZE = 15
+export const DEFAULT_STATUS_SIZE = 32
+export const DEFAULT_STATUS_COLOR = '#16A34A'
+export const DEFAULT_IDLE_NUMBER_COLOR = '#1ac756'
+export const DEFAULT_EVIDENCE_MODES: Record<Mode, boolean> = {
+  forward: true,
+  reverse: false,
+}
 
 export interface PersistedSettings {
   mode: Mode
@@ -160,8 +166,8 @@ export function defaultSettings(): PersistedSettings {
     theme: DEFAULT_THEME,
     darkMode: DEFAULT_DARK_MODE,
     modeLabels: { ...DEFAULT_MODE_LABELS },
-    idleNumberColor: '',
-    statusColor: '',
+    idleNumberColor: DEFAULT_IDLE_NUMBER_COLOR,
+    statusColor: DEFAULT_STATUS_COLOR,
     idleText: { ...DEFAULT_IDLE_TEXT },
     levelNameSize: DEFAULT_LEVEL_NAME_SIZE,
     levelNoteSize: DEFAULT_LEVEL_NOTE_SIZE,
@@ -175,7 +181,7 @@ export function defaultSettings(): PersistedSettings {
     statusFont: DEFAULT_STATUS_FONT,
     statusSize: DEFAULT_STATUS_SIZE,
     recordingEnabled: DEFAULT_RECORDING_ENABLED,
-    evidenceModes: { forward: true, reverse: true },
+    evidenceModes: { ...DEFAULT_EVIDENCE_MODES },
     recordingDir: '',
     prerollSeconds: DEFAULT_PREROLL_SECONDS,
     postrollSeconds: DEFAULT_POSTROLL_SECONDS,
@@ -260,7 +266,10 @@ function sanitizeNumber(value: unknown, fallback: number, min: number, max: numb
   return Math.min(max, Math.max(min, Math.round(parsed)))
 }
 
-function sanitizeColorOrEmpty(value: unknown): string {
+function sanitizeColor(value: unknown, fallback: string): string {
+  // Missing values inherit the shipped default; an explicit empty string means
+  // "automatic", so later edits to the app's text colour are still picked up.
+  if (value === undefined) return fallback
   return typeof value === 'string' && /^#[0-9a-f]{6}$/i.test(value) ? value : ''
 }
 
@@ -318,8 +327,8 @@ export function sanitizeSettings(value: unknown): PersistedSettings {
     theme: isThemeId(value.theme) ? value.theme : DEFAULT_THEME,
     darkMode: value.darkMode === true,
     modeLabels: sanitizeModeLabels(value.modeLabels),
-    idleNumberColor: sanitizeColorOrEmpty(value.idleNumberColor),
-    statusColor: sanitizeColorOrEmpty(value.statusColor),
+    idleNumberColor: sanitizeColor(value.idleNumberColor, DEFAULT_IDLE_NUMBER_COLOR),
+    statusColor: sanitizeColor(value.statusColor, DEFAULT_STATUS_COLOR),
     idleText: sanitizeIdleText(value.idleText),
     levelNameSize: sanitizeNumber(
       value.levelNameSize,
@@ -372,15 +381,27 @@ export function sanitizeSettings(value: unknown): PersistedSettings {
         : DEFAULT_SUBTITLE_COLOR,
     statusFont: isKnownTitleFont(value.statusFont) ? value.statusFont : DEFAULT_STATUS_FONT,
     statusSize: sanitizeNumber(value.statusSize, DEFAULT_STATUS_SIZE, STATUS_SIZE_MIN, STATUS_SIZE_MAX),
-    recordingEnabled: value.recordingEnabled !== false,
+    recordingEnabled:
+      typeof value.recordingEnabled === 'boolean'
+        ? value.recordingEnabled
+        : DEFAULT_RECORDING_ENABLED,
     evidenceModes: {
-      forward: (isRecord(value.evidenceModes) ? value.evidenceModes.forward : undefined) !== false,
-      reverse: (isRecord(value.evidenceModes) ? value.evidenceModes.reverse : undefined) !== false,
+      forward:
+        typeof (value.evidenceModes as Record<string, unknown> | undefined)?.forward === 'boolean'
+          ? ((value.evidenceModes as Record<string, unknown>).forward as boolean)
+          : DEFAULT_EVIDENCE_MODES.forward,
+      reverse:
+        typeof (value.evidenceModes as Record<string, unknown> | undefined)?.reverse === 'boolean'
+          ? ((value.evidenceModes as Record<string, unknown>).reverse as boolean)
+          : DEFAULT_EVIDENCE_MODES.reverse,
     },
     recordingDir: typeof value.recordingDir === 'string' ? value.recordingDir.trim() : '',
     prerollSeconds: sanitizeNumber(value.prerollSeconds, DEFAULT_PREROLL_SECONDS, PREROLL_MIN, PREROLL_MAX),
     postrollSeconds: sanitizeNumber(value.postrollSeconds, DEFAULT_POSTROLL_SECONDS, POSTROLL_MIN, POSTROLL_MAX),
-    snapshotEnabled: value.snapshotEnabled === true,
+    snapshotEnabled:
+      typeof value.snapshotEnabled === 'boolean'
+        ? value.snapshotEnabled
+        : DEFAULT_SNAPSHOT_ENABLED,
     cameraId: typeof value.cameraId === 'string' ? value.cameraId.trim() : DEFAULT_CAMERA_ID,
     snapshotSize:
       typeof value.snapshotSize === 'string' && value.snapshotSize in SNAPSHOT_SIZES

@@ -1,9 +1,17 @@
 import { describe, expect, it } from 'vitest'
 import { AlertEngine } from './alertEngine'
-import { defaultLevels } from './presets'
+import type { Level } from './types'
 
-const forward = defaultLevels('forward')
-const reverse = defaultLevels('reverse')
+const forward: Level[] = [
+  { id: 'f-1', threshold: 65, name: '注意', note: '', color: '#2563EB', enabled: true },
+  { id: 'f-2', threshold: 75, name: '警告', note: '', color: '#D97706', enabled: true },
+  { id: 'f-3', threshold: 85, name: '危险', note: '', color: '#DC2626', enabled: true },
+]
+const reverse: Level[] = [
+  { id: 'r-1', threshold: 60, name: '偏小', note: '', color: '#2563EB', enabled: true },
+  { id: 'r-2', threshold: 50, name: '过小', note: '', color: '#D97706', enabled: true },
+  { id: 'r-3', threshold: 40, name: '无声', note: '', color: '#DC2626', enabled: true },
+]
 
 const STEP = 33
 

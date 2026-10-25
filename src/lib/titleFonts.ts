@@ -16,15 +16,15 @@ export const TITLE_FONTS: TitleFontOption[] = [
   { id: 'mono', label: '等宽', stack: 'Consolas, "Cascadia Mono", "Courier New", monospace' },
 ]
 
-export const DEFAULT_TITLE_FONT = 'system'
+export const DEFAULT_TITLE_FONT = 'simhei'
 export const TITLE_SIZE_MIN = 14
 export const TITLE_SIZE_MAX = 56
-export const DEFAULT_TITLE_SIZE = 20
+export const DEFAULT_TITLE_SIZE = 35
 export const DEFAULT_TITLE_COLOR = '#17171A'
 
 export const SUBTITLE_SIZE_MIN = 10
 export const SUBTITLE_SIZE_MAX = 40
-export const DEFAULT_SUBTITLE_SIZE = 13
+export const DEFAULT_SUBTITLE_SIZE = 29
 export const DEFAULT_SUBTITLE_COLOR = '#6B6B72'
 
 export function fontStackFor(id: string): string {

@@ -15,8 +15,16 @@ import {
 import { defaultLevels } from './presets'
 import type { Level, Mode } from './types'
 
-const forward = defaultLevels('forward')
-const reverse = defaultLevels('reverse')
+const forward: Level[] = [
+  { id: 'f-1', threshold: 65, name: '注意', note: '', color: '#2563EB', enabled: true },
+  { id: 'f-2', threshold: 75, name: '警告', note: '', color: '#D97706', enabled: true },
+  { id: 'f-3', threshold: 85, name: '危险', note: '', color: '#DC2626', enabled: true },
+]
+const reverse: Level[] = [
+  { id: 'r-1', threshold: 60, name: '偏小', note: '', color: '#2563EB', enabled: true },
+  { id: 'r-2', threshold: 50, name: '过小', note: '', color: '#D97706', enabled: true },
+  { id: 'r-3', threshold: 40, name: '无声', note: '', color: '#DC2626', enabled: true },
+]
 
 function level(threshold: number, enabled = true): Level {
   return { id: `l-${threshold}`, threshold, name: String(threshold), note: '', color: '#000000', enabled }
@@ -28,10 +36,10 @@ describe('db conversion', () => {
     expect(rmsToDb(1, DEFAULT_OFFSET)).toBeCloseTo(DEFAULT_OFFSET, 5)
   })
 
-  it('reads a quiet room around 30 dB with the default offset', () => {
-    // rms 0.0018 ≈ -55 dBFS
-    expect(rmsToDb(0.0018, DEFAULT_OFFSET)).toBeGreaterThan(39)
-    expect(rmsToDb(0.0018, DEFAULT_OFFSET)).toBeLessThan(41)
+  it('reads a quiet room near the calibrated floor', () => {
+    // rms 0.0018 ≈ -55 dBFS; the shipped offset maps it to ~35 dB
+    expect(rmsToDb(0.0018, DEFAULT_OFFSET)).toBeGreaterThan(34)
+    expect(rmsToDb(0.0018, DEFAULT_OFFSET)).toBeLessThan(36)
   })
 
   it('clamps into the display range and never returns -Infinity', () => {

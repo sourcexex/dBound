@@ -7,7 +7,7 @@ import type { Level, Mode } from './types'
  * This is a *guess* for a typical laptop mic; the calibration flow refines it and the
  * UI must always keep the "≈" prefix so nobody mistakes it for a calibrated SPL meter.
  */
-export const DEFAULT_OFFSET = 95
+export const DEFAULT_OFFSET = 90
 
 export const DB_MIN = 0
 export const DB_MAX = 120
