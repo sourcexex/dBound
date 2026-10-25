@@ -27,15 +27,15 @@ export function placeholderNumber(dark: boolean): string {
 export const THEME_OPTIONS: Array<{ id: ThemeId; label: string; hint: string; preview: string }> = [
   {
     id: 'aurora',
-    label: '彩霞',
-    hint: '靛蓝 · 蜜橙 · 薄荷 · 薰衣草',
+    label: '极光',
+    hint: '靛蓝 · 蜜橙 · 浅绿 · 薰衣草',
     preview:
       'linear-gradient(135deg, #A5B4FC 0%, #FDBA74 34%, #86EFAC 68%, #C4B5FD 100%)',
   },
   {
     id: 'ocean',
-    label: '青碧',
-    hint: '湖蓝 · 青绿 · 薄荷',
+    label: '薄荷',
+    hint: '湖蓝 · 青绿 · 薄荷绿',
     preview:
       'linear-gradient(135deg, #93C5FD 0%, #5EEAD4 38%, #6EE7B7 70%, #A7F3D0 100%)',
   },
